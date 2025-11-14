@@ -27,31 +27,25 @@
 
 ```mermaid
 gantt
-    title CloudChat项目进度甘特图
+    title 项目进度甘特图
     dateFormat  YYYY/MM/DD
     axisFormat %m/%d
     axisScale day
 
-    section 准备阶段
-    确定选题       :milestone, crit, done, des1, 2025/11/14, 1d
-    需求调研       :done, des2, after des1, 1d
-    编写文档       :done, des3, after des2, 1d
-    
-    section 设计阶段
-    设计前端       :active, des4, after des3, 2d
-    设计后端       :active, des5, after des3, 2d
-    架构数据库     :active, des6, after des3, 2d
-    搭建并测试数据库 :active, des7, after des6, 1d
-    
-    section 核心开发阶段
-    用户模块开发   :des8, after des7, 4d
-    前端界面开发   :des9, after des4, 4d
-    即时通讯功能开发 :des10, after des8, 4d
-    文件传输功能开发 :des11, after des10, 4d
-    视频通话功能开发 :des12, after des10, 4d
-    
-    section 测试部署阶段
-    系统联调       :des13, after des9, after des12, 1d
-    压力测试       :des14, after des13, 1d
-    修复与优化     :des15, after des14, 1d
-    部署           :milestone, des16, after des15, 1d
+    section 项目阶段
+    确定选题       :done, des1, 2025/11/14, 1d
+    需求调研       :done, des2, 2025/11/15, 1d
+    编写文档       :done, des3, 2025/11/16, 1d
+    设计前端       :done, des4, 2025/11/17, 2d
+    设计后端       :done, des5, 2025/11/19, 2d
+    架构数据库     :done, des6, 2025/11/21, 2d
+    搭建并测试数据库 :done, des7, 2025/11/23, 1d
+    用户模块开发   :done, des8, 2025/11/24, 4d
+    前端界面开发   :done, des9, 2025/11/28, 4d
+    即时通讯功能开发 :done, des10, 2025/12/01, 4d
+    文件传输功能开发 :done, des11, 2025/12/05, 4d
+    视频通话功能开发 :done, des12, 2025/12/09, 4d
+    系统联调       :done, des13, 2025/12/13, 1d
+    压力测试       :done, des14, 2025/12/14, 1d
+    修复与优化     :done, des15, 2025/12/15, 1d
+    部署           :done, des16, 2025/12/16, 1d
