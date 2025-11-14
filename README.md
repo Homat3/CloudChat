@@ -24,12 +24,11 @@
 | 部署 | 2025/12/16 | 1 | 2025/12/16 |
 
 ## 可视化甘特图
-
-```mariadb
+```mermaid
 gantt
-title 项目进度甘特图
-dateFormat  YYYY/MM/DD
-axisFormat %m/%d
+    title 项目进度甘特图
+    dateFormat  YYYY/MM/DD
+    axisFormat %m/%d
 
     section 项目阶段
     确定选题       :done, des1, 2025/11/14, 1d
@@ -40,4 +39,12 @@ axisFormat %m/%d
     架构数据库     :done, des6, 2025/11/21, 2d
     搭建并测试数据库 :done, des7, 2025/11/23, 1d
     用户模块开发   :done, des8, 2025/11/24, 4d
-    前端界面
+    前端界面开发   :done, des9, 2025/11/28, 4d
+    即时通讯功能开发 :done, des10, 2025/12/01, 4d
+    文件传输功能开发 :done, des11, 2025/12/05, 4d
+    视频通话功能开发 :done, des12, 2025/12/09, 4d
+    系统联调       :done, des13, 2025/12/13, 1d
+    压力测试       :done, des14, 2025/12/14, 1d
+    修复与优化     :done, des15, 2025/12/15, 1d
+    部署           :done, des16, 2025/12/16, 1d
+```
