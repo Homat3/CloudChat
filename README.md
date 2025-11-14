@@ -25,6 +25,7 @@
 
 ## 可视化甘特图
 
+```mariadb
 gantt
 title 项目进度甘特图
 dateFormat  YYYY/MM/DD
