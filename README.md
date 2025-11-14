@@ -1,48 +1,57 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+# 项目进度甘特图
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+本项目从2025年11月14日开始，预计于2025年12月16日完成所有任务。
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## 进度表
 
-### Build and Run Android Application
+| 任务 | 开始日期 | 持续天数 | 结束日期 |
+|------|----------|----------|----------|
+| 确定选题 | 2025/11/14 | 1 | 2025/11/14 |
+| 需求调研 | 2025/11/15 | 1 | 2025/11/15 |
+| 编写文档 | 2025/11/16 | 1 | 2025/11/16 |
+| 设计前端 | 2025/11/17 | 2 | 2025/11/18 |
+| 设计后端 | 2025/11/19 | 2 | 2025/11/20 |
+| 架构数据库 | 2025/11/21 | 2 | 2025/11/22 |
+| 搭建并测试数据库 | 2025/11/23 | 1 | 2025/11/23 |
+| 用户模块开发 | 2025/11/24 | 4 | 2025/11/27 |
+| 前端界面开发 | 2025/11/28 | 4 | 2025/11/30 |
+| 即时通讯功能开发 | 2025/12/01 | 4 | 2025/12/04 |
+| 文件传输功能开发 | 2025/12/05 | 4 | 2025/12/08 |
+| 视频通话功能开发 | 2025/12/09 | 4 | 2025/12/12 |
+| 系统联调 | 2025/12/13 | 1 | 2025/12/13 |
+| 压力测试 | 2025/12/14 | 1 | 2025/12/14 |
+| 修复与优化 | 2025/12/15 | 1 | 2025/12/15 |
+| 部署 | 2025/12/16 | 1 | 2025/12/16 |
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+## 可视化甘特图
 
-### Build and Run Desktop (JVM) Application
+```mermaid
+gantt
+    title CloudChat项目进度甘特图
+    dateFormat  YYYY/MM/DD
+    axisFormat %m/%d
+    axisScale day
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
-
-### Build and Run iOS Application
-
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
-
----
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+    section 准备阶段
+    确定选题       :milestone, crit, done, des1, 2025/11/14, 1d
+    需求调研       :done, des2, after des1, 1d
+    编写文档       :done, des3, after des2, 1d
+    
+    section 设计阶段
+    设计前端       :active, des4, after des3, 2d
+    设计后端       :active, des5, after des3, 2d
+    架构数据库     :active, des6, after des3, 2d
+    搭建并测试数据库 :active, des7, after des6, 1d
+    
+    section 核心开发阶段
+    用户模块开发   :des8, after des7, 4d
+    前端界面开发   :des9, after des4, 4d
+    即时通讯功能开发 :des10, after des8, 4d
+    文件传输功能开发 :des11, after des10, 4d
+    视频通话功能开发 :des12, after des10, 4d
+    
+    section 测试部署阶段
+    系统联调       :des13, after des9, after des12, 1d
+    压力测试       :des14, after des13, 1d
+    修复与优化     :des15, after des14, 1d
+    部署           :milestone, des16, after des15, 1d
