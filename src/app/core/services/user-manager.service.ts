@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../models/user';
+import { SocketService } from './socket.service';
+import { MessageType, ProtocolMessage } from '../protocol/message-protocol';
 
 @Injectable({
     providedIn: 'root'
@@ -9,7 +11,7 @@ export class UserManagerService {
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
-    constructor() {
+    constructor(private socketService: SocketService) {
         const token = localStorage.getItem('user_token');
         if (token) {
             // 恢复用户状态，这里简化处理，直接使用mock用户
@@ -17,6 +19,20 @@ export class UserManagerService {
             this.testUser.token = token;
             this.currentUserSubject.next(this.testUser);
         }
+
+        this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+            switch (message.type) {
+                case MessageType.LOGIN_SUCCESS:
+                    this.login(message.payload);
+                    break;
+                case MessageType.REGISTER_SUCCESS:
+                    this.register(message.payload);
+                    break;
+                case MessageType.PROFILE_UPDATED:
+                    this.updateProfile(message.payload);
+                    break;
+            }
+        });
     }
 
     private testUser: User = {
@@ -29,30 +45,31 @@ export class UserManagerService {
 
     // Request functions (placeholders)
     requireLogin(username: string, password: string): void {
-        // 模拟服务器请求延迟
-        setTimeout(() => {
-            if (username === 'TestUser' && password === '123456') {
-                this.login(this.testUser);
-            } else {
-                console.error('登录失败：用户名或密码错误');
-                // 实际项目中这里应该触发一个错误回调或Subject
-            }
-        }, 1000);
+        this.socketService.sendMessage({
+            type: MessageType.LOGIN,
+            payload: { username, password }
+        });
     }
 
     requireRegister(username: string, password: string, email: string): void {
-        // TODO: 向服务器发出注册请求
-        // TODO: 回调register
-    }
-
-    requireUpdateProfile(user: Partial<User>): void {
-        // TODO: 向服务器发出更新个人信息请求
-        // TODO: 回调updateProfile
+        this.socketService.sendMessage({
+            type: MessageType.REGISTER,
+            payload: { username, password, email }
+        });
     }
 
     requireLogout(): void {
-        // TODO: 向服务器发出登出请求
-        // TODO: 回调logout
+        this.socketService.sendMessage({
+            type: MessageType.LOGOUT,
+            payload: null
+        });
+    }
+
+    requireUpdateProfile(user: Partial<User>): void {
+        this.socketService.sendMessage({
+            type: MessageType.UPDATE_PROFILE,
+            payload: user
+        });
     }
 
     // Callback functions (local state updates)
