@@ -1,0 +1,43 @@
+<div class="contact-list-container">
+  <!-- 顶部搜索区 -->
+  <div class="search-section">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="搜索联系人 / 聊天记录">
+    <div class="action-buttons">
+      <button class="icon-button">
+        <i class="plus-icon"></i>
+      </button>
+      <button class="icon-button">
+        <i class="settings-icon"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 联系人列表 -->
+  <div class="contacts-list">
+    @for (contact of contacts; track contact.id){
+      <div
+        class="contact-item"
+        [class.selected]="contact.id === selectedContactId"
+        (click)="selectContact(contact)">
+        <div class="avatar-container">
+          <div class="avatar" [class.online]="contact.isOnline"></div>
+        </div>
+        <div class="contact-info">
+          <div class="contact-name">{{ contact.name }}</div>
+          <div class="last-message">{{ contact.lastMessage }}</div>
+        </div>
+        <div class="contact-meta">
+          <div class="timestamp">{{ contact.timestamp }}</div>
+          @if (contact.unreadCount > 0) {
+            <div class="unread-count">
+              {{ contact.unreadCount > 99 ? '99+' : contact.unreadCount }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

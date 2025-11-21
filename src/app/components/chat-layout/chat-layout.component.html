@@ -1,0 +1,54 @@
+<!-- 顶部导航栏 -->
+@if (isMobile) {
+  <div class="top-navigation">
+    <button class="nav-button" [class.active]="activeView === ActiveView.Contacts" (click)="setActiveView(ActiveView.Contacts)">
+      联系人
+    </button>
+    <button class="nav-button" [class.active]="activeView === ActiveView.Chat" (click)="setActiveView(ActiveView.Chat)" [disabled]="!selectedContact">
+      聊天
+    </button>
+    <button class="nav-button" [class.active]="activeView === ActiveView.Settings" (click)="setActiveView(ActiveView.Settings)" [disabled]="!selectedContact">
+      设置
+    </button>
+  </div>
+}
+
+<div class="chat-layout">
+  @if (isMobile){
+    @if (ActiveView.Contacts === activeView){
+      <div class="contacts-panel">
+        <app-contact-list (contactSelected)="onContactSelected($event)"></app-contact-list>
+      </div>
+    }
+    @if (selectedContact) {
+      @if (ActiveView.Settings === activeView){
+        <div class="sidebar-panel">
+          <app-sidebar style="height: 100%" (settingChanged)="onSettingChanged($event)"></app-sidebar>
+        </div>
+      } @else if (ActiveView.Chat === activeView) {
+        <div class="chat-main">
+          <app-chat-area style="height: 100%" [selectedContact]="selectedContact"></app-chat-area>
+        </div>
+      }
+    }
+  }
+  @else {
+    <!-- 左侧联系人栏 -->
+    <div class="contacts-panel">
+      <app-contact-list (contactSelected)="onContactSelected($event)"></app-contact-list>
+    </div>
+
+    <!-- 中间聊天主区域 -->
+    <div class="chat-main">
+      <app-chat-area style="height: 100%" [selectedContact]="selectedContact"></app-chat-area>
+    </div>
+
+    <!-- 右侧功能侧边栏 -->
+    @if (selectedContact) {
+      <div class="sidebar-panel">
+        <app-sidebar style="height: 100%"
+                     (settingChanged)="onSettingChanged($event)"></app-sidebar>
+      </div>
+    }
+  }
+</div>
