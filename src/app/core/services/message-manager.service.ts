@@ -45,6 +45,16 @@ export class MessageManagerService {
     return message;
   }
 
+  requireLoadMessage(contactId: number): void {
+    // TODO: 向服务器发出加载消息请求
+    // TODO: 回调updateMessage
+  }
+
+  requireClearMessages(contactId: number): void {
+    // TODO: 向服务器发出清除消息请求
+    // TODO: 回调clearMessages
+  }
+
   clearMessages(contactId: number): void {
     this.messagesByContact.set(contactId, []);
   }
@@ -54,7 +64,12 @@ export class MessageManagerService {
     return messages.filter(m => m.status === 'sent' && m.sender === 'other').length;
   }
 
+  updateMessages(contactId: number, messages: Message[]){
+    this.messagesByContact.set(contactId, messages);
+  }
+
   private initializeSampleMessages(): void {
+    // TODO: requireLoadMessage
     this.messagesByContact.set(1, [
       new MessageImpl(1, 'other', '你好，今天怎么样？', '10:25', 'sent', 'text'),
       new MessageImpl(2, 'me', '我很好，谢谢！你呢？', '10:26', 'sent', 'text'),

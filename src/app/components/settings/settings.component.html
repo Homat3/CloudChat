@@ -1,0 +1,31 @@
+<div class="settings-container">
+    <div class="settings-header">
+        <a routerLink="/" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+        <h1>设置</h1>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <h2>账号</h2>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">退出登录</span>
+                    <span class="setting-desc">清除本地缓存并退出当前账号</span>
+                </div>
+                <button class="logout-btn" (click)="onLogout()">退出登录</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>关于</h2>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">版本</span>
+                    <span class="setting-desc">v1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

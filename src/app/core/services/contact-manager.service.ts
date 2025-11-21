@@ -51,14 +51,23 @@ export class ContactManagerService {
     return this.contacts;
   }
 
+  requireLoadContacts(): void {
+    // TODO: 向服务器发出从数据库或API加载联系人数据请求
+    // TODO: 回调updateContact
+  }
+
   getContactById(id: number): Contact | undefined {
     return this.contacts.find(contact => contact.id === id);
   }
 
-  addContact(contact: Contact): void {
-    const maxId = this.contacts.reduce((max, c) => c.id > max ? c.id : max, 0);
-    contact.id = maxId + 1;
-    this.contacts.push(contact);
+  requireAddContact(contact: Contact): void {
+    // TODO: 向服务器发出添加联系人消息请求
+    // TODO: 回调addContact
+  }
+
+  requireDeleteContact(id: number): void {
+    // TODO: 向服务器发出删除联系人消息请求
+    // TODO: 回调removeContact
   }
 
   updateContact(updatedContact: Contact): void {
@@ -68,11 +77,12 @@ export class ContactManagerService {
     }
   }
 
-  deleteContact(id: number): void {
-    const index = this.contacts.findIndex(c => c.id === id);
-    if (index !== -1) {
-      this.contacts.splice(index, 1);
-    }
+  addContact(newContact: Contact): void {
+    this.contacts.push(newContact);
+  }
+
+  removeContact(id: number): void {
+    this.contacts = this.contacts.filter(contact => contact.id !== id);
   }
 
   setSelectedContact(contact: Contact | null): void {

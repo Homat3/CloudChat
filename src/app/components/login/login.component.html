@@ -1,0 +1,47 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>CloudChat</h1>
+      <p>欢迎回来</p>
+    </div>
+    
+    <form (ngSubmit)="onLogin()" class="login-form">
+      <div class="form-group">
+        <label for="username">用户名</label>
+        <input 
+          type="text" 
+          id="username" 
+          [(ngModel)]="username" 
+          name="username" 
+          placeholder="请输入用户名"
+          required
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input 
+          type="password" 
+          id="password" 
+          [(ngModel)]="password" 
+          name="password" 
+          placeholder="请输入密码"
+          required
+        >
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="isLoading" class="login-btn">
+        <span *ngIf="!isLoading">登录</span>
+        <span *ngIf="isLoading">登录中...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>测试账号: TestUser / 123456</p>
+    </div>
+  </div>
+</div>

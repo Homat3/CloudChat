@@ -57,47 +57,49 @@
   </ng-template>
 
   <!-- 底部输入区 -->
-  <div class="input-area">
-    <div class="input-container">
-      <div class="input-actions">
-        <button class="icon-button"
-                (click)="sendEmoji('😊')"
-                [disabled]="!selectedContact"
-        >😊</button>
-        <button class="icon-button"
-                (click)="sendEmoji('📎')"
-                [disabled]="!selectedContact"
-        >📎</button>
-        <button class="icon-button"
-                (click)="sendEmoji('📁')"
-                [disabled]="!selectedContact"
-        >📁</button>
-        <button class="icon-button"
-                (click)="sendEmoji('🎤')"
-                [disabled]="!selectedContact"
-        >🎤</button>
-        <button class="icon-button"
-                (click)="sendEmoji('📍')"
-                [disabled]="!selectedContact"
-        >📍</button>
-        <!-- 仅用于测试的按钮 -->
-        <button class="icon-button"
-                (click)="simulateReceiveMessage()"
-                [disabled]="!selectedContact"
-                title="模拟接收消息"
-                style="font-size: 12px;"
-        >📥</button>
+  @if (selectedContact){
+    <div class="input-area">
+      <div class="input-container">
+        <div class="input-actions">
+          <button class="icon-button"
+                  (click)="sendEmoji('😊')"
+                  [disabled]="!selectedContact"
+          >😊</button>
+          <button class="icon-button"
+                  (click)="sendEmoji('📎')"
+                  [disabled]="!selectedContact"
+          >📎</button>
+          <button class="icon-button"
+                  (click)="sendEmoji('📁')"
+                  [disabled]="!selectedContact"
+          >📁</button>
+          <button class="icon-button"
+                  (click)="sendEmoji('🎤')"
+                  [disabled]="!selectedContact"
+          >🎤</button>
+          <button class="icon-button"
+                  (click)="sendEmoji('📍')"
+                  [disabled]="!selectedContact"
+          >📍</button>
+          <!-- 仅用于测试的按钮 -->
+          <button class="icon-button"
+                  (click)="simulateReceiveMessage()"
+                  [disabled]="!selectedContact"
+                  title="模拟接收消息"
+                  style="font-size: 12px;"
+          >📥</button>
+        </div>
+        <textarea
+          class="message-input"
+          placeholder="{{selectedContact ? '输入消息...' : '请先选择一个联系人'}}"
+          [(ngModel)]="newMessage"
+          (keydown.enter)="sendMessage($event)"
+          [disabled]="!selectedContact"
+        ></textarea>
       </div>
-      <textarea
-        class="message-input"
-        placeholder="{{selectedContact ? '输入消息...' : '请先选择一个联系人'}}"
-        [(ngModel)]="newMessage"
-        (keydown.enter)="sendMessage($event)"
-        [disabled]="!selectedContact"
-      ></textarea>
+      <button class="send-button"
+              (click)="sendMessage()"
+              [disabled]="!selectedContact || !newMessage.trim()">发送</button>
     </div>
-    <button class="send-button"
-            (click)="sendMessage()"
-            [disabled]="!selectedContact || !newMessage.trim()">发送</button>
-  </div>
+  }
 </div>

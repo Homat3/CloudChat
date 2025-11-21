@@ -37,10 +37,6 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     return this.contactManager.getSelectedContact();
   }
 
-  trackByFn(index: number, item: Message) {
-    return item.id;
-  }
-
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedContact'] && changes['selectedContact'].currentValue) {
       this.newMessage = '';
@@ -54,6 +50,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
   scrollToBottom(): void {
@@ -102,6 +99,8 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     this.newMessage = '';
 
     setTimeout(() => {
+      // TODO: 向服务端发送消息
+      // TODO: 服务端返回接收成功时更新消息状态为已发送
       this.scrollToBottom();
       console.log('消息已发送');
       message.status = 'sent';
