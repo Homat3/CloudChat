@@ -10,6 +10,7 @@ private:
 	std::string password_;
 	std::string avatar_;
 	std::string token_;
+	std::string email_;
 
 public:
 	CloudChatUser(int id, std::string username, std::string password, std::string avatar,
@@ -20,12 +21,14 @@ public:
 	std::string GetPassword();
 	std::string GetAvatar();
 	std::string GetToken();
+	std::string GetEmail();
 	// setter
 	void SetId(int id);
 	void SetUserName(std::string username);
 	void SetPassword(std::string password);
 	void SetAvatar(std::string avatar);
 	void SetToken(std::string token);
+	void SetEmail(std::string email);
 };
 
 #endif // CLOUDCHATUSER_H

@@ -48,3 +48,11 @@ CloudChatUser::CloudChatUser(int id, std::string username, std::string password,
 	avatar_   = avatar;
 	token_    = token;
 }
+
+std::string CloudChatUser::GetEmail() {
+	return email_;
+}
+
+void CloudChatUser::SetEmail(std::string email) {
+	email_ = email;
+}

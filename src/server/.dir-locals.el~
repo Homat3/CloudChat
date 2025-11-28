@@ -1,4 +1,0 @@
-;((c++-mode . ((flycheck-gcc-include-path . ("/home/peter-winchester/Projects/CloudChat/src/server/include/")))))
-;((c-mode . ((flycheck-gcc-include-path . ("/home/peter-winchester/Projects/CloudChat/src/server/include/")))))
-((c++-mode . ((flycheck-gcc-include-path . ("./include/")))))
-((c-mode . ((flycheck-gcc-include-path . ("./include/")))))
