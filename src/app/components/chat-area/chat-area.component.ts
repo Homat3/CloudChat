@@ -40,7 +40,9 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedContact'] && changes['selectedContact'].currentValue) {
       this.newMessage = '';
-      this.loadContactMessages(changes['selectedContact'].currentValue.id);
+      const contactId = changes['selectedContact'].currentValue.id;
+      this.loadContactMessages(contactId);
+      this.messageManager.markMessagesAsRead(contactId);
       console.log('切换到联系人:', changes['selectedContact'].currentValue.name);
     }
   }
@@ -86,42 +88,16 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   private processSendMessage() {
     if (!this.selectedContact) return;
 
-    const message = this.messageManager.createMessage(
-      this.selectedContact.id,
-      'me',
-      this.newMessage,
-      'sending',
-      'text'
-    );
-
-    this.messageManager.addMessage(this.selectedContact.id, message);
+    this.messageManager.sendMessage(this.selectedContact.id, this.newMessage);
     this.messages = this.messageManager.getMessages(this.selectedContact.id);
     this.newMessage = '';
 
     setTimeout(() => {
-      // TODO: 向服务端发送消息
-      // TODO: 服务端返回接收成功时更新消息状态为已发送
-      this.scrollToBottom();
-      console.log('消息已发送');
-      message.status = 'sent';
-      this.messages = [...this.messageManager.getMessages(this.selectedContact!.id)];
-    }, 0);
-  }
-
-  simulateReceiveMessage() {
-    if (!this.selectedContact) return;
-
-    const message = this.messageManager.receiveMessage(
-      this.selectedContact.id,
-      '这是一条模拟的新接收消息'
-    );
-
-    this.messages = [...this.messageManager.getMessages(this.selectedContact.id)];
-
-    setTimeout(() => {
       this.scrollToBottom();
     }, 0);
   }
+
+  // simulateReceiveMessage removed as it's now handled by service/socket
 
   isNewMessage(message: Message): boolean {
     return message.sender === 'me' && message.status === 'sent';
@@ -132,11 +108,32 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   }
 
   sendFile() {
-    console.log('发送文件');
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      if (file && this.selectedContact) {
+        this.messageManager.sendFile(this.selectedContact.id, file);
+        this.messages = this.messageManager.getMessages(this.selectedContact.id);
+        setTimeout(() => this.scrollToBottom(), 0);
+      }
+    };
+    input.click();
   }
 
   sendImage() {
-    console.log('发送图片');
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      if (file && this.selectedContact) {
+        this.messageManager.sendImage(this.selectedContact.id, file);
+        this.messages = this.messageManager.getMessages(this.selectedContact.id);
+        setTimeout(() => this.scrollToBottom(), 0);
+      }
+    };
+    input.click();
   }
 
   sendEmoji(emoji: string) {

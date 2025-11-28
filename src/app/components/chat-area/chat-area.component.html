@@ -81,13 +81,6 @@
                   (click)="sendEmoji('📍')"
                   [disabled]="!selectedContact"
           >📍</button>
-          <!-- 仅用于测试的按钮 -->
-          <button class="icon-button"
-                  (click)="simulateReceiveMessage()"
-                  [disabled]="!selectedContact"
-                  title="模拟接收消息"
-                  style="font-size: 12px;"
-          >📥</button>
         </div>
         <textarea
           class="message-input"

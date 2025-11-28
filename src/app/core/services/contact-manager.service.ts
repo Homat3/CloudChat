@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Contact } from '../../components/contact-list/contact-list.component';
 import { ChatContact } from '../models/chat-contact';
+import { SocketService } from './socket.service';
+import { MessageType, ProtocolMessage } from '../protocol/message-protocol';
 
 @Injectable({
   providedIn: 'root'
@@ -10,50 +12,56 @@ export class ContactManagerService {
     {
       id: 1,
       name: '张三',
-      lastMessage: '好的，明天见',
-      timestamp: '10:30',
       avatar: 'ZS',
-      unreadCount: 0,
       isOnline: true
     },
     {
       id: 2,
       name: '李四',
-      lastMessage: '这个需求有点复杂',
-      timestamp: '昨天',
       avatar: 'LS',
-      unreadCount: 0,
       isOnline: false
     },
     {
       id: 3,
       name: '王五',
-      lastMessage: '好的，我看看',
-      timestamp: '12:45',
       avatar: 'WW',
-      unreadCount: 0,
       isOnline: true
     },
     {
       id: 4,
       name: '赵六',
-      lastMessage: '会议时间改了吗？',
-      timestamp: '09:15',
       avatar: 'ZL',
-      unreadCount: 0,
       isOnline: true
     }
   ];
 
   private selectedContact: ChatContact | null = null;
 
+  constructor(private socketService: SocketService) {
+    this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+      switch (message.type) {
+        case MessageType.CONTACTS_LOADED:
+          this.contacts = message.payload;
+          break;
+        case MessageType.CONTACT_ADDED:
+          this.addContact(message.payload);
+          break;
+        case MessageType.CONTACT_DELETED:
+          this.removeContact(message.payload.id);
+          break;
+      }
+    });
+  }
+
   getContacts(): Contact[] {
     return this.contacts;
   }
 
   requireLoadContacts(): void {
-    // TODO: 向服务器发出从数据库或API加载联系人数据请求
-    // TODO: 回调updateContact
+    this.socketService.sendMessage({
+      type: MessageType.LOAD_CONTACTS,
+      payload: null
+    });
   }
 
   getContactById(id: number): Contact | undefined {
@@ -61,13 +69,17 @@ export class ContactManagerService {
   }
 
   requireAddContact(contact: Contact): void {
-    // TODO: 向服务器发出添加联系人消息请求
-    // TODO: 回调addContact
+    this.socketService.sendMessage({
+      type: MessageType.ADD_CONTACT,
+      payload: contact
+    });
   }
 
   requireDeleteContact(id: number): void {
-    // TODO: 向服务器发出删除联系人消息请求
-    // TODO: 回调removeContact
+    this.socketService.sendMessage({
+      type: MessageType.DELETE_CONTACT,
+      payload: { id }
+    });
   }
 
   updateContact(updatedContact: Contact): void {
