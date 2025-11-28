@@ -1,0 +1,24 @@
+#ifndef CLOUDCHATDAT_H
+#define CLOUDCHATDAT_H
+
+#define DATABASE_USERNAME "cloudchat" // 数据库用户名
+#define DATABASE_PASSWORD "1919810" // 数据库密码
+#define DATABASE_HOST     "tcp://127.0.0.1:3306" // 数据库主机地址
+
+#define DATABASE_INITIALIZED 0                   // 数据库已初始化
+#define DATABASE_INITIALIZATION_FAILED -1        // 数据库初始化失败
+
+#include "cloudchatsys.h"
+
+class CloudChatDatabase { // CloudChat 数据库类
+private:
+	sql::mysql::MySQL_Driver* driver_; // 驱动对象指针
+	sql::Connection*          connection_; // MySQL 连接对象指针
+
+	CloudChatDatabase();
+
+public:
+	static CloudChatDatabase* GetInstance(); // 获取单例模式实例
+};
+
+#endif // CLOUDCHATDAT_H
