@@ -11,17 +11,17 @@
     </div>
     <div class="header-actions">
       <button class="icon-button" title="语音通话"
-              (click)="selectedContact && sendEmoji('📞')"
+              (click)="selectedContact && sendEmoji()"
               [disabled]="!selectedContact">
         <i>📞</i>
       </button>
       <button class="icon-button" title="视频通话"
-              (click)="selectedContact && sendEmoji('📹')"
+              (click)="selectedContact && sendEmoji()"
               [disabled]="!selectedContact">
         <i>📹</i>
       </button>
       <button class="icon-button" title="更多选项"
-              (click)="selectedContact && sendEmoji('⋯')"
+              (click)="selectedContact && sendEmoji()"
               [disabled]="!selectedContact">
         <i>⋯</i>
       </button>
@@ -62,25 +62,17 @@
       <div class="input-container">
         <div class="input-actions">
           <button class="icon-button"
-                  (click)="sendEmoji('😊')"
+                  (click)="sendEmoji()"
                   [disabled]="!selectedContact"
           >😊</button>
           <button class="icon-button"
-                  (click)="sendEmoji('📎')"
+                  (click)="sendFile()"
                   [disabled]="!selectedContact"
           >📎</button>
           <button class="icon-button"
-                  (click)="sendEmoji('📁')"
-                  [disabled]="!selectedContact"
-          >📁</button>
-          <button class="icon-button"
-                  (click)="sendEmoji('🎤')"
+                  (click)="sendImage()"
                   [disabled]="!selectedContact"
           >🎤</button>
-          <button class="icon-button"
-                  (click)="sendEmoji('📍')"
-                  [disabled]="!selectedContact"
-          >📍</button>
         </div>
         <textarea
           class="message-input"

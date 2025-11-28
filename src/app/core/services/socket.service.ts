@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import {ProtocolMessage} from '../protocol/message-protocol';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,7 @@ export class SocketService {
         this.isConnected = true;
         this.connectionStatusSubject.next(true);
         console.log('WebSocket连接已建立');
+        window.alert('已与服务器建立连接！');
       };
 
       this.socket.onmessage = (event) => {
@@ -38,6 +40,7 @@ export class SocketService {
       this.socket.onerror = (error) => {
         this.errorSubject.next('WebSocket连接发生错误');
         console.error('WebSocket错误:', error);
+        window.alert('WebSocket连接发生错误！' +  error)
       };
 
       this.socket.onclose = (event) => {
@@ -52,6 +55,7 @@ export class SocketService {
     } catch (error) {
       this.errorSubject.next('创建WebSocket连接时出错');
       console.error('创建WebSocket连接失败:', error);
+      window.alert('创建WebSocket连接失败:' +  error)
     }
   }
 
@@ -64,16 +68,16 @@ export class SocketService {
     }, 5000);
   }
 
-  public sendMessage(message: any) {
+  public sendMessage(message: ProtocolMessage) {
     if (this.isConnected && this.socket) {
       try {
-        const messageStr = typeof message === 'string' ? message : JSON.stringify(message);
-        this.socket.send(messageStr);
+        this.socket.send(JSON.stringify(message));
       } catch (error) {
         console.error('发送消息失败:', error);
       }
     } else {
       console.warn('WebSocket未连接，无法发送消息');
+      window.alert('WebSocket未连接，无法发送消息')
     }
   }
 
