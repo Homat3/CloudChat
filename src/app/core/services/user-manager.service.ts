@@ -19,20 +19,20 @@ export class UserManagerService {
             this.testUser.token = token;
             this.currentUserSubject.next(this.testUser);
         }
-
-        this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
-            switch (message.type) {
-                case MessageType.LOGIN_SUCCESS:
-                    this.login(message.payload);
-                    break;
-                case MessageType.REGISTER_SUCCESS:
-                    this.register(message.payload);
-                    break;
-                case MessageType.PROFILE_UPDATED:
-                    this.updateProfile(message.payload);
-                    break;
-            }
-        });
+        // TODO
+        // this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+        //     switch (message.type) {
+        //         case MessageType.LOGIN_SUCCESS:
+        //             this.login(message.payload);
+        //             break;
+        //         case MessageType.REGISTER_SUCCESS:
+        //             this.register(message.payload);
+        //             break;
+        //         case MessageType.PROFILE_UPDATED:
+        //             this.updateProfile(message.payload);
+        //             break;
+        //     }
+        // });
     }
 
     private testUser: User = {
@@ -45,31 +45,36 @@ export class UserManagerService {
 
     // Request functions (placeholders)
     requireLogin(username: string, password: string): void {
-        this.socketService.sendMessage({
-            type: MessageType.LOGIN,
-            payload: { username, password }
-        });
+      // TODO
+        // this.socketService.sendMessage({
+        //     type: MessageType.LOGIN,
+        //     payload: { username, password }
+        // });
     }
 
     requireRegister(username: string, password: string, email: string): void {
-        this.socketService.sendMessage({
-            type: MessageType.REGISTER,
-            payload: { username, password, email }
-        });
+      // TODO
+        // this.socketService.sendMessage({
+        //     type: MessageType.REGISTER,
+        //     payload: { username, password, email }
+        // });
     }
 
-    requireLogout(): void {
-        this.socketService.sendMessage({
-            type: MessageType.LOGOUT,
-            payload: null
-        });
+    requireLogout(contactId: number): void {
+      // TODO
+        // this.socketService.sendMessage({
+        //     type: MessageType.LOGOUT,
+        //     payload: contactId
+        // });
+        this.logout()
     }
 
     requireUpdateProfile(user: Partial<User>): void {
-        this.socketService.sendMessage({
-            type: MessageType.UPDATE_PROFILE,
-            payload: user
-        });
+      // TODO
+        // this.socketService.sendMessage({
+        //     type: MessageType.UPDATE_PROFILE,
+        //     payload: user
+        // });
     }
 
     // Callback functions (local state updates)

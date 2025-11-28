@@ -12,8 +12,23 @@ export class MessageManagerService {
 
   constructor(private socketService: SocketService) {
     this.initializeSampleMessages();
-    this.socketService.getMessages().subscribe(() => {
-    })
+
+    // TODO: Subscribe to incoming messages
+    // this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+    //   switch (message.type) {
+    //     case MessageType.MESSAGES_LOADED:
+    //       // Assuming payload is { contactId: number, messages: Message[] }
+    //       this.updateMessages(message.payload.contactId, message.payload.messages);
+    //       break;
+    //     case MessageType.MESSAGES_CLEARED:
+    //       this.clearMessages(message.payload.contactId);
+    //       break;
+    //     case MessageType.MESSAGE_RECEIVED:
+    //       // Handle incoming message
+    //       this.receiveMessage(message.payload.contactId, message.payload.content);
+    //       break;
+    //   }
+    // });
   }
 
   getMessages(contactId: number): Message[] {
@@ -47,7 +62,19 @@ export class MessageManagerService {
     const message = this.createMessage(contactId, 'me', content, 'sending', 'text');
     this.addMessage(contactId, message);
 
-    // TODO
+    // TODO: sendMessage
+    // const protocolMessage: ProtocolMessage = {
+    //   type: MessageType.SEND_MESSAGE,
+    //   payload: { contactId, content }
+    // };
+    //
+    // this.socketService.sendMessage(protocolMessage);
+
+    // Simulate server response for now (or rely on actual server ack if implemented)
+    // For now, we'll just mark it as sent immediately to keep UI responsive
+    setTimeout(() => {
+      message.status = 'sent';
+    }, 100);
   }
 
   private parseFile(e: any): string[]{
@@ -71,7 +98,13 @@ export class MessageManagerService {
         contactId: contactId
       };
 
-      // TODO
+      // TODO: sendFile
+      // const protocolMessage: ProtocolMessage = {
+      //   type: MessageType.SEND_FILE,
+      //   payload: payload
+      // }
+      //
+      // this.socketService.sendMessage(protocolMessage);
 
       // Add a local message to show it's sent
       const message = this.createMessage(contactId, 'me', `Sent file: ${file.name}`, 'sent', 'file');
@@ -91,7 +124,13 @@ export class MessageManagerService {
         contactId: contactId
       };
 
-      // TODO
+      // TODO: sendImage
+      // const protocolMessage: ProtocolMessage = {
+      //   type: MessageType.SEND_FILE,
+      //   payload: payload
+      // }
+      //
+      // this.socketService.sendMessage(protocolMessage);
 
       // Add a local message to show it's sent
       const message = this.createMessage(contactId, 'me', `Sent image: ${file.name}`, 'sent', 'image');
@@ -112,7 +151,11 @@ export class MessageManagerService {
     });
 
     if (hasUnread) {
-      // TODO
+      // TODO: markMessagesAsRead
+      // this.socketService.sendMessage({
+      //   type: MessageType.MARK_READ,
+      //   payload: { contactId }
+      // });
     }
   }
 
@@ -136,11 +179,19 @@ export class MessageManagerService {
   }
 
   requireLoadMessage(contactId: number): void {
-    // TODO
+    // TODO: requireLoadMessage
+    // this.socketService.sendMessage({
+    //   type: MessageType.LOAD_MESSAGES,
+    //   payload: { contactId }
+    // });
   }
 
   requireClearMessages(contactId: number): void {
-    // TODO
+    // TODO: requireClearMessages
+    // this.socketService.sendMessage({
+    //   type: MessageType.CLEAR_MESSAGES,
+    //   payload: { contactId }
+    // });
   }
 
   clearMessages(contactId: number): void {

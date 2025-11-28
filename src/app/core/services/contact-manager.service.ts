@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Contact } from '../../components/contact-list/contact-list.component';
 import { ChatContact } from '../models/chat-contact';
 import { SocketService } from './socket.service';
-import { MessageType, ProtocolMessage } from '../protocol/message-protocol';
 
 @Injectable({
   providedIn: 'root'
@@ -38,30 +37,32 @@ export class ContactManagerService {
   private selectedContact: ChatContact | null = null;
 
   constructor(private socketService: SocketService) {
-    this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
-      switch (message.type) {
-        case MessageType.CONTACTS_LOADED:
-          this.contacts = message.payload;
-          break;
-        case MessageType.CONTACT_ADDED:
-          this.addContact(message.payload);
-          break;
-        case MessageType.CONTACT_DELETED:
-          this.removeContact(message.payload.id);
-          break;
-      }
-    });
+    // TODO
+    // this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+    //   switch (message.type) {
+    //     case MessageType.CONTACTS_LOADED:
+    //       this.contacts = message.payload;
+    //       break;
+    //     case MessageType.CONTACT_ADDED:
+    //       this.addContact(message.payload);
+    //       break;
+    //     case MessageType.CONTACT_DELETED:
+    //       this.removeContact(message.payload.id);
+    //       break;
+    //   }
+    // });
   }
 
   getContacts(): Contact[] {
     return this.contacts;
   }
 
-  requireLoadContacts(): void {
-    this.socketService.sendMessage({
-      type: MessageType.LOAD_CONTACTS,
-      payload: null
-    });
+  requireLoadContacts(thisId: number): void {
+    // TODO
+    // this.socketService.sendMessage({
+    //   type: MessageType.LOAD_CONTACTS,
+    //   payload: thisId
+    // });
   }
 
   getContactById(id: number): Contact | undefined {
@@ -69,17 +70,19 @@ export class ContactManagerService {
   }
 
   requireAddContact(contact: Contact): void {
-    this.socketService.sendMessage({
-      type: MessageType.ADD_CONTACT,
-      payload: contact
-    });
+    // TODO
+    // this.socketService.sendMessage({
+    //   type: MessageType.ADD_CONTACT,
+    //   payload: contact
+    // });
   }
 
-  requireDeleteContact(id: number): void {
-    this.socketService.sendMessage({
-      type: MessageType.DELETE_CONTACT,
-      payload: { id }
-    });
+  requireDeleteContact(thisDd: number, id: number): void {
+    // TODO
+    // this.socketService.sendMessage({
+    //   type: MessageType.DELETE_CONTACT,
+    //   payload: { id }
+    // });
   }
 
   updateContact(updatedContact: Contact): void {
