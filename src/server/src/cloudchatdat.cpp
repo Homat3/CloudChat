@@ -19,6 +19,7 @@ CloudChatDatabase::CloudChatDatabase() {
 create table if not exists users (
 id int auto_increment primary key,
 username varchar(50) not null unique,
+email varchar(50) not null unique,
 password varchar(50) not null,
 avatar varchar(50) not null unique,
 token varchar(50) not null
