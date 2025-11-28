@@ -12,21 +12,8 @@ export class MessageManagerService {
 
   constructor(private socketService: SocketService) {
     this.initializeSampleMessages();
-    this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
-      switch (message.type) {
-        case MessageType.MESSAGES_LOADED:
-          // Assuming payload is { contactId: number, messages: Message[] }
-          this.updateMessages(message.payload.contactId, message.payload.messages);
-          break;
-        case MessageType.MESSAGES_CLEARED:
-          this.clearMessages(message.payload.contactId);
-          break;
-        case MessageType.MESSAGE_RECEIVED:
-          // Handle incoming message
-          this.receiveMessage(message.payload.contactId, message.payload.content);
-          break;
-      }
-    });
+    this.socketService.getMessages().subscribe(() => {
+    })
   }
 
   getMessages(contactId: number): Message[] {
@@ -60,27 +47,23 @@ export class MessageManagerService {
     const message = this.createMessage(contactId, 'me', content, 'sending', 'text');
     this.addMessage(contactId, message);
 
-    this.socketService.sendMessage({
-      type: MessageType.SEND_MESSAGE,
-      payload: { contactId, content }
-    });
+    // TODO
+  }
 
-    // Simulate server response for now (or rely on actual server ack if implemented)
-    // For now, we'll just mark it as sent immediately to keep UI responsive
-    setTimeout(() => {
-      message.status = 'sent';
-    }, 100);
+  private parseFile(e: any): string[]{
+    const arrayBuffer = e.target.result;
+    const bytes = new Uint8Array(arrayBuffer);
+    const hexList: string[] = [];
+    for (let i = 0; i < bytes.length; i++) {
+      hexList.push(bytes[i].toString(16).padStart(2, '0'));
+    }
+    return hexList;
   }
 
   sendFile(contactId: number, file: File): void {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const arrayBuffer = e.target.result;
-      const bytes = new Uint8Array(arrayBuffer);
-      const hexList: string[] = [];
-      for (let i = 0; i < bytes.length; i++) {
-        hexList.push(bytes[i].toString(16).padStart(2, '0'));
-      }
+      const hexList = this.parseFile(e)
 
       const payload: FilePayload = {
         fileName: file.name,
@@ -88,10 +71,7 @@ export class MessageManagerService {
         contactId: contactId
       };
 
-      this.socketService.sendMessage({
-        type: MessageType.SEND_FILE,
-        payload: payload
-      });
+      // TODO
 
       // Add a local message to show it's sent
       const message = this.createMessage(contactId, 'me', `Sent file: ${file.name}`, 'sent', 'file');
@@ -103,12 +83,7 @@ export class MessageManagerService {
   sendImage(contactId: number, file: File): void {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const arrayBuffer = e.target.result;
-      const bytes = new Uint8Array(arrayBuffer);
-      const hexList: string[] = [];
-      for (let i = 0; i < bytes.length; i++) {
-        hexList.push(bytes[i].toString(16).padStart(2, '0'));
-      }
+      const hexList = this.parseFile(e)
 
       const payload: FilePayload = {
         fileName: file.name,
@@ -116,10 +91,7 @@ export class MessageManagerService {
         contactId: contactId
       };
 
-      this.socketService.sendMessage({
-        type: MessageType.SEND_IMAGE,
-        payload: payload
-      });
+      // TODO
 
       // Add a local message to show it's sent
       const message = this.createMessage(contactId, 'me', `Sent image: ${file.name}`, 'sent', 'image');
@@ -140,10 +112,7 @@ export class MessageManagerService {
     });
 
     if (hasUnread) {
-      this.socketService.sendMessage({
-        type: MessageType.MARK_READ,
-        payload: { contactId }
-      });
+      // TODO
     }
   }
 
@@ -167,17 +136,11 @@ export class MessageManagerService {
   }
 
   requireLoadMessage(contactId: number): void {
-    this.socketService.sendMessage({
-      type: MessageType.LOAD_MESSAGES,
-      payload: { contactId }
-    });
+    // TODO
   }
 
   requireClearMessages(contactId: number): void {
-    this.socketService.sendMessage({
-      type: MessageType.CLEAR_MESSAGES,
-      payload: { contactId }
-    });
+    // TODO
   }
 
   clearMessages(contactId: number): void {

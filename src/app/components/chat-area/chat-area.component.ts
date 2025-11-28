@@ -136,7 +136,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     input.click();
   }
 
-  sendEmoji(emoji: string) {
-    this.newMessage += emoji;
+  sendEmoji() {
+    this.newMessage += 'i';
   }
 }
