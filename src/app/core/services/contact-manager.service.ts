@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Contact } from '../../components/contact-list/contact-list.component';
-import { ChatContact } from '../models/chat-contact';
+import { ChatContact } from '../models';
 import { SocketService } from './socket.service';
 
 @Injectable({
