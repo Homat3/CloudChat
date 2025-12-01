@@ -1,3 +1,7 @@
+/** cloudchatuser.h
+ * CloudChat 用户头文件
+ */
+
 #ifndef CLOUDCHATUSER_H
 #define CLOUDCHATUSER_H
 

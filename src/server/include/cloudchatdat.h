@@ -1,3 +1,7 @@
+/** cloudchat.h
+ * CloudChat 数据库相关头文件
+ */
+
 #ifndef CLOUDCHATDAT_H
 #define CLOUDCHATDAT_H
 
