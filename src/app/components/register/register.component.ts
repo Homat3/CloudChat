@@ -39,7 +39,7 @@ export class RegisterComponent implements OnInit {
         return;
       }
 
-      if (this.username != this.password_repeat) {
+      if (this.password != this.password_repeat) {
         this.errorMessage = '两次输入密码不一致';
         return;
       }
