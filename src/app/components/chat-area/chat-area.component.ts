@@ -88,8 +88,8 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   private processSendMessage() {
     if (!this.selectedContact) return;
 
-    this.messageManager.sendMessage(this.selectedContact.id, this.newMessage);
-    this.messages = this.messageManager.getMessages(this.selectedContact.id);
+    this.messageManager.sendMessage(this.selectedContact.contactId, this.newMessage);
+    this.messages = this.messageManager.getMessages(this.selectedContact.contactId);
     this.newMessage = '';
 
     setTimeout(() => {
@@ -113,8 +113,8 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     input.onchange = (e: any) => {
       const file = e.target.files[0];
       if (file && this.selectedContact) {
-        this.messageManager.sendFile(this.selectedContact.id, file);
-        this.messages = this.messageManager.getMessages(this.selectedContact.id);
+        this.messageManager.sendFile(this.selectedContact.contactId, file);
+        this.messages = this.messageManager.getMessages(this.selectedContact.contactId);
         setTimeout(() => this.scrollToBottom(), 0);
       }
     };
@@ -128,8 +128,8 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     input.onchange = (e: any) => {
       const file = e.target.files[0];
       if (file && this.selectedContact) {
-        this.messageManager.sendImage(this.selectedContact.id, file);
-        this.messages = this.messageManager.getMessages(this.selectedContact.id);
+        this.messageManager.sendImage(this.selectedContact.contactId, file);
+        this.messages = this.messageManager.getMessages(this.selectedContact.contactId);
         setTimeout(() => this.scrollToBottom(), 0);
       }
     };

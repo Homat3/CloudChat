@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Message, MessageImpl } from '../models/message';
 import { Contact } from '../../components/contact-list/contact-list.component';
 import { SocketService } from './socket.service';
-import { MessageType, ProtocolMessage, FilePayload } from '../protocol/message-protocol';
+import { MessageType, ProtocolMessage } from '../protocol/message-protocol';
 
 @Injectable({
   providedIn: 'root'
@@ -92,11 +92,11 @@ export class MessageManagerService {
     reader.onload = (e: any) => {
       const hexList = this.parseFile(e)
 
-      const payload: FilePayload = {
-        fileName: file.name,
-        content: hexList,
-        contactId: contactId
-      };
+      // const payload: FilePayload = {
+      //   fileName: file.name,
+      //   content: hexList,
+      //   contactId: contactId
+      // };
 
       // TODO: sendFile
       // const protocolMessage: ProtocolMessage = {
@@ -118,11 +118,11 @@ export class MessageManagerService {
     reader.onload = (e: any) => {
       const hexList = this.parseFile(e)
 
-      const payload: FilePayload = {
-        fileName: file.name,
-        content: hexList,
-        contactId: contactId
-      };
+      // const payload: FilePayload = {
+      //   fileName: file.name,
+      //   content: hexList,
+      //   contactId: contactId
+      // };
 
       // TODO: sendImage
       // const protocolMessage: ProtocolMessage = {

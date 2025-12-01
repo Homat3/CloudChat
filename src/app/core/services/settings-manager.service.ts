@@ -14,7 +14,7 @@ export class SettingsManagerService {
 
     logout(): void {
         // 调用UserManagerService的logout方法清除token和状态
-        this.userManager.logout();
+        this.userManager.requireLogout();
         // 跳转到登录页
         this.router.navigate(['/login']);
     }

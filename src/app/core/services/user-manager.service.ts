@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { User } from '../models/user';
+import { isUser, User } from '../models/user';
 import { SocketService } from './socket.service';
-import { MessageType, ProtocolMessage } from '../protocol/message-protocol';
+import {
+  LoginByTokenPayload,
+  LoginPayload,
+  LoginSuccessPayload, LogoutPayload,
+  MessageType,
+  ProtocolMessage,
+  RegisterPayload, UpdateProfilePayload
+} from '../protocol/message-protocol';
 
 @Injectable({
     providedIn: 'root'
@@ -11,70 +18,106 @@ export class UserManagerService {
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
+    private loginFailedCallback: ( message: string ) => void = () => {};
+    private registerFailedCallback: ( message: string ) => void = () => {};
+
     constructor(private socketService: SocketService) {
         const token = localStorage.getItem('user_token');
         if (token) {
-            // 恢复用户状态，这里简化处理，直接使用mock用户
-            // 实际项目中应该用token去换取用户信息
-            this.testUser.token = token;
-            this.currentUserSubject.next(this.testUser);
+          this.requireLoginFromToken(token)
         }
-        // TODO
-        // this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
-        //     switch (message.type) {
-        //         case MessageType.LOGIN_SUCCESS:
-        //             this.login(message.payload);
-        //             break;
-        //         case MessageType.REGISTER_SUCCESS:
-        //             this.register(message.payload);
-        //             break;
-        //         case MessageType.PROFILE_UPDATED:
-        //             this.updateProfile(message.payload);
-        //             break;
-        //     }
-        // });
+
+        this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+            switch (message.type) {
+              case MessageType.LOGIN_SUCCESS: {
+                if (isUser(message.payload))
+                  this.login(message.payload);
+                else
+                  this.loginFailedCallback('Invalid login response');
+                break;
+              }
+              case MessageType.LOGIN_FAILURE: {
+                this.loginFailedCallback(message.payload.error);
+                break;
+              }
+              case MessageType.REGISTER_SUCCESS:{
+                if (isUser(message.payload))
+                  this.register(message.payload);
+                else
+                  this.registerFailedCallback('Invalid login response');
+                break;
+              }
+              case MessageType.PROFILE_UPDATED: {
+                this.registerFailedCallback(message.payload.error);
+                break;
+              }
+              case MessageType.LOGOUT: {
+                this.logout();
+                break;
+              }
+            }
+        });
     }
 
-    private testUser: User = {
-        id: 1,
-        username: 'TestUser',
-        email: 'test@example.com',
-        avatar: 'TU',
-        token: 'mock-token-12345'
-    };
-
-    // Request functions (placeholders)
-    requireLogin(username: string, password: string): void {
-      // TODO
-        // this.socketService.sendMessage({
-        //     type: MessageType.LOGIN,
-        //     payload: { username, password }
-        // });
+  // Request functions (placeholders)
+    requireLoginFromToken(token: string): void{
+      let info: LoginByTokenPayload = {
+        token: token
+      };
+      this.socketService.sendMessage({
+        type: MessageType.LOGIN_BY_TOKEN,
+        payload: info
+      });
     }
 
-    requireRegister(username: string, password: string, email: string): void {
-      // TODO
-        // this.socketService.sendMessage({
-        //     type: MessageType.REGISTER,
-        //     payload: { username, password, email }
-        // });
+    requireLogin(username: string, password: string, callback: ( message: string ) => void): void {
+      let info: LoginPayload = {
+        username : username,
+        password : password
+      };
+      this.loginFailedCallback = callback;
+      this.socketService.sendMessage({
+          type: MessageType.LOGIN,
+          payload: info
+      });
     }
 
-    requireLogout(contactId: number): void {
-      // TODO
-        // this.socketService.sendMessage({
-        //     type: MessageType.LOGOUT,
-        //     payload: contactId
-        // });
-        this.logout()
+    requireRegister(username: string, password: string, email: string, callback: ( message: string ) => void): void {
+      let info: RegisterPayload = {
+        username : username,
+        password : password,
+        email : email
+      };
+      this.registerFailedCallback = callback;
+      this.socketService.sendMessage({
+          type: MessageType.REGISTER,
+          payload: info
+      });
     }
 
-    requireUpdateProfile(user: Partial<User>): void {
-      // TODO
-        // this.socketService.sendMessage({
-        //     type: MessageType.UPDATE_PROFILE,
-        //     payload: user
-        // });
+    requireLogout(): void {
+      if (!this.isLoggedIn() || !this.isLoggedIn()) return;
+      let info: LogoutPayload = {
+        userId : this.getCurrentUser()!!.userId
+      };
+      this.socketService.sendMessage({
+          type: MessageType.LOGOUT,
+          payload: info
+      });
+    }
+
+    requireUpdateProfile(user: User, password: string): void {
+      let info: UpdateProfilePayload = {
+        userId : user.userId,
+        username : user.username,
+        password : password,
+        email : user.email,
+        avatar : user.avatar
+      }
+      this.socketService.sendMessage({
+          type: MessageType.UPDATE_PROFILE,
+          payload: user
+      });
     }
 
     // Callback functions (local state updates)
@@ -86,15 +129,20 @@ export class UserManagerService {
     }
 
     register(user: User): void {
-        // 注册成功后通常会自动登录，或者跳转到登录页
-        // 这里假设注册成功后直接登录
         this.currentUserSubject.next(user);
     }
 
     updateProfile(updatedUser: User): void {
         const currentUser = this.currentUserSubject.value;
-        if (currentUser && currentUser.id === updatedUser.id) {
-            this.currentUserSubject.next({ ...currentUser, ...updatedUser });
+        if (currentUser && currentUser.userId === updatedUser.userId) {
+          let newUser: User = {
+            userId: currentUser.userId,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            avatar: updatedUser.avatar,
+            token: currentUser.token
+          };
+          this.currentUserSubject.next(newUser);
         }
     }
 

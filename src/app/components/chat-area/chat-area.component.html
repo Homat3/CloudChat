@@ -3,10 +3,10 @@
   <!-- 顶部信息栏 -->
   <div class="chat-header">
     <div class="contact-info">
-      <div class="avatar">{{ selectedContact?.name?.charAt(0) || 'U' }}</div>
+      <div class="avatar">{{ selectedContact?.userName?.charAt(0) || 'U' }}</div>
       <div class="contact-details">
-        <div class="contact-name">{{ selectedContact?.name || '请选择一个联系人' }}</div>
-        <div class="contact-status">{{ selectedContact?.status || '' }}</div>
+        <div class="contact-name">{{ selectedContact?.userName || '请选择一个联系人' }}</div>
+        <div class="contact-status">{{ selectedContact?.online || '' }}</div>
       </div>
     </div>
     <div class="header-actions">

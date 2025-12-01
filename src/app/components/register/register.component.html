@@ -2,10 +2,10 @@
   <div class="login-card">
     <div class="login-header">
       <h1>CloudChat</h1>
-      <p>欢迎回来</p>
+      <p>注册</p>
     </div>
 
-    <form (ngSubmit)="onLogin()" class="login-form">
+    <form (ngSubmit)="onRegister()" class="login-form">
       <div class="form-group">
         <label for="username">用户名</label>
         <input
@@ -30,17 +30,38 @@
         >
       </div>
 
+      <div class="form-group">
+        <label for="password_repeat">重复密码</label>
+        <input
+          type="password"
+          id="password_repeat"
+          [(ngModel)]="password_repeat"
+          name="password_repeat"
+          placeholder="请输入密码"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="email">邮箱</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="请输入邮箱"
+          required
+        >
+      </div>
+
       <div class="error-message" *ngIf="errorMessage">
         {{ errorMessage }}
       </div>
 
       <button type="submit" [disabled]="isLoading" class="login-btn">
-        <span *ngIf="!isLoading">登录</span>
-        <span *ngIf="isLoading">登录中...</span>
+        <span *ngIf="!isLoading">注册</span>
+        <span *ngIf="isLoading">等待服务器响应...</span>
       </button>
     </form>
-    <button class="login-btn" (click)="onRegister()">
-      <span>注册</span>
-    </button>
   </div>
 </div>

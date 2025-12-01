@@ -1,10 +1,10 @@
 <div class="sidebar-container">
   <!-- 基础信息区 -->
   <div class="profile-section">
-    <div class="avatar">{{ selectedContact?.name?.charAt(0) || 'U' }}</div>
-    <div class="profile-name">{{ selectedContact?.name || '未知用户' }}</div>
-    <div class="profile-status">{{ selectedContact?.status || '未知状态' }}</div>
-    <div class="profile-bio">产品经理 @ ABC公司</div>
+    <div class="avatar">{{ selectedContact?.userName?.charAt(0) || 'U' }}</div>
+    <div class="profile-name">{{ selectedContact?.userName || '未知用户' }}</div>
+    <div class="profile-status">{{ selectedContact?.online ? '在线' : '离线' }}</div>
+    <div class="profile-bio">产品经理 &#64; ABC公司</div>
   </div>
 
   <!-- 功能模块区 -->
