@@ -1,3 +1,7 @@
+/** cloudchatsys.h
+ * CloudChat 系统相关头文件
+ */
+
 #ifndef CLOUDCHATSYS_H
 #define CLOUDCHATSYS_H
 
@@ -14,6 +18,9 @@
 #include <cppconn/prepared_statement.h>
 
 #define SERVER_PORT 14514 // 服务器通信端口号
+// 114.116.245.123
+// server
+// 1234567SSH
 
 typedef websocketpp::server<websocketpp::config::asio> server_t; // 服务器对象类型
 
