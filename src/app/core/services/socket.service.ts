@@ -6,7 +6,7 @@ import {ProtocolMessage} from '../protocol/message-protocol';
   providedIn: 'root'
 })
 export class SocketService {
-  private url = "ws://test.infinomat.com:14514";
+  private url = "ws://114.116.245.123:14514";
   private isConnected = false;
   private socket: WebSocket | null = null;
   private messageSubject = new Subject<any>();

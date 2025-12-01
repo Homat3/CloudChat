@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
         // 监听登录状态，如果已登录则跳转到主页
         this.userManager.currentUser$.subscribe(user => {
             if (user) {
-                this.router.navigate(['/']);
+                this.router.navigate(['/'])
             }
         });
     }
@@ -41,19 +41,10 @@ export class LoginComponent implements OnInit {
         this.errorMessage = '';
 
         // 调用服务层的登录请求
-        this.userManager.requireLogin(this.username, this.password);
+        this.userManager.requireLogin(this.username, this.password, message => {this.errorMessage = message});
+    }
 
-        // 由于requireLogin是异步的且没有直接返回Promise/Observable，
-        // 我们这里简单处理loading状态。实际项目中应该有更完善的状态管理。
-        // 这里我们假设3秒后如果还没跳转就是超时或失败（配合Service里的console.error）
-        setTimeout(() => {
-            if (this.isLoading) {
-                this.isLoading = false;
-                // 简单提示，实际应由Service通过ErrorSubject通知
-                if (!this.userManager.getCurrentUser()) {
-                    this.errorMessage = '登录失败或超时，请检查用户名密码 (TestUser/123456)';
-                }
-            }
-        }, 1500);
+    onRegister(): void {
+        this.router.navigate(['/register']);
     }
 }

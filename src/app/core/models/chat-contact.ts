@@ -1,6 +1,6 @@
 export interface ChatContact {
-  id: number;
-  name: string;
-  status: string;
+  contactId: number;
+  userName: string;
+  online: boolean;
   avatar: string;
 }

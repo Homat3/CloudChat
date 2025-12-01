@@ -103,9 +103,9 @@ export class ContactManagerService {
   setSelectedContact(contact: Contact | null): void {
     if (contact) {
       this.selectedContact = {
-        id: contact.id,
-        name: contact.name,
-        status: contact.isOnline ? '在线' : '离线',
+        contactId: contact.id,
+        userName: contact.name,
+        online: contact.isOnline,
         avatar: contact.avatar
       };
     } else {
