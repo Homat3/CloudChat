@@ -19,6 +19,7 @@ private:
 	sql::mysql::MySQL_Driver* driver_; // 驱动对象指针
 	sql::Connection*          connection_; // MySQL 连接对象指针
 
+	// 构造函数建立与 mysql 的连接，初始化数据库，创建数据表
 	CloudChatDatabase();
 
 public:

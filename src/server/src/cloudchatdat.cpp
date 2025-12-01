@@ -14,7 +14,7 @@ CloudChatDatabase::CloudChatDatabase() {
 		
 		statement->execute("use cloudchat;"); // 选择 cloudchat 数据库
 
-		// TODO: 创建数据表
+		// 创建用户数据表
 		statement->execute(R"(
 create table if not exists users (
 id int auto_increment primary key,
@@ -26,6 +26,9 @@ token varchar(50) not null
 )
 )");
 		std::cout << "数据表 users 已成功创建。" << std::endl;
+
+		// TODO: 创建好友关系数据表
+		// 好友关系数据表有两列，均存储用户 id，表示一对好友关系中的两个用户，每一行（即每个条目）表示一对好友关系。
 
 		// 清理资源
 		delete statement;
