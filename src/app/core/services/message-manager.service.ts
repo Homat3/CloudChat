@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Message, MessageImpl } from '../models/message';
 import { Contact } from '../../components/contact-list/contact-list.component';
 import { SocketService } from './socket.service';
-import { MessageType, ProtocolMessage } from '../protocol/message-protocol';
+import {ClearMessagesPayload, MessageType, ProtocolMessage} from '../protocol/message-protocol';
 
 @Injectable({
   providedIn: 'root'
@@ -13,22 +13,13 @@ export class MessageManagerService {
   constructor(private socketService: SocketService) {
     this.initializeSampleMessages();
 
-    // TODO: Subscribe to incoming messages
-    // this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
-    //   switch (message.type) {
-    //     case MessageType.MESSAGES_LOADED:
-    //       // Assuming payload is { contactId: number, messages: Message[] }
-    //       this.updateMessages(message.payload.contactId, message.payload.messages);
-    //       break;
-    //     case MessageType.MESSAGES_CLEARED:
-    //       this.clearMessages(message.payload.contactId);
-    //       break;
-    //     case MessageType.MESSAGE_RECEIVED:
-    //       // Handle incoming message
-    //       this.receiveMessage(message.payload.contactId, message.payload.content);
-    //       break;
-    //   }
-    // });
+    this.socketService.getMessages().subscribe((message: ProtocolMessage) => {
+      switch (message.type) {
+        case MessageType.MESSAGES_CLEARED:
+          this.clearMessages(message.payload.targetUserId);
+          break;
+      }
+    });
   }
 
   getMessages(contactId: number): Message[] {
@@ -186,12 +177,15 @@ export class MessageManagerService {
     // });
   }
 
-  requireClearMessages(contactId: number): void {
-    // TODO: requireClearMessages
-    // this.socketService.sendMessage({
-    //   type: MessageType.CLEAR_MESSAGES,
-    //   payload: { contactId }
-    // });
+  requireClearMessages(thisId: number, toId: number): void {
+    let info : ClearMessagesPayload = {
+      requesterUserId: thisId,
+      targetUserId: toId
+    }
+    this.socketService.sendMessage({
+      type: MessageType.CLEAR_MESSAGES,
+      payload: info
+    });
   }
 
   clearMessages(contactId: number): void {

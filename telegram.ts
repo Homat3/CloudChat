@@ -12,19 +12,37 @@ import {
 } from './src/app/core/protocol/message-protocol';
 
 type Protocol =
-    //登录模块
+  // 登录模块
+  //  客户端->服务端
+  //    账密登录
   | { type: MessageType.LOGIN; payload: LoginPayload }
+  //    令牌登录
   | { type: MessageType.LOGIN_BY_TOKEN; payload: LoginByTokenPayload }
+  //    登出
+  | { type: MessageType.LOGOUT; payload: LogoutPayload }
+  //  服务端->客户端
+  //    登录成功
   | { type: MessageType.LOGIN_SUCCESS; payload: LoginSuccessPayload }
+  //    登录失败
   | { type: MessageType.LOGIN_FAILURE; payload: LoginFailurePayload }
-    // 注册模块
+  //    登出成功
+  | { type: MessageType.LOGOUT_SUCCESS; payload: LogoutPayload }
+  // 注册模块
+  //  客户端->服务端
+  //    注册
   | { type: MessageType.REGISTER; payload: RegisterPayload }
+  //  服务端->客户端
+  //    注册成功
   | { type: MessageType.REGISTER_SUCCESS; payload: RegisterSuccessPayload }
+  //    注册失败
   | { type: MessageType.REGISTER_FAILURE; payload: RegisterFailurePayload }
   // 个人资料模块
+  //  客户端->服务端
+  //    更新个人资料
   | { type: MessageType.UPDATE_PROFILE; payload: UpdateProfilePayload }
+  //  服务端->客户端
+  //    个人资料更新成功
   | { type: MessageType.PROFILE_UPDATED; payload: ProfileUpdatedPayload }
-  | { type: MessageType.LOGOUT; payload: LogoutPayload }
    // 联系人模块
   | { type: MessageType.LOAD_CONTACTS; payload: LoadContactsPayload }
   | { type: MessageType.CONTACTS_LOADED; payload: ContactsLoadedPayload }

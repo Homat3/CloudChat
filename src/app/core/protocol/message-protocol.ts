@@ -11,6 +11,7 @@ export enum MessageType {
   UPDATE_PROFILE = 'UPDATE_PROFILE',
   PROFILE_UPDATED = 'PROFILE_UPDATED',
   LOGOUT = 'LOGOUT',
+  LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
   LOAD_CONTACTS = 'LOAD_CONTACTS',
   CONTACTS_LOADED = 'CONTACTS_LOADED',
   ADD_CONTACT = 'ADD_CONTACT',
@@ -29,11 +30,13 @@ export enum MessageType {
   MESSAGES_CLEARED = 'MESSAGES_CLEARED'
 }
 
+//  Message
 export interface ProtocolMessage {
   type: MessageType;
   payload: any;
 }
 
+// Pay loads
 export interface LoginPayload {
   username: string;
   password: string;
@@ -44,7 +47,7 @@ export interface LoginByTokenPayload {
 }
 
 export interface LoginSuccessPayload {
-  userId: string;
+  userId: number;
   username: string;
   email: string;
   avatar: string;
@@ -62,7 +65,7 @@ export interface RegisterPayload {
 }
 
 export interface RegisterSuccessPayload {
-  userId: string;
+  userId: number;
   username: string;
   email: string;
   avatar: string;
@@ -74,7 +77,7 @@ export interface RegisterFailurePayload {
 }
 
 export interface UpdateProfilePayload {
-  userId: string;
+  userId: number;
   username: string;
   password: string;
   email: string;
@@ -82,26 +85,24 @@ export interface UpdateProfilePayload {
 }
 
 export interface ProfileUpdatedPayload {
-  userId: string;
-  updated: {
-    username: string;
-    password: string;
-    email: string;
-    avatar: string;
-  };
+  userId: number;
+  username: string;
+  password: string;
+  email: string;
+  avatar: string;
 }
 
 export interface LogoutPayload {
-  userId: string;
+  userId: number;
 }
 
 export interface LoadContactsPayload {
-  userId: string;
+  userId: number;
 }
 
 export interface ContactsLoadedPayload {
   contacts: Array<{
-    contactId: string;
+    contactId: number;
     username: string;
     avatar: string;
     online: boolean;
@@ -109,8 +110,8 @@ export interface ContactsLoadedPayload {
 }
 
 export interface AddContactPayload {
-  userId: string;
-  targetId: string;
+  userId: number;
+  targetId: number;
 }
 
 export interface ContactAddedPayload {
@@ -118,8 +119,8 @@ export interface ContactAddedPayload {
 }
 
 export interface DeleteContactPayload {
-  userId: string;
-  targetId: string;
+  requesterUserId: number;
+  targetUserId: number;
 }
 
 export interface ContactDeletedPayload {
@@ -127,41 +128,46 @@ export interface ContactDeletedPayload {
 }
 
 export interface LoadMessagesPayload {
-  requesterUserId: string;
+  requesterUserId: number;
 }
 
 export interface SendMessagePayload {
-  requesterUserId: string;
-  senderId: string;
-  receiverId: string;
+  requesterUserId: number;
+  senderId: number;
+  receiverId: number;
   content: string;
 }
 
 export interface SendFilePayload {
-  requesterUserId: string;
+  requesterUserId: number;
   fileName: string;
   fileContent: Uint8Array;
 }
 
 export interface SendImagePayload {
-  requesterUserId: string;
+  requesterUserId: number;
   imageName: string;
   imageContent: Uint8Array;
 }
 
 export interface MarkReadPayload {
-  requesterUserId: string;
+  requesterUserId: number;
 }
 
 export interface ClearMessagesPayload {
-  requesterUserId: string;
+  requesterUserId: number;
+  targetUserId: number;
 }
 
 export interface MessagesLoadedPayload {}
 
+export interface LogoutSuccessPayload {}
+
 export interface MessageReceivedPayload {}
 
-export interface MessagesClearedPayload {}
+export interface MessagesClearedPayload {
+  targetUserId: number;
+}
 
 export interface ProtocolMessage {
     type: MessageType;
@@ -181,9 +187,15 @@ export interface ProtocolMessage {
 
       {@link LogoutPayload} - LOGOUT
 
+      {@link LogoutSuccessPayload} - LOGOUT_SUCCESS
+
       {@link UpdateProfilePayload} - UPDATE_PROFILE
 
       {@link ProfileUpdatedPayload} - PROFILE_UPDATED
+
+      {@link ClearMessagesPayload} - CLEAR_MESSAGES
+
+      {@link MessagesClearedPayload} - MESSAGES_CLEARED
      */
     payload: any;
 }

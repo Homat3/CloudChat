@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Contact } from '../../components/contact-list/contact-list.component';
 import { ChatContact } from '../models';
 import { SocketService } from './socket.service';
+import {ClearMessagesPayload, DeleteContactPayload, MessageType} from '../protocol/message-protocol';
 
 @Injectable({
   providedIn: 'root'
@@ -77,12 +78,15 @@ export class ContactManagerService {
     // });
   }
 
-  requireDeleteContact(thisDd: number, id: number): void {
-    // TODO
-    // this.socketService.sendMessage({
-    //   type: MessageType.DELETE_CONTACT,
-    //   payload: { id }
-    // });
+  requireDeleteContact(thisId: number, toId: number): void {
+    let info : DeleteContactPayload = {
+      requesterUserId: thisId,
+      targetUserId: toId
+    }
+    this.socketService.sendMessage({
+      type: MessageType.DELETE_CONTACT,
+      payload: info
+    });
   }
 
   updateContact(updatedContact: Contact): void {

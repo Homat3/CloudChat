@@ -30,12 +30,12 @@ export class SidebarComponent {
   handleSetting(setting: string) {
     this.settingChanged.emit(setting);
     switch (setting) {
-      case 'mute':
-        console.log('消息免打扰');
-        break;
       case 'clear':
+        this.contactManager.requireDeleteContact(this.selectedContact!!.contactId, this.selectedContact!!.contactId);
         console.log('清空聊天记录');
         break;
+      default:
+        console.log('未定义的设置:', setting);
     }
   }
 

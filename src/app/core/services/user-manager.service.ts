@@ -48,10 +48,13 @@ export class UserManagerService {
                 break;
               }
               case MessageType.PROFILE_UPDATED: {
-                this.registerFailedCallback(message.payload.error);
+                if (isUser(message.payload))
+                  this.updateProfile(message.payload);
+                else
+                  this.registerFailedCallback('Invalid login response');
                 break;
               }
-              case MessageType.LOGOUT: {
+              case MessageType.LOGOUT_SUCCESS: {
                 this.logout();
                 break;
               }
