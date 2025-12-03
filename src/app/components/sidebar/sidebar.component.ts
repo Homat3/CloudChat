@@ -1,7 +1,8 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChatContact } from '../../core/models/chat-contact';
-import { ContactManagerService } from '../../core/services/contact-manager.service';
+import { Contact } from '../../core/models';
+import { RequestService } from '../../core/services/request.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface SharedFile {
   id: number;
@@ -19,20 +20,32 @@ interface SharedFile {
 })
 export class SidebarComponent {
   @Output() settingChanged = new EventEmitter<string>();
+  @Input() selectedContact: Contact | null = null;
   sharedFiles: SharedFile[] = [];
 
-  constructor(private contactManager: ContactManagerService) { }
-
-  get selectedContact(): ChatContact | null {
-    return this.contactManager.getSelectedContact();
-  }
+  constructor(
+    private requestService: RequestService,
+    private authService: AuthService
+  ) { }
 
   handleSetting(setting: string) {
     this.settingChanged.emit(setting);
     switch (setting) {
       case 'clear':
-        this.contactManager.requireDeleteContact(this.selectedContact!!.contactId, this.selectedContact!!.contactId);
-        console.log('清空聊天记录');
+        const currentUser = this.authService.currentUserValue;
+        if (currentUser && this.selectedContact) {
+          this.requestService.clearMessages({
+            requesterUserId: currentUser.userId,
+            targetUserId: this.selectedContact.contactId
+          });
+          console.log('清空聊天记录');
+        }
+        break;
+      case 'logout':
+        const user = this.authService.currentUserValue;
+        if (user) {
+          this.requestService.logout({ userId: user.userId });
+        }
         break;
       default:
         console.log('未定义的设置:', setting);

@@ -10,13 +10,13 @@
 
   <!-- 联系人列表 -->
   <div class="contacts-list">
-    @for (contact of contacts; track contact.id){
-    <div class="contact-item" [class.selected]="contact.id === selectedContactId" (click)="selectContact(contact)">
+    @for (contact of contacts; track contact.contactId){
+    <div class="contact-item" [class.selected]="contact.contactId === selectedContactId" (click)="selectContact(contact)">
       <div class="avatar-container">
-        <div class="avatar" [class.online]="contact.isOnline"></div>
+        <div class="avatar" [class.online]="contact.online"></div>
       </div>
       <div class="contact-info">
-        <div class="contact-name">{{ contact.name }}</div>
+        <div class="contact-name">{{ contact.username }}</div>
         <div class="last-message">{{ getLastMessage(contact) }}</div>
       </div>
       <div class="contact-meta">

@@ -1,2 +1,2 @@
 export * from './message';
-export * from './chat-contact';
+export * from './models';

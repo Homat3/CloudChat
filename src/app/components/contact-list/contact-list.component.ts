@@ -1,15 +1,11 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ContactManagerService } from '../../core/services/contact-manager.service';
-import { MessageManagerService } from '../../core/services/message-manager.service';
-
-export interface Contact {
-  id: number;
-  name: string;
-  avatar: string;
-  isOnline: boolean;
-}
+import { Contact } from '../../core/models/models';
+import { RequestService } from '../../core/services/request.service';
+import { ResponseService } from '../../core/services/response.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-contact-list',
@@ -18,33 +14,67 @@ export interface Contact {
   standalone: true,
   imports: [CommonModule, RouterLink]
 })
-export class ContactListComponent {
+export class ContactListComponent implements OnInit, OnDestroy {
   @Output() contactSelected = new EventEmitter<Contact>();
   selectedContactId: number | null = null;
+  contactsList: Contact[] = [];
+  private subscriptions: Subscription[] = [];
 
   constructor(
-    private contactManager: ContactManagerService,
-    private messageManager: MessageManagerService
+    private requestService: RequestService,
+    private responseService: ResponseService,
+    private authService: AuthService
   ) { }
 
+  ngOnInit() {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser) {
+      this.requestService.loadContacts({ userId: currentUser.userId });
+    }
+
+    this.subscriptions.push(
+      this.responseService.contactsLoaded$.subscribe(payload => {
+        this.contactsList = payload.contacts.map(c => new Contact(c.contactId, c.username, c.online, c.avatar));
+      }),
+      this.responseService.contactAdded$.subscribe(payload => {
+        this.contactsList.push(new Contact(payload.contactId, payload.userName, payload.online, payload.avatar));
+      }),
+      this.responseService.contactDeleted$.subscribe(() => {
+        // Reload contacts or remove locally if we had the ID.
+        // The protocol for delete success doesn't return the ID, so we might need to reload.
+        const currentUser = this.authService.currentUserValue;
+        if (currentUser) {
+          this.requestService.loadContacts({ userId: currentUser.userId });
+        }
+      })
+    );
+  }
+
   get contacts(): Contact[] {
-    return this.contactManager.getContacts();
+    return this.contactsList;
   }
 
   selectContact(contact: Contact) {
-    this.selectedContactId = contact.id;
+    this.selectedContactId = contact.contactId;
     this.contactSelected.emit(contact);
   }
 
   getLastMessage(contact: Contact): string {
-    return this.messageManager.getLastMessage(contact.id);
+    // Placeholder: Real implementation would require a message store service
+    return '';
   }
 
   getLastMessageTime(contact: Contact): string {
-    return this.messageManager.getLastMessageTime(contact.id);
+    // Placeholder
+    return '';
   }
 
   getUnreadCount(contact: Contact): number {
-    return this.messageManager.getUnreadCount(contact.id);
+    // Placeholder
+    return 0;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

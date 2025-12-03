@@ -3,28 +3,11 @@
   <!-- 顶部信息栏 -->
   <div class="chat-header">
     <div class="contact-info">
-      <div class="avatar">{{ selectedContact?.userName?.charAt(0) || 'U' }}</div>
+      <div class="avatar">{{ selectedContact?.username?.charAt(0) || 'U' }}</div>
       <div class="contact-details">
-        <div class="contact-name">{{ selectedContact?.userName || '请选择一个联系人' }}</div>
+        <div class="contact-name">{{ selectedContact?.username || '请选择一个联系人' }}</div>
         <div class="contact-status">{{ selectedContact?.online || '' }}</div>
       </div>
-    </div>
-    <div class="header-actions">
-      <button class="icon-button" title="语音通话"
-              (click)="selectedContact && sendEmoji()"
-              [disabled]="!selectedContact">
-        <i>📞</i>
-      </button>
-      <button class="icon-button" title="视频通话"
-              (click)="selectedContact && sendEmoji()"
-              [disabled]="!selectedContact">
-        <i>📹</i>
-      </button>
-      <button class="icon-button" title="更多选项"
-              (click)="selectedContact && sendEmoji()"
-              [disabled]="!selectedContact">
-        <i>⋯</i>
-      </button>
     </div>
   </div>
 
@@ -32,17 +15,14 @@
   <div class="chat-messages" #chatMessagesContainer *ngIf="selectedContact; else noContactSelected">
     <div class="date-divider">今天</div>
     @for (message of messages; track message.id) {
-      <div
-        class="message-bubble"
-        [class.own-message]="message.sender === 'me'"
-        [class.other-message]="message.sender === 'other'"
-        [class.new-message]="isNewMessage(message)"
-        [class.new-received-message]="isNewReceivedMessage(message)">
-        <div class="message-content">
-          {{ message.content }}
-        </div>
-        <div class="message-time">{{ message.timestamp }}</div>
+    <div class="message-bubble" [class.own-message]="isNewMessage(message)"
+      [class.other-message]="isNewReceivedMessage(message)" [class.new-message]="isNewMessage(message)"
+      [class.new-received-message]="isNewReceivedMessage(message)">
+      <div class="message-content">
+        {{ message.content }}
       </div>
+      <div class="message-time">{{ message.timestamp }}</div>
+    </div>
     }
   </div>
 
@@ -58,33 +38,17 @@
 
   <!-- 底部输入区 -->
   @if (selectedContact){
-    <div class="input-area">
-      <div class="input-container">
-        <div class="input-actions">
-          <button class="icon-button"
-                  (click)="sendEmoji()"
-                  [disabled]="!selectedContact"
-          >😊</button>
-          <button class="icon-button"
-                  (click)="sendFile()"
-                  [disabled]="!selectedContact"
-          >📎</button>
-          <button class="icon-button"
-                  (click)="sendImage()"
-                  [disabled]="!selectedContact"
-          >🎤</button>
-        </div>
-        <textarea
-          class="message-input"
-          placeholder="{{selectedContact ? '输入消息...' : '请先选择一个联系人'}}"
-          [(ngModel)]="newMessage"
-          (keydown.enter)="sendMessage($event)"
-          [disabled]="!selectedContact"
-        ></textarea>
+  <div class="input-area">
+    <div class="input-container">
+      <div class="input-actions">
+        <button class="icon-button" (click)="appendEmoji()" [disabled]="!selectedContact">😊</button>
+        <button class="icon-button" (click)="sendFile()" [disabled]="!selectedContact">📎</button>
+        <button class="icon-button" (click)="sendImage()" [disabled]="!selectedContact">🎤</button>
       </div>
-      <button class="send-button"
-              (click)="sendMessage()"
-              [disabled]="!selectedContact || !newMessage.trim()">发送</button>
+      <textarea class="message-input" placeholder="{{selectedContact ? '输入消息...' : '请先选择一个联系人'}}"
+        [(ngModel)]="newMessage" (keydown.enter)="sendMessage($event)" [disabled]="!selectedContact"></textarea>
     </div>
+    <button class="send-button" (click)="sendMessage($event)" [disabled]="!selectedContact || !newMessage.trim()">发送</button>
+  </div>
   }
 </div>

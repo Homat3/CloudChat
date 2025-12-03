@@ -1,8 +1,8 @@
 <div class="sidebar-container">
   <!-- 基础信息区 -->
   <div class="profile-section">
-    <div class="avatar">{{ selectedContact?.userName?.charAt(0) || 'U' }}</div>
-    <div class="profile-name">{{ selectedContact?.userName || '未知用户' }}</div>
+    <div class="avatar">{{ selectedContact?.username?.charAt(0) || 'U' }}</div>
+    <div class="profile-name">{{ selectedContact?.username || '未知用户' }}</div>
     <div class="profile-status">{{ selectedContact?.online ? '在线' : '离线' }}</div>
     <div class="profile-bio">产品经理 &#64; ABC公司</div>
   </div>
@@ -22,12 +22,8 @@
     <div class="module">
       <div class="module-title">共享内容</div>
       <div class="shared-files">
-        <div
-          *ngFor="let file of sharedFiles"
-          class="file-item"
-          [class.image-file]="file.type === 'image'"
-          (click)="previewFile(file)"
-          title="点击预览 {{ file.name }}">
+        <div *ngFor="let file of sharedFiles" class="file-item" [class.image-file]="file.type === 'image'"
+          (click)="previewFile(file)" title="点击预览 {{ file.name }}">
           <i class="file-icon"></i>
           <div class="file-info">
             <div class="file-name">{{ file.name }}</div>

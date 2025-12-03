@@ -6,13 +6,17 @@ import {
   ViewChild,
   ElementRef,
   AfterViewChecked,
-  Output, EventEmitter
+  OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ContactManagerService } from '../../core/services/contact-manager.service';
-import { MessageManagerService } from '../../core/services/message-manager.service';
-import { Message, ChatContact } from '../../core/models';
+import { Message, TextMessage, ImageMessage, FileMessage } from '../../core/models/message';
+import { Contact } from '../../core/models/models';
+import { RequestService } from '../../core/services/request.service';
+import { ResponseService } from '../../core/services/response.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Subscription } from 'rxjs';
+import { ClientMessageType } from '../../core/protocol/client.protocol';
 
 @Component({
   selector: 'app-chat-area',
@@ -21,34 +25,63 @@ import { Message, ChatContact } from '../../core/models';
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class ChatAreaComponent implements OnChanges, AfterViewChecked {
-  @Input() selectedContact: ChatContact | null = null;
+export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy {
+  @Input() selectedContact: Contact | null = null;
   @ViewChild('chatMessagesContainer', { static: false }) private chatMessagesContainer!: ElementRef;
 
   messages: Message[] = [];
   newMessage = '';
+  private subscriptions: Subscription[] = [];
 
   constructor(
-    private contactManager: ContactManagerService,
-    private messageManager: MessageManagerService
-  ) { }
+    private requestService: RequestService,
+    private responseService: ResponseService,
+    private authService: AuthService
+  ) {
+    this.subscriptions.push(
+      this.responseService.messagesLoaded$.subscribe(payload => {
+        this.messages = payload.messages.map(msg => this.mapToMessage(msg));
+        this.scrollToBottom();
+      }),
+      this.responseService.messageReceivedSelf$.subscribe(payload => {
+        // We might need to fetch the full message or optimistically add it.
+        // For now, let's assume we handle optimistic updates in sendMessage
+        // or we reload/wait for the echo.
+        // Actually, the protocol says MESSAGE_RECEIVED_SELF returns { messageId }.
+        // It doesn't return the full content.
+        // So we should probably add the message to the list when we send it,
+        // and maybe update its status when we get this confirmation.
+      }),
+      this.responseService.messageReceivedOther$.subscribe(payload => {
+        if (this.selectedContact && payload.senderId === this.selectedContact.contactId) {
+          this.messages.push(this.mapToMessage(payload));
+          this.scrollToBottom();
+          this.markMessagesAsRead(payload.id);
+        }
+      })
+    );
+  }
 
-  get currentContact(): ChatContact | null {
-    return this.contactManager.getSelectedContact();
+  get currentContact(): Contact | null {
+    return this.selectedContact;
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedContact'] && changes['selectedContact'].currentValue) {
       this.newMessage = '';
-      const contactId = changes['selectedContact'].currentValue.id;
+      const contactId = changes['selectedContact'].currentValue.contactId;
       this.loadContactMessages(contactId);
-      this.messageManager.markMessagesAsRead(contactId);
-      console.log('切换到联系人:', changes['selectedContact'].currentValue.name);
+      console.log('切换到联系人:', changes['selectedContact'].currentValue.username);
     }
   }
 
   private loadContactMessages(contactId: number): void {
-    this.messages = [...this.messageManager.getMessages(contactId)];
+    this.messages = []; // Clear current messages
+    this.requestService.loadMessages({ userId: contactId });
+  }
+
+  private markMessagesAsRead(messageId: number): void {
+    this.requestService.markRead({ messageId });
   }
 
   ngAfterViewChecked() {
@@ -66,77 +99,79 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     }
   }
 
-  sendMessage(event?: Event) {
-    if (event && event instanceof KeyboardEvent && event.key === 'Enter') {
-      event.preventDefault();
+  sendMessage(event: Event) {
+    if (!this.newMessage.trim() || !this.selectedContact) return;
 
-      if (!event.shiftKey) {
-        if (this.newMessage.trim() && this.selectedContact) {
-          this.processSendMessage();
-        }
-        return;
-      }
-
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser) {
+      console.error('User not logged in');
       return;
     }
 
-    if (this.newMessage.trim() && this.selectedContact) {
-      this.processSendMessage();
-    }
-  }
+    const tempMessageId = Date.now(); // Temporary ID
+    const content = this.newMessage;
+    const receiverId = this.selectedContact.contactId;
 
-  private processSendMessage() {
-    if (!this.selectedContact) return;
+    const messagePayload = {
+      messageId: tempMessageId,
+      senderId: currentUser.userId,
+      receiverId: receiverId,
+      content: content
+    };
 
-    this.messageManager.sendMessage(this.selectedContact.contactId, this.newMessage);
-    this.messages = this.messageManager.getMessages(this.selectedContact.contactId);
-    this.newMessage = '';
-
-    setTimeout(() => {
+    this.requestService.sendMessage(messagePayload, () => {
+      // Success callback - update local state here
+      const sentMsg = new TextMessage(
+        tempMessageId,
+        currentUser.userId,
+        receiverId,
+        content,
+        new Date().toISOString(), // Use local time as server doesn't return it in ack
+        'sent'
+      );
+      this.messages.push(sentMsg);
+      this.newMessage = '';
       this.scrollToBottom();
-    }, 0);
+    });
   }
-
-  // simulateReceiveMessage removed as it's now handled by service/socket
 
   isNewMessage(message: Message): boolean {
-    return message.sender === 'me' && message.status === 'sent';
+    const currentUser = this.authService.currentUserValue;
+    return !!currentUser && message.senderId === currentUser.userId;
   }
 
   isNewReceivedMessage(message: Message): boolean {
-    return message.sender === 'other' && message.status === 'sent';
+    const currentUser = this.authService.currentUserValue;
+    return !!currentUser && message.senderId !== currentUser.userId;
   }
 
   sendFile() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = (e: any) => {
-      const file = e.target.files[0];
-      if (file && this.selectedContact) {
-        this.messageManager.sendFile(this.selectedContact.contactId, file);
-        this.messages = this.messageManager.getMessages(this.selectedContact.contactId);
-        setTimeout(() => this.scrollToBottom(), 0);
-      }
-    };
-    input.click();
+    // TODO: Implement file selection and sending logic
+    console.log('File sending not implemented yet');
   }
 
   sendImage() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e: any) => {
-      const file = e.target.files[0];
-      if (file && this.selectedContact) {
-        this.messageManager.sendImage(this.selectedContact.contactId, file);
-        this.messages = this.messageManager.getMessages(this.selectedContact.contactId);
-        setTimeout(() => this.scrollToBottom(), 0);
-      }
-    };
-    input.click();
+    // TODO: Implement image selection and sending logic
+    console.log('Image sending not implemented yet');
   }
 
-  sendEmoji() {
-    this.newMessage += 'i';
+  appendEmoji() {
+    this.newMessage += '😊'; // Simple example
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private mapToMessage(data: any): Message {
+    if (data.type === 'text') {
+      return new TextMessage(data.id, data.senderId, data.receiverId, data.content, data.timestamp, data.status);
+    } else if (data.type === 'image') {
+      return new ImageMessage(data.id, data.senderId, data.receiverId, data.content, data.timestamp, data.status);
+    } else if (data.type === 'file') {
+      return new FileMessage(data.id, data.senderId, data.receiverId, data.content, data.timestamp, data.status);
+    }
+    // Default to text if unknown
+    return new TextMessage(data.id, data.senderId, data.receiverId, typeof data.content === 'string' ? data.content : '', data.timestamp, data.status);
   }
 }

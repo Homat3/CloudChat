@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserManagerService } from '../../core/services/user-manager.service';
+import { RequestService } from '../../core/services/request.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -18,17 +19,15 @@ export class LoginComponent implements OnInit {
     errorMessage = '';
 
     constructor(
-        private userManager: UserManagerService,
-        private router: Router
+        private router: Router,
+        private requestService: RequestService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
-        // 监听登录状态，如果已登录则跳转到主页
-        this.userManager.currentUser$.subscribe(user => {
-            if (user) {
-                this.router.navigate(['/'])
-            }
-        });
+        if (this.authService.currentUserValue) {
+            this.router.navigate(['/chat']);
+        }
     }
 
     onLogin(): void {
@@ -40,8 +39,17 @@ export class LoginComponent implements OnInit {
         this.isLoading = true;
         this.errorMessage = '';
 
-        // 调用服务层的登录请求
-        this.userManager.requireLogin(this.username, this.password, message => {this.errorMessage = message});
+        this.requestService.login(
+            { username: this.username, password: this.password },
+            () => {
+                this.isLoading = false;
+                // Navigation is handled in AuthService
+            },
+            (error) => {
+                this.isLoading = false;
+                this.errorMessage = error;
+            }
+        );
     }
 
     onRegister(): void {

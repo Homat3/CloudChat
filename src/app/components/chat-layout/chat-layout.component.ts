@@ -1,10 +1,9 @@
 import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { ContactListComponent, Contact } from '../contact-list/contact-list.component';
+import { ContactListComponent } from '../contact-list/contact-list.component';
+import { Contact } from '../../core/models/models';
 import { ChatAreaComponent } from '../chat-area/chat-area.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-import { ContactManagerService } from '../../core/services/contact-manager.service';
-import { ChatContact } from '../../core/models';
 
 // 定义视图部分枚举
 enum ActiveView {
@@ -26,7 +25,6 @@ export class ChatLayoutComponent {
   isMobile = false;
 
   constructor(
-    private contactManager: ContactManagerService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     if (isPlatformBrowser(this.platformId)) {
@@ -38,8 +36,10 @@ export class ChatLayoutComponent {
     }
   }
 
+  selectedContactState: Contact | null = null;
+
   onContactSelected(contact: Contact) {
-    this.contactManager.setSelectedContact(contact);
+    this.selectedContactState = contact;
     // 在移动端，选择联系人后切换到聊天视图
     if (this.isMobile) {
       this.activeView = ActiveView.Chat;
@@ -50,8 +50,8 @@ export class ChatLayoutComponent {
     console.log('设置已更改:', setting);
   }
 
-  get selectedContact(): ChatContact | null {
-    return this.contactManager.getSelectedContact();
+  get selectedContact(): Contact | null {
+    return this.selectedContactState;
   }
 
   // 切换视图的方法

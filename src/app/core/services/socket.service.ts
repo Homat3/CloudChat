@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import {ProtocolMessage} from '../protocol/message-protocol';
+import { Message as ProtocolMessage } from '../protocol/client.protocol';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
-  private url = "ws://114.116.245.123:14514";
+  private url = "ws://cloudchat.infinomat.com:14514";
   private isConnected = false;
   private socket: WebSocket | null = null;
   private messageSubject = new Subject<any>();
@@ -40,7 +40,7 @@ export class SocketService {
       this.socket.onerror = (error) => {
         this.errorSubject.next('WebSocket连接发生错误');
         console.error('WebSocket错误:', error);
-        window.alert('WebSocket连接发生错误！' +  error)
+        window.alert('WebSocket连接发生错误！' + error)
       };
 
       this.socket.onclose = (event) => {
@@ -55,7 +55,7 @@ export class SocketService {
     } catch (error) {
       this.errorSubject.next('创建WebSocket连接时出错');
       console.error('创建WebSocket连接失败:', error);
-      window.alert('创建WebSocket连接失败:' +  error)
+      window.alert('创建WebSocket连接失败:' + error)
     }
   }
 
