@@ -43,6 +43,7 @@ export interface LoginPayload {
 
 export interface LoginByTokenPayload {
   token: string;
+  userId: number;
 }
 
 
@@ -104,10 +105,12 @@ export interface SendImagePayload {
 
 export interface LoadMessagesPayload {
   userId: number;
+  targetId: number;
 }
 
 export interface MarkReadPayload {
-  messageId: number;
+  userId: number;
+  targetId: number;
 }
 
 export interface ClearMessagesPayload {

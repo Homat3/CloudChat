@@ -10,13 +10,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Message, TextMessage, ImageMessage, FileMessage } from '../../core/models/message';
-import { Contact } from '../../core/models/models';
+import { Message, TextMessage, ImageMessage, FileMessage } from '../../core/models';
+import { Contact } from '../../core/models';
 import { RequestService } from '../../core/services/request.service';
 import { ResponseService } from '../../core/services/response.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
-import { ClientMessageType } from '../../core/protocol/client.protocol';
 
 @Component({
   selector: 'app-chat-area',
@@ -56,7 +55,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
         if (this.selectedContact && payload.senderId === this.selectedContact.contactId) {
           this.messages.push(this.mapToMessage(payload));
           this.scrollToBottom();
-          this.markMessagesAsRead(payload.id);
+          this.markMessagesAsRead(<number>this.authService.currentUserValue?.userId, this.selectedContact.contactId);
         }
       })
     );
@@ -70,18 +69,18 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
     if (changes['selectedContact'] && changes['selectedContact'].currentValue) {
       this.newMessage = '';
       const contactId = changes['selectedContact'].currentValue.contactId;
-      this.loadContactMessages(contactId);
+      this.loadContactMessages(<number>this.authService.currentUserValue?.userId, contactId);
       console.log('切换到联系人:', changes['selectedContact'].currentValue.username);
     }
   }
 
-  private loadContactMessages(contactId: number): void {
+  private loadContactMessages(contactId: number, targetId: number): void {
     this.messages = []; // Clear current messages
-    this.requestService.loadMessages({ userId: contactId });
+    this.requestService.loadMessages({ userId: contactId, targetId: targetId });
   }
 
-  private markMessagesAsRead(messageId: number): void {
-    this.requestService.markRead({ messageId });
+  private markMessagesAsRead(userId: number, targetId: number): void {
+    this.requestService.markRead({ userId, targetId });
   }
 
   ngAfterViewChecked() {

@@ -282,7 +282,8 @@
 {
   "type": "LOAD_MESSAGES",
   "payload": {
-    "userId": "int"
+    "userId": "int",
+    "targetId": "int"
   }
 }
 ```
