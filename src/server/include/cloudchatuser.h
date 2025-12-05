@@ -20,12 +20,12 @@ public:
 	CloudChatUser(int id, std::string username, std::string password, std::string avatar,
 				  std::string token);
 	// getter
-	int GetId();
-	std::string GetUserName();
-	std::string GetPassword();
-	std::string GetAvatar();
-	std::string GetToken();
-	std::string GetEmail();
+	int get_id();
+	std::string get_user_name();
+	std::string get_password();
+	std::string get_avatar();
+	std::string get_token();
+	std::string get_email();
 	// setter
 	void SetId(int id);
 	void SetUserName(std::string username);

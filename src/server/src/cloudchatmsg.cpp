@@ -287,7 +287,7 @@ std::string MessagesClearedMsg::ToJSON() {
 	
 }
 
-ProtocalMsg parse_protocal_msg(std::string JSON) {
+ProtocalMsg* parse_protocal_msg(std::string JSON) {
 	int len = JSON.length();
 	// 找到 "type" 字段的位置
 	int type_pos = 0;
@@ -345,10 +345,10 @@ ProtocalMsg parse_protocal_msg(std::string JSON) {
 	} else if (type == REGISTER) {
 		return RegisterMsg::parse_from_JSON(JSON, payload_pos);
 	}
-	return ProtocalMsg(ILLEGAL_MSG);
+	return new ProtocalMsg(ILLEGAL_MSG);
 }
 
-LoginMsg LoginMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+LoginMsg* LoginMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	int len = JSON.length();
 	std::string username, password;
 	int first_quote = 0, second_quote = 0; // 两个引号的位置
@@ -414,10 +414,10 @@ LoginMsg LoginMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	for (int i = first_quote + 1; i < second_quote; i++) {
 		password.push_back(JSON[i]);
 	}
-	return LoginMsg(username, password);
+	return new LoginMsg(username, password);
 }
 
-LoginByTokenMsg LoginByTokenMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+LoginByTokenMsg* LoginByTokenMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	int len = JSON.length();
 	std::string username, token;
 	int first_quote = 0, second_quote = 0; // 两个引号的位置
@@ -483,10 +483,10 @@ LoginByTokenMsg LoginByTokenMsg::parse_from_JSON(std::string JSON, int payload_p
 	for (int i = first_quote + 1; i < second_quote; i++) {
 		token.push_back(JSON[i]);
 	}
-	return LoginByTokenMsg(username, token);
+	return new LoginByTokenMsg(username, token);
 }
 
-RegisterMsg RegisterMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+RegisterMsg* RegisterMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	int len = JSON.length();
 	std::string username, password, email;
 	int first_quote = 0, second_quote = 0; // 两个引号的位置
@@ -584,5 +584,9 @@ RegisterMsg RegisterMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	for (int i = first_quote + 1; i < second_quote; i++) {
 		email.push_back(JSON[i]);
 	}
-	return RegisterMsg(username, password, email);
+	return new RegisterMsg(username, password, email);
+}
+
+std::string ProtocalMsg::get_type() {
+	return type_;
 }

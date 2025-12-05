@@ -64,6 +64,7 @@ CloudChatDatabase::CloudChatDatabase() {
 			)"
 		);
 		std::cout << "数据表 messages 已成功创建。" << std::endl;
+		/*
 		// 创建群聊表
         statement->execute(R"(
 			create table if not exists groups (
@@ -113,7 +114,7 @@ CloudChatDatabase::CloudChatDatabase() {
 			)"
 		);
 		std::cout << "数据表 group_messages 已成功创建。" << std::endl;
-
+		*/
 		//添加好友请求表
 		statement->execute(R"(
 			create table if not exists friend_requests (

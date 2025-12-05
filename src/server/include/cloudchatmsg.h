@@ -72,6 +72,7 @@ protected:
 
 public:
 	ProtocalMsg(std::string type);
+	std::string get_type();
 };
 
 class LoginMsg : public ProtocalMsg { // 账密登录消息
@@ -81,7 +82,7 @@ private:
 
 public:
 	LoginMsg(std::string username, std::string password);
-	static LoginMsg parse_from_JSON(std::string JSON, int payload_pos);
+	static LoginMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class LoginByTokenMsg : public ProtocalMsg { // 令牌登录消息
@@ -91,7 +92,7 @@ private:
 
 public:
 	LoginByTokenMsg(std::string username, std::string token);
-	static LoginByTokenMsg parse_from_JSON(std::string JSON, int payload_pos);
+	static LoginByTokenMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class RegisterMsg : public ProtocalMsg { // 注册消息
@@ -102,7 +103,7 @@ private:
 
 public:
 	RegisterMsg(std::string username, std::string password, std::string email);
-	static RegisterMsg parse_from_JSON(std::string JSON, int payload_pos);
+	static RegisterMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class LogoutMsg : public ProtocalMsg { // 退出登录消息
@@ -386,6 +387,6 @@ public:
 	std::string ToJSON();
 };
 
-ProtocalMsg parse_protocal_msg(std::string JSON); // 将 JSON 字符串解析为 ProtocalMsg 对象
+ProtocalMsg* parse_protocal_msg(std::string JSON); // 将 JSON 字符串解析为 ProtocalMsg 对象
 
 #endif // CLOUDCHATMSG_H

@@ -18,6 +18,10 @@
 #include <cppconn/prepared_statement.h>
 #include <time.h>
 #include <cstdlib>
+#include <iostream>
+#include <websocketpp/common/connection_hdl.hpp>
+#include <websocketpp/error.hpp>
+#include <websocketpp/logger/levels.hpp>
 
 #define SERVER_PORT 14514 // 服务器通信端口号
 // 114.116.245.123

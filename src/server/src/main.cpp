@@ -1,9 +1,4 @@
-#include "cloudchatdat.h"
-#include "cloudchatsys.h"
-#include <iostream>
-#include <websocketpp/common/connection_hdl.hpp>
-#include <websocketpp/error.hpp>
-#include <websocketpp/logger/levels.hpp>
+#include "cloudchatservice.h"
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
@@ -86,8 +81,7 @@ int InitNetwork() {
 	return NETWORK_INITIALIZED;
 }
 
-void OnOpen(websocketpp::connection_hdl hdl) {
-	// TODO: 客户端连接建立时服务端的提示信息
+void OnOpen(websocketpp::connection_hdl hdl) { // 客户端连接建立时服务端的提示信息
     // 通过连接句柄获取连接指针
     server_t::connection_ptr con = g_cloudchat_srv.get_con_from_hdl(hdl);
     
@@ -100,8 +94,7 @@ void OnOpen(websocketpp::connection_hdl hdl) {
     std::cout << "客户端已连接，IP地址: " << remote_ip << std::endl;
 }
 
-void OnClose(websocketpp::connection_hdl hdl) {
-	// TODO: 客户端关闭连接时服务端的提示信息
+void OnClose(websocketpp::connection_hdl hdl) {	// 客户端断开连接时服务端的提示信息
 	// 通过连接句柄获取连接指针
     server_t::connection_ptr con = g_cloudchat_srv.get_con_from_hdl(hdl);
     
@@ -116,4 +109,11 @@ void OnClose(websocketpp::connection_hdl hdl) {
 
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	// TODO: 收到客户端的消息并解析处理
+	std::string JSON_msg = msg->get_payload();
+	ProtocalMsg* protocal_msg = parse_protocal_msg(JSON_msg);
+	std::string type = protocal_msg->get_type();
+
+	if (type == LOGIN) Login(hdl, (LoginMsg*)protocal_msg);
+	else if (type == LOGIN_BY_TOKEN) LoginByToken(hdl, (LoginByTokenMsg*)protocal_msg);
+    else if (type == REGISTER) Register(hdl, (RegisterMsg*)protocal_msg);
 }
