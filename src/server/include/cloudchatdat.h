@@ -24,6 +24,7 @@ private:
 
 public:
 	static CloudChatDatabase* GetInstance(); // 获取单例模式实例
+	// TODO: 编写数据库操作接口
 };
 
 #endif // CLOUDCHATDAT_H

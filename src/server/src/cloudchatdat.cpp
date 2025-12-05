@@ -36,7 +36,6 @@ CloudChatDatabase::CloudChatDatabase() {
 			create table if not exists friends (
 			user_id1 int not null,
 			user_id2 int not null,
-			status enum('pending', 'accepted', 'blocked') default ''accepted,
 			created_at timestamp default current_timestamp,
 			primary key (user_id1, user_id2),
 			foreign key (user_id1) references users(id) on delete cascade,
@@ -71,7 +70,7 @@ CloudChatDatabase::CloudChatDatabase() {
 			id int auto_increment primary key,
 			name varchar(100) not null,
 			description text,
-			creator_id int not null,
+			owner_id int not null,
 			avatar varchar(100),
 			created_at timestamp default current_timestamp,
 			foreign key (creator_id) references users(id) on delete cascade

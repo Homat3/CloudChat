@@ -16,6 +16,7 @@
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/prepared_statement.h>
+#include <time.h>
 
 #define SERVER_PORT 14514 // 服务器通信端口号
 // 114.116.245.123
