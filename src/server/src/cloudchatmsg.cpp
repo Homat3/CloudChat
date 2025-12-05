@@ -1,4 +1,5 @@
 #include "cloudchatmsg.h"
+#include "cloudchatsys.h"
 
 ProtocalMsg::ProtocalMsg(std::string type) {
 	type_ = type;
@@ -192,23 +193,49 @@ MessagesClearedMsg::MessagesClearedMsg(int user_id, int target_id) : ProtocalMsg
 }
 
 std::string LoginSuccessMsg::ToJSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"userId\":%d,\"username\":\"%s\",\"email\":\"%s\",\"avatar\":\"%s\",\"token\":\"%s\"}}",
+			type_.c_str(), user_id_, username_.c_str(), email_.c_str(), avatar_.c_str(),
+			token_.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string LoginFailureMsg::ToJSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", type_.c_str(),
+			error_.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string LogoutSuccessMsg::ToJSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{}}", type_.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string RegisterSuccessMsg::ToJSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"userId\":%d,\"username\":\"%s\",\"email\":\"%s\",\"avatar\":\"%s\",\"token\":\"%s\"}}",
+			type_.c_str(), user_id_, username_.c_str(), email_.c_str(), avatar_.c_str(),
+			token_.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string RegisterFailureMsg::ToJSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", type_.c_str(),
+			error_.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ProfileUpdatedSuccessMsg::ToJSON() {
@@ -258,4 +285,304 @@ std::string MessagesLoadedMsg::ToJSON() {
 
 std::string MessagesClearedMsg::ToJSON() {
 	
+}
+
+ProtocalMsg parse_protocal_msg(std::string JSON) {
+	int len = JSON.length();
+	// 找到 "type" 字段的位置
+	int type_pos = 0;
+	for (int i = 0; i + 5 < len; i++) {
+		std::string target = "\"type\"";
+		bool flag = true;
+		for (int j = 0; j < 6; j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			type_pos = i;
+			break;
+		}
+	}
+	// 找到 "payload" 字段的位置
+	int payload_pos = 0;
+	for (int i = 0; i + 8 < len; i++) {
+		std::string target = "\"payload\"";
+		bool flag = true;
+		for (int j = 0; j < 9; j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			payload_pos = i;
+			break;
+		}
+	}
+	// 提取 type 值
+	int first_quote = 0, second_quote = 0; // 两个双引号的位置
+	for (int i = type_pos + 6; i < payload_pos; i++) {
+		if (JSON[i] == '"') {
+			first_quote = i;
+			break;
+		}
+	}
+	for (int i = payload_pos - 1; i >= type_pos + 6; i--) {
+		if (JSON[i] == '"') {
+			second_quote = i;
+			break;
+		}
+	}
+	std::string type;
+	for (int i = first_quote + 1; i < second_quote; i++) type.push_back(JSON[i]);
+	// 根据 type 值提取相应类型对象
+	if (type == LOGIN) {
+		return LoginMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == LOGIN_BY_TOKEN) {
+		return LoginByTokenMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == REGISTER) {
+		return RegisterMsg::parse_from_JSON(JSON, payload_pos);
+	}
+	return ProtocalMsg(ILLEGAL_MSG);
+}
+
+LoginMsg LoginMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int len = JSON.length();
+	std::string username, password;
+	int first_quote = 0, second_quote = 0; // 两个引号的位置
+	// 找到 username 字段的位置
+	int username_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"username\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			username_pos = i;
+			break;
+		}
+	}
+	// 找到 password 字段的位置
+	int password_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"password\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			password_pos = i;
+			break;
+		}
+	}
+	// 提取 username 值
+	for (int i = username_pos + 10; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		username.push_back(JSON[i]);
+	}
+	// 提取 password 值
+	first_quote = 0;
+	second_quote = 0;
+	for (int i = password_pos + 10; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		password.push_back(JSON[i]);
+	}
+	return LoginMsg(username, password);
+}
+
+LoginByTokenMsg LoginByTokenMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int len = JSON.length();
+	std::string username, token;
+	int first_quote = 0, second_quote = 0; // 两个引号的位置
+	// 找到 username 字段的位置
+	int username_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"username\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			username_pos = i;
+			break;
+		}
+	}
+	// 找到 token 字段的位置
+	int token_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"token\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			token_pos = i;
+			break;
+		}
+	}
+	// 提取 username 值
+	for (int i = username_pos + 10; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		username.push_back(JSON[i]);
+	}
+	// 提取 token 值
+	first_quote = 0;
+	second_quote = 0;
+	for (int i = token_pos + 8; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		token.push_back(JSON[i]);
+	}
+	return LoginByTokenMsg(username, token);
+}
+
+RegisterMsg RegisterMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int len = JSON.length();
+	std::string username, password, email;
+	int first_quote = 0, second_quote = 0; // 两个引号的位置
+	// 找到 username 字段的位置
+	int username_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"username\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			username_pos = i;
+			break;
+		}
+	}
+	// 找到 password 字段的位置
+	int password_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"password\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			password_pos = i;
+			break;
+		}
+	}
+	// 找到 email 字段的位置
+	int email_pos = 0;
+	for (int i = payload_pos + 9; i < len; i++) {
+		std::string target = "\"email\"";
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) {
+			email_pos = i;
+			break;
+		}
+	}
+	// 提取 username 值
+	for (int i = username_pos + 10; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		username.push_back(JSON[i]);
+	}
+	// 提取 password 值
+	first_quote = 0;
+	second_quote = 0;
+	for (int i = password_pos + 10; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		password.push_back(JSON[i]);
+	}
+	// 提取 email 值
+	first_quote = 0;
+	second_quote = 0;
+	for (int i = email_pos + 8; i < len; i++) {
+		if (JSON[i] == '"') {
+			if (first_quote == 0) {
+				first_quote = i;
+			} else {
+				second_quote = i;
+				break;
+			}
+		}
+	}
+	for (int i = first_quote + 1; i < second_quote; i++) {
+		email.push_back(JSON[i]);
+	}
+	return RegisterMsg(username, password, email);
 }

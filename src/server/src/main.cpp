@@ -88,10 +88,30 @@ int InitNetwork() {
 
 void OnOpen(websocketpp::connection_hdl hdl) {
 	// TODO: 客户端连接建立时服务端的提示信息
+    // 通过连接句柄获取连接指针
+    server_t::connection_ptr con = g_cloudchat_srv.get_con_from_hdl(hdl);
+    
+    // 获取底层socket，然后获取远程端点
+    boost::asio::ip::tcp::socket &sock = con->get_raw_socket();
+    boost::asio::ip::tcp::endpoint remote_ep = sock.remote_endpoint();
+    
+    // 获取IP地址（字符串形式）
+    std::string remote_ip = remote_ep.address().to_string();
+    std::cout << "客户端已连接，IP地址: " << remote_ip << std::endl;
 }
 
 void OnClose(websocketpp::connection_hdl hdl) {
 	// TODO: 客户端关闭连接时服务端的提示信息
+	// 通过连接句柄获取连接指针
+    server_t::connection_ptr con = g_cloudchat_srv.get_con_from_hdl(hdl);
+    
+    // 获取底层socket，然后获取远程端点
+    boost::asio::ip::tcp::socket &sock = con->get_raw_socket();
+    boost::asio::ip::tcp::endpoint remote_ep = sock.remote_endpoint();
+    
+    // 获取IP地址（字符串形式）
+    std::string remote_ip = remote_ep.address().to_string();
+    std::cout << "客户端已断开连接，IP地址: " << remote_ip << std::endl;
 }
 
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {

@@ -35,4 +35,6 @@ public:
 	void SetEmail(std::string email);
 };
 
+std::string generate_token();	// 生成令牌
+
 #endif // CLOUDCHATUSER_H

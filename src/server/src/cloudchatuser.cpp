@@ -56,3 +56,12 @@ std::string CloudChatUser::GetEmail() {
 void CloudChatUser::SetEmail(std::string email) {
 	email_ = email;
 }
+
+std::string generate_token() {
+	int len = 15 + rand() % 5;
+	std::string token;
+	for (int i = 0; i < len; i++) {
+		token.push_back(33 + rand() % 94);
+	}
+	return token;
+}

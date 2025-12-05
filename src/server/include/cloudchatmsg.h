@@ -15,6 +15,7 @@
 #define FILE_MESSAGE  "file"	// 文件
 
 // 通信消息类型宏
+#define ILLEGAL_MSG "ILLEGAL_MSG"						  // 无效消息
 // 客户端消息
 #define LOGIN "LOGIN"			// 账密登录
 #define LOGIN_BY_TOKEN "LOGIN_BY_TOKEN" // 令牌登录
@@ -73,25 +74,27 @@ public:
 	ProtocalMsg(std::string type);
 };
 
-class LoginMsg : ProtocalMsg { // 账密登录消息
+class LoginMsg : public ProtocalMsg { // 账密登录消息
 private:
 	std::string username_; // 用户名
 	std::string password_; // 密码
 
 public:
 	LoginMsg(std::string username, std::string password);
+	static LoginMsg parse_from_JSON(std::string JSON, int payload_pos);
 };
 
-class LoginByTokenMsg : ProtocalMsg { // 令牌登录消息
+class LoginByTokenMsg : public ProtocalMsg { // 令牌登录消息
 private:
 	std::string username_;		// 用户名
 	std::string token_;			// 令牌
 
 public:
 	LoginByTokenMsg(std::string username, std::string token);
+	static LoginByTokenMsg parse_from_JSON(std::string JSON, int payload_pos);
 };
 
-class RegisterMsg : ProtocalMsg { // 注册消息
+class RegisterMsg : public ProtocalMsg { // 注册消息
 private:
 	std::string username_; // 用户名
 	std::string password_; // 密码
@@ -99,9 +102,10 @@ private:
 
 public:
 	RegisterMsg(std::string username, std::string password, std::string email);
+	static RegisterMsg parse_from_JSON(std::string JSON, int payload_pos);
 };
 
-class LogoutMsg : ProtocalMsg { // 退出登录消息
+class LogoutMsg : public ProtocalMsg { // 退出登录消息
 private:
 	int user_id_; // 用户 id
 
@@ -109,7 +113,7 @@ public:
 	LogoutMsg(int user_id);
 };
 
-class UpdateProfileMsg : ProtocalMsg { // 更新用户信息消息
+class UpdateProfileMsg : public ProtocalMsg { // 更新用户信息消息
 private:
 	int user_id_; // 用户 id
 	std::string username_; // 用户名
@@ -122,7 +126,7 @@ public:
 						 std::string avatar);
 };
 
-class LoadContactsMsg : ProtocalMsg { // 加载联系人列表消息
+class LoadContactsMsg : public ProtocalMsg { // 加载联系人列表消息
 private:
 	int user_id_; // 用户 id
 
@@ -130,7 +134,7 @@ public:
 	LoadContactsMsg(int user_id);
 };
 
-class AddContactMsg : ProtocalMsg { // 添加联系人消息
+class AddContactMsg : public ProtocalMsg { // 添加联系人消息
 private:
 	int user_id_;				// 用户 id
 	int target_id_;				// 联系人 id
@@ -139,7 +143,7 @@ public:
 	AddContactMsg(int user_id, int target_id);
 };
 
-class DeleteContactMsg : ProtocalMsg { // 删除联系人消息
+class DeleteContactMsg : public ProtocalMsg { // 删除联系人消息
 private:
 	int user_id_;		// 用户 id
 	int target_id_;		// 目标联系人 id
@@ -148,7 +152,7 @@ public:
 	DeleteContactMsg(int requester_user_id, int target_uesr_id);
 };
 
-class SendMessageMsg : ProtocalMsg { // 发送聊天消息消息
+class SendMessageMsg : public ProtocalMsg { // 发送聊天消息消息
 private:
 	int message_id_;		    // 消息 id
 	int sender_id_;				// 发送者用户 id
@@ -159,7 +163,7 @@ public:
 	SendMessageMsg(int message_id, int sender_id, int receiver_id, std::string content);
 };
 
-class SendFileMsg : ProtocalMsg { // 发送文件消息
+class SendFileMsg : public ProtocalMsg { // 发送文件消息
 private:
 	int message_id_;			// 消息 id
 	int sender_id_;				// 发送者 id
@@ -172,7 +176,7 @@ public:
 				std::vector<std::string> file_content);
 };
 
-class SendImageMsg : ProtocalMsg { // 发送图片消息
+class SendImageMsg : public ProtocalMsg { // 发送图片消息
 private:
 	int message_id_;			// 消息 id
 	int sender_id_;				// 发送者 id
@@ -185,7 +189,7 @@ public:
 				 std::vector<std::string> image_content);
 };
 
-class LoadMessagesMsg : ProtocalMsg { // 加载聊天记录消息
+class LoadMessagesMsg : public ProtocalMsg { // 加载聊天记录消息
 private:
 	int user_id_;		// 用户 id
 	int target_id_;		// 目标联系人 id
@@ -194,7 +198,7 @@ public:
 	LoadMessagesMsg(int user_id, int target_id);
 };
 
-class MarkReadMsg : ProtocalMsg { // 标记为已读消息
+class MarkReadMsg : public ProtocalMsg { // 标记为已读消息
 private:
 	int user_id_;				// 用户 id
 	int target_id_;				// 目标联系人 id
@@ -203,7 +207,7 @@ public:
 	MarkReadMsg(int user_id, int target_id);
 };
 
-class ClearMessagesMsg : ProtocalMsg { // 清空聊天记录
+class ClearMessagesMsg : public ProtocalMsg { // 清空聊天记录
 private:
 	int requester_user_id_;		// 用户 id
 	int target_user_id_;		// 目标用户 id
@@ -212,7 +216,7 @@ public:
 	ClearMessagesMsg(int requester_user_id, int target_user_id);
 };
 
-class LoginSuccessMsg : ProtocalMsg { // 登录成功消息
+class LoginSuccessMsg : public ProtocalMsg { // 登录成功消息
 private:
 	int user_id_; // 用户 id
 	std::string username_; // 用户名
@@ -226,7 +230,7 @@ public:
 	std::string ToJSON();
 };
 
-class LoginFailureMsg : ProtocalMsg { // 登录失败消息
+class LoginFailureMsg : public ProtocalMsg { // 登录失败消息
 private:
 	std::string error_; // 错误信息
 
@@ -235,12 +239,12 @@ public:
 	std::string ToJSON();
 };
 
-class LogoutSuccessMsg : ProtocalMsg { // 成功退出登录消息
+class LogoutSuccessMsg : public ProtocalMsg { // 成功退出登录消息
 public:
 	std::string ToJSON();
 };
 
-class RegisterSuccessMsg : ProtocalMsg { // 注册成功消息
+class RegisterSuccessMsg : public ProtocalMsg { // 注册成功消息
 private:
 	int user_id_; // 用户 id
 	std::string username_; // 用户名
@@ -254,7 +258,7 @@ public:
 	std::string ToJSON();
 };
 
-class RegisterFailureMsg : ProtocalMsg { // 注册失败消息
+class RegisterFailureMsg : public ProtocalMsg { // 注册失败消息
 private:
 	std::string error_; // 错误信息
 	
@@ -263,7 +267,7 @@ public:
 	std::string ToJSON();
 };
 
-class ProfileUpdatedSuccessMsg : ProtocalMsg { // 用户信息已更新消息
+class ProfileUpdatedSuccessMsg : public ProtocalMsg { // 用户信息已更新消息
 private:
 	int user_id_; // 用户 id
 	std::string username_; // 用户名
@@ -277,7 +281,7 @@ public:
 	std::string ToJSON();
 };
 
-class ProfileUpdatedFailedMsg : ProtocalMsg { // 更新用户信息失败
+class ProfileUpdatedFailedMsg : public ProtocalMsg { // 更新用户信息失败
 private:
 	std::string error_;
 
@@ -286,7 +290,7 @@ public:
 	std::string ToJSON();
 };
 
-class ContactsLoadedMsg : ProtocalMsg { // 已加载联系人消息
+class ContactsLoadedMsg : public ProtocalMsg { // 已加载联系人消息
 private:
 	struct Contact { // 联系人结构体
 		int contact_id; // 联系人用户 id
@@ -301,7 +305,7 @@ public:
 	std::string ToJSON();
 };
 
-class ContactsLoadedFailedMsg : ProtocalMsg { // 加载联系人列表失败
+class ContactsLoadedFailedMsg : public ProtocalMsg { // 加载联系人列表失败
 private:
 	std::string error_;
 
@@ -310,7 +314,7 @@ public:
 	std::string ToJSON();
 };
 
-class ContactAddedMsg : ProtocalMsg { // 联系人已添加消息
+class ContactAddedMsg : public ProtocalMsg { // 联系人已添加消息
 private:
 	int contact_id_;			// 联系人用户 id
 	std::string username_; 		// 联系人用户名
@@ -321,7 +325,7 @@ public:
 	std::string ToJSON();
 };
 
-class ContactAddedFailedMsg : ProtocalMsg { // 添加联系人失败
+class ContactAddedFailedMsg : public ProtocalMsg { // 添加联系人失败
 private:
 	std::string error_;
 
@@ -330,12 +334,12 @@ public:
 	std::string ToJSON();
 };
 
-class ContactDeletedMsg : ProtocalMsg { // 联系人已删除消息
+class ContactDeletedMsg : public ProtocalMsg { // 联系人已删除消息
 public:
 	std::string ToJSON();
 };
 
-class ContactDeletedFailedMsg : ProtocalMsg { // 联系人删除失败
+class ContactDeletedFailedMsg : public ProtocalMsg { // 联系人删除失败
 private:
 	std::string error_;
 
@@ -344,7 +348,7 @@ public:
 	std::string ToJSON();
 };
 
-class SelfMessageReceivedMsg : ProtocalMsg { // 聊天消息被接收
+class SelfMessageReceivedMsg : public ProtocalMsg { // 聊天消息被接收
 private:
 	int message_id_;
 
@@ -353,7 +357,7 @@ public:
 	std::string ToJSON();
 };
 
-class ToSelfMessageReceivedMsg : ProtocalMsg { // 收到新聊天消息
+class ToSelfMessageReceivedMsg : public ProtocalMsg { // 收到新聊天消息
 private:
 	CloudChatMessage message_;	// 收到的新消息
 
@@ -362,7 +366,7 @@ public:
 	std::string ToJSON();
 };
 
-class MessagesLoadedMsg : ProtocalMsg { // 已加载聊天记录
+class MessagesLoadedMsg : public ProtocalMsg { // 已加载聊天记录
 private:
 	int target_id_;				// 目标联系人
 	std::vector<CloudChatMessage> messages_; // 加载的聊天记录
@@ -372,7 +376,7 @@ public:
 	std::string ToJSON();
 };
 
-class MessagesClearedMsg : ProtocalMsg { // 已清空聊天记录
+class MessagesClearedMsg : public ProtocalMsg { // 已清空聊天记录
 private:
 	int user_id_;				// 用户 id
 	int target_id_;				// 目标联系人 id
@@ -381,5 +385,7 @@ public:
 	MessagesClearedMsg(int user_id, int target_id);
 	std::string ToJSON();
 };
+
+ProtocalMsg parse_protocal_msg(std::string JSON); // 将 JSON 字符串解析为 ProtocalMsg 对象
 
 #endif // CLOUDCHATMSG_H
