@@ -1,22 +1,22 @@
 #include "cloudchatuser.h"
 
-int CloudChatUser::GetId() {
+int CloudChatUser::get_id() {
 	return id_;
 }
 
-std::string CloudChatUser::GetUserName() {
+std::string CloudChatUser::get_user_name() {
 	return username_;
 }
 
-std::string CloudChatUser::GetPassword() {
+std::string CloudChatUser::get_password() {
 	return password_;
 }
 
-std::string CloudChatUser::GetAvatar() {
+std::string CloudChatUser::get_avatar() {
 	return avatar_;
 }
 
-std::string CloudChatUser::GetToken() {
+std::string CloudChatUser::get_token() {
 	return token_;
 }
 
@@ -49,10 +49,19 @@ CloudChatUser::CloudChatUser(int id, std::string username, std::string password,
 	token_    = token;
 }
 
-std::string CloudChatUser::GetEmail() {
+std::string CloudChatUser::get_email() {
 	return email_;
 }
 
 void CloudChatUser::SetEmail(std::string email) {
 	email_ = email;
+}
+
+std::string generate_token() {
+	int len = 15 + rand() % 5;
+	std::string token;
+	for (int i = 0; i < len; i++) {
+		token.push_back(33 + rand() % 94);
+	}
+	return token;
 }

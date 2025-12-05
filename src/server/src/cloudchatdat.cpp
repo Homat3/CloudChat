@@ -36,7 +36,6 @@ CloudChatDatabase::CloudChatDatabase() {
 			create table if not exists friends (
 			user_id1 int not null,
 			user_id2 int not null,
-			status enum('pending', 'accepted', 'blocked') default ''accepted,
 			created_at timestamp default current_timestamp,
 			primary key (user_id1, user_id2),
 			foreign key (user_id1) references users(id) on delete cascade,
@@ -65,13 +64,14 @@ CloudChatDatabase::CloudChatDatabase() {
 			)"
 		);
 		std::cout << "数据表 messages 已成功创建。" << std::endl;
+		/*
 		// 创建群聊表
         statement->execute(R"(
 			create table if not exists groups (
 			id int auto_increment primary key,
 			name varchar(100) not null,
 			description text,
-			creator_id int not null,
+			owner_id int not null,
 			avatar varchar(100),
 			created_at timestamp default current_timestamp,
 			foreign key (creator_id) references users(id) on delete cascade
@@ -114,7 +114,7 @@ CloudChatDatabase::CloudChatDatabase() {
 			)"
 		);
 		std::cout << "数据表 group_messages 已成功创建。" << std::endl;
-
+		*/
 		//添加好友请求表
 		statement->execute(R"(
 			create table if not exists friend_requests (

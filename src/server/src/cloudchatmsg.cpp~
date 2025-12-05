@@ -1,0 +1,196 @@
+#include "cloudchatmsg.h"
+
+ProtocalMsg::ProtocalMsg(std::string type) {
+	type_ = type;
+}
+
+LoginMsg::LoginMsg(std::string username, std::string password) : ProtocalMsg(LOGIN) {
+	username_ = username;
+	password = password_;
+}
+
+LoginByTokenMsg::LoginByTokenMsg(std::string username, std::string token) : ProtocalMsg(
+	LOGIN_BY_TOKEN) {
+	username_ = username;
+	token_ = token;
+}
+
+LoginSuccessMsg::LoginSuccessMsg(int user_id, std::string username, std::string email,
+										 std::string avatar, std::string token) : ProtocalMsg(
+											 LOGIN_SUCCESS) {
+	user_id_ = user_id;
+	username_ = username;
+	email_    = email;
+	avatar_   = avatar;
+	token_    = token;
+}
+
+LoginFailureMsg::LoginFailureMsg(std::string error) : ProtocalMsg(LOGIN_FAILURE) {
+	error_ = error;
+}
+
+RegisterMsg::RegisterMsg(std::string username, std::string password, std::string email) :
+	ProtocalMsg(REGISTER) {
+	username_ = username;
+	password_ = password;
+	email_    = email;
+}
+
+RegisterSuccessMsg::RegisterSuccessMsg(int user_id, std::string username, std::string email,
+											   std::string avatar, std::string token) :
+	ProtocalMsg(REGISTER_SUCCESS) {
+	user_id_ = user_id;
+	username_ = username;
+	email_ = email;
+	avatar_ = avatar;
+	token_ = token;
+}
+
+RegisterFailureMsg::RegisterFailureMsg(std::string error) : ProtocalMsg(
+	REGISTER_FAILURE) {
+	error_ = error;
+}
+
+UpdateProfileMsg::UpdateProfileMsg(int user_id, std::string username, std::string password,
+										   std::string email, std::string avatar) : ProtocalMsg(
+											   UPDATE_PROFILE
+											   ) {
+	user_id_ = user_id;
+	username_ = username;
+	password_ = password;
+	email_    = email;
+	avatar_   = avatar;
+}
+
+ProfileUpdatedSuccessMsg::ProfileUpdatedSuccessMsg(int user_id, std::string username, std::string password,
+											 std::string email, std::string avatar) :
+	ProtocalMsg(PROFILE_UPDATED_SUCCESS) {
+	user_id_ = user_id;
+	username_ = username;
+	password_ = password;
+	email_    = email;
+	avatar_   = avatar;
+}
+
+LogoutMsg::LogoutMsg(int user_id) : ProtocalMsg(LOGOUT) {
+	user_id_ = user_id;
+}
+
+LoadContactsMsg::LoadContactsMsg(int user_id) : ProtocalMsg(LOAD_CONTACTS) {
+	user_id_ = user_id;
+}
+
+ContactsLoadedMsg::ContactsLoadedMsg(std::vector<Contact> contacts) : ProtocalMsg(
+	CONTACTS_LOADED
+	) {
+	contacts_ = contacts;
+}
+
+AddContactMsg::AddContactMsg(int user_id, int target_id) : ProtocalMsg(ADD_CONTACT) {
+	user_id_ = user_id;
+	target_id_ = target_id;
+}
+
+ContactAddedMsg::ContactAddedMsg(int contact_id, std::string username, std::string avatar,
+										 bool online) : ProtocalMsg(CONTACT_ADDED) {
+	contact_id_ = contact_id;
+	username_   = username;
+	avatar_     = avatar;
+	online_     = online;
+}
+
+DeleteContactMsg::DeleteContactMsg(int requester_user_id, int target_user_id) :
+	ProtocalMsg(DELETE_CONTACT) {
+	user_id_ = requester_user_id;
+	target_id_    = target_user_id;
+}
+
+LoadMessagesMsg::LoadMessagesMsg(int user_id, int target_id) : ProtocalMsg(LOAD_MESSAGES) {
+	user_id_ = user_id;
+	target_id_ = target_id;
+}
+
+SendMessageMsg::SendMessageMsg(int message_id, int sender_id, int receiver_id,
+									   std::string content) : ProtocalMsg(SEND_MESSAGE) {
+	message_id_ = message_id;
+	sender_id_  = sender_id;
+	receiver_id_ = receiver_id;
+	content_     = content;
+}
+
+SendFileMsg::SendFileMsg(int message_id, int sender_id, int receiver_id, std::string file_name,
+						 std::vector<std::string> file_content) : ProtocalMsg(SEND_FILE) {
+	message_id_ = message_id;
+	sender_id_  = sender_id;
+	receiver_id_ = receiver_id;
+	file_name_   = file_name;
+	file_content_ = file_content;
+}
+
+SendImageMsg::SendImageMsg(int message_id, int sender_id, int receiver_id, std::string image_name,
+						   std::vector<std::string> image_content) : ProtocalMsg(SEND_IMAGE) {
+	message_id_ = message_id;
+	sender_id_  = sender_id;
+	receiver_id_ = receiver_id;
+	image_name_  = image_name;
+	image_content_ = image_content;
+}
+
+MarkReadMsg::MarkReadMsg(int user_id, int target_id) : ProtocalMsg(MARK_READ) {
+	user_id_ = user_id;
+	target_id_ = target_id;
+}
+
+ClearMessagesMsg::ClearMessagesMsg(int requester_user_id, int target_user_id) : ProtocalMsg(
+	CLEAR_MESSAGES) {
+	requester_user_id_ = requester_user_id;
+	target_user_id_    = target_user_id;
+}
+
+ProfileUpdatedFailedMsg::ProfileUpdatedFailedMsg(std::string error) : ProtocalMsg(
+	PROFILE_UPDATED_FAILED
+	) {
+	error_ = error;
+}
+
+ContactsLoadedFailedMsg::ContactsLoadedFailedMsg(std::string error) : ProtocalMsg(
+	CONTACTS_LOADED_FAILED
+	) {
+	error_ = error;
+}
+
+ContactAddedFailedMsg::ContactAddedFailedMsg(std::string error) : ProtocalMsg(
+	CONTACT_ADDED_FAILED) {
+	error_ = error;
+}
+
+ContactDeletedFailedMsg::ContactDeletedFailedMsg(std::string error) : ProtocalMsg(
+	CONTACT_DELETED_FAILED
+	) {
+	error_ = error;
+}
+
+SelfMessageReceivedMsg::SelfMessageReceivedMsg(int message_id) : ProtocalMsg(
+	MESSAGE_RECEIVED_SELF) {
+	message_id_ = message_id;
+}
+
+ToSelfMessageReceivedMsg::ToSelfMessageReceivedMsg(CloudChatMessage message) :
+	ProtocalMsg(MESSAGE_RECEIVED_OTHER) {
+	message_ = message;
+}
+
+MessagesLoadedMsg::MessagesLoadedMsg(int target_id, std::vector<CloudChatMessage> messages) :
+	ProtocalMsg(MESSAGES_LOADED) {
+	target_id_ = target_id;
+	messages_  = messages;
+}
+
+MessagesClearedMsg::MessagesClearedMsg(int user_id, int target_id) : ProtocalMsg(MESSAGES_CLEARD) {
+	user_id_ = user_id;
+	target_id_ = target_id;
+}
+
+std::string LoginSuccessMsg::ToJSON() {
+	
+}

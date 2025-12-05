@@ -16,11 +16,19 @@
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/prepared_statement.h>
+#include <time.h>
+#include <cstdlib>
+#include <iostream>
+#include <websocketpp/common/connection_hdl.hpp>
+#include <websocketpp/error.hpp>
+#include <websocketpp/logger/levels.hpp>
 
 #define SERVER_PORT 14514 // 服务器通信端口号
 // 114.116.245.123
 // server
 // 1234567SSH
+
+#define BUFF_LEN    512			// 字符串缓冲区大小
 
 typedef websocketpp::server<websocketpp::config::asio> server_t; // 服务器对象类型
 
