@@ -54,13 +54,19 @@
         >
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
+      @if (errorMessage){
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
 
       <button type="submit" [disabled]="isLoading" class="login-btn">
-        <span *ngIf="!isLoading">注册</span>
-        <span *ngIf="isLoading">等待服务器响应...</span>
+        @if (!isLoading) {
+          <span>注册</span>
+        }
+        @if (isLoading) {
+          <span>等待服务器响应...</span>
+        }
       </button>
     </form>
   </div>

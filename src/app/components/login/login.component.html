@@ -30,13 +30,15 @@
         >
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
+      @if (errorMessage){
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
 
       <button type="submit" [disabled]="isLoading" class="login-btn">
-        <span *ngIf="!isLoading">登录</span>
-        <span *ngIf="isLoading">登录中...</span>
+        @if (!isLoading){<span>登录</span>}
+        @if (isLoading){<span>登录中...</span>}
       </button>
     </form>
     <button class="login-btn" (click)="onRegister()">

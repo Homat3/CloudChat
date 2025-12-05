@@ -22,17 +22,19 @@
     <div class="module">
       <div class="module-title">共享内容</div>
       <div class="shared-files">
-        <div *ngFor="let file of sharedFiles" class="file-item" [class.image-file]="file.type === 'image'"
-          (click)="previewFile(file)" title="点击预览 {{ file.name }}">
-          <i class="file-icon"></i>
-          <div class="file-info">
-            <div class="file-name">{{ file.name }}</div>
-            <div class="file-size">{{ file.size }}</div>
+        @for (file of sharedFiles; track file.id) {
+          <div class="file-item" [class.image-file]="file.type === 'image'"
+               (click)="previewFile(file)" title="点击预览 {{ file.name }}">
+            <i class="file-icon"></i>
+            <div class="file-info">
+              <div class="file-name">{{ file.name }}</div>
+              <div class="file-size">{{ file.size }}</div>
+            </div>
+            <button class="download-button" (click)="downloadFile(file); $event.stopPropagation()" title="下载文件">
+              ↓
+            </button>
           </div>
-          <button class="download-button" (click)="downloadFile(file); $event.stopPropagation()" title="下载文件">
-            ↓
-          </button>
-        </div>
+        }
       </div>
     </div>
   </div>
