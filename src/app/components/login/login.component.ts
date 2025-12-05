@@ -28,6 +28,26 @@ export class LoginComponent implements OnInit {
         if (this.authService.currentUserValue) {
             this.router.navigate(['/chat']);
         }
+        let localToken = localStorage.getItem('localToken');
+        let localUserId = localStorage.getItem('localUserId');
+        if (localToken && localUserId) {
+          let localUserIdNum = parseInt(localUserId);
+          if (!isNaN(localUserIdNum)) {
+            this.requestService.loginByToken(
+              { token: localToken, userId: localUserIdNum },
+              (payload) => {
+                this.isLoading = false;
+                // Navigation is handled in AuthService
+                localStorage.setItem('localToken', payload.token)
+                localStorage.setItem('localUserId', payload.userId.toString())
+              },
+              (error) => {
+                this.isLoading = false;
+                this.errorMessage = error;
+              }
+            );
+          }
+        }
     }
 
     onLogin(): void {
@@ -41,9 +61,11 @@ export class LoginComponent implements OnInit {
 
         this.requestService.login(
             { username: this.username, password: this.password },
-            () => {
+            (payload) => {
                 this.isLoading = false;
                 // Navigation is handled in AuthService
+                localStorage.setItem('localToken', payload.token)
+                localStorage.setItem('localUserId', payload.userId.toString())
             },
             (error) => {
                 this.isLoading = false;

@@ -3,6 +3,7 @@ import { SocketService } from './socket.service';
 import { ResponseService } from './response.service';
 import { ClientMessageType, LoginPayload, LoginByTokenPayload, RegisterPayload, UpdateProfilePayload, LogoutPayload, LoadContactsPayload, AddContactPayload, DeleteContactPayload, LoadMessagesPayload, SendMessagePayload, SendFilePayload, SendImagePayload, MarkReadPayload, ClearMessagesPayload } from '../protocol/client.protocol';
 import { filter, take } from 'rxjs/operators';
+import {LoginSuccessPayload} from '../protocol/service.protocol';
 
 @Injectable({
     providedIn: 'root'
@@ -14,20 +15,23 @@ export class RequestService {
         private responseService: ResponseService
     ) { }
 
-    login(payload: LoginPayload, onSuccess?: () => void, onError?: (err: string) => void) {
+    login(payload: LoginPayload, onSuccess?: (payload: LoginSuccessPayload) => void, onError?: (err: string) => void) {
         this.socketService.sendMessage({ type: ClientMessageType.LOGIN, payload });
         if (onSuccess) {
-            this.responseService.loginSuccess$.pipe(take(1)).subscribe(() => onSuccess());
+            this.responseService.loginSuccess$.pipe(take(1)).subscribe((payload) => onSuccess(payload));
         }
         if (onError) {
             this.responseService.loginFailure$.pipe(take(1)).subscribe(err => onError(err.error));
         }
     }
 
-    loginByToken(payload: LoginByTokenPayload, onSuccess?: () => void) {
+    loginByToken(payload: LoginByTokenPayload, onSuccess?: (payload: LoginSuccessPayload) => void, onError?: (err: string) => void) {
         this.socketService.sendMessage({ type: ClientMessageType.LOGIN_BY_TOKEN, payload });
         if (onSuccess) {
-            this.responseService.loginSuccess$.pipe(take(1)).subscribe(() => onSuccess());
+            this.responseService.loginSuccess$.pipe(take(1)).subscribe((payload) => onSuccess(payload));
+        }
+        if (onError) {
+          this.responseService.loginFailure$.pipe(take(1)).subscribe(err => onError(err.error));
         }
     }
 
