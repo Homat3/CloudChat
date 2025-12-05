@@ -35,10 +35,10 @@ export class RequestService {
         }
     }
 
-    register(payload: RegisterPayload, onSuccess?: () => void, onError?: (err: string) => void) {
+    register(payload: RegisterPayload, onSuccess?: (payload: LoginSuccessPayload) => void, onError?: (err: string) => void) {
         this.socketService.sendMessage({ type: ClientMessageType.REGISTER, payload });
         if (onSuccess) {
-            this.responseService.registerSuccess$.pipe(take(1)).subscribe(() => onSuccess());
+            this.responseService.registerSuccess$.pipe(take(1)).subscribe((payload) => onSuccess(payload));
         }
         if (onError) {
             this.responseService.registerFailure$.pipe(take(1)).subscribe(err => onError(err.error));
