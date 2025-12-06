@@ -28,6 +28,7 @@ public:
 
 	bool AddUser(CloudChatUser& user);//addUser
 	CloudChatUser* GetUserById(int id);//
+	CloudChatUser* GetUserByName(std::string name);
 	bool UpdateUser(CloudChatUser& user);//
 	bool DeleteUser(int id);
 };

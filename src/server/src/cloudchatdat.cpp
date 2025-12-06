@@ -247,4 +247,32 @@ bool CloudDatabase::UpdateUser(CloudChatUser *user){
 	}
 }
 
+CloudchatUser* CloudchatDatabase::GetUserByName(std::string username){
+	try{
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM users WHERE username = ?"
+		);
+		pstmt->setString(1,username);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		CloudChatUser* user = nullptr;
+
+		if(res->next()){
+			user = new CloudChatUser(
+				res->getInt("id"),
+				res->getString("username"),
+				res->getString("password"),
+				res->getString("avatar"),
+				res->getString("token"),
+				res->getString("email")
+			);
+			delete res;
+			delete pstmt;
+			return user;
+		}
+	}catch(sql::SQLException &e){
+		std::cout << "# ERR: SQLException in " << std::endl;
+		return nullptr;
+	}
+}
 
