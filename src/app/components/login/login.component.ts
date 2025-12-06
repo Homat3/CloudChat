@@ -25,8 +25,8 @@ export class LoginComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        if (this.authService.currentUserValue) {
-            this.router.navigate(['/chat']);
+        if (this.authService.currentUser$) {
+            this.router.navigate(['/']);
         }
         let localToken = localStorage.getItem('localToken');
         let localUserId = localStorage.getItem('localUserId');

@@ -13,6 +13,7 @@
 #define DATABASE_INITIALIZATION_FAILED -1        // 数据库初始化失败
 
 #include "cloudchatsys.h"
+#include "cloudchatuser.h"
 
 class CloudChatDatabase { // CloudChat 数据库类
 private:
@@ -28,8 +29,9 @@ public:
 
 	bool AddUser(CloudChatUser& user);//addUser
 	CloudChatUser* GetUserById(int id);//
+	bool UpdateUser(CloudChatUser* user);//
 	CloudChatUser* GetUserByName(std::string name);
-	bool UpdateUser(CloudChatUser& user);//
+
 	bool DeleteUser(int id);
 };
 

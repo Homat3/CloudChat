@@ -340,9 +340,7 @@
     "id": "int",
     "senderId": "int",
     "receiverId": "int",
-    "content": [
-      "","","","","..."
-    ],
+    "content": "string",
     "timestamp": "string",
     "status": "string = sent",
     "type": "string = file"
@@ -357,9 +355,7 @@
     "id": "int",
     "senderId": "int",
     "receiverId": "int",
-    "content": [
-      "","","","","..."
-    ],
+    "content": "string",
     "timestamp": "string",
     "status": "string = sent",
     "type": "string = image"
@@ -384,9 +380,7 @@
       "id": "int",
       "senderId": "int",
       "receiverId": "int",
-      "content": [
-        "","","","","..."
-      ],
+      "content": "string",
       "timestamp": "string",
       "status": "string = sent",
       "type": "string = file"
@@ -395,9 +389,7 @@
       "id": "int",
       "senderId": "int",
       "receiverId": "int",
-      "content": [
-        "", "", "", "", "..."
-      ],
+      "content": "string",
       "timestamp": "string",
       "status": "string = sent",
       "type": "string = image"

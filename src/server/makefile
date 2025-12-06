@@ -1,5 +1,5 @@
-all : src/main.o src/cloudchatdat.o src/cloudchatuser.o src/cloudchatmsg.o src/cloudchatgroup.o
-	g++ src/main.o src/cloudchatdat.o src/cloudchatuser.o src/cloudchatmsg.o src/cloudchatgroup.o -o cloudchat_server -lmysqlcppconn
+all : src/main.o src/cloudchatdat.o src/cloudchatuser.o src/cloudchatmsg.o src/cloudchatgroup.o src/cloudchatservice.o
+	g++ src/cloudchatservice.o src/main.o src/cloudchatdat.o src/cloudchatuser.o src/cloudchatmsg.o src/cloudchatgroup.o -o cloudchat_server -lmysqlcppconn
 
 src/main.o : src/main.cpp
 	g++ -g -c src/main.cpp -I include -o src/main.o
@@ -15,6 +15,9 @@ src/cloudchatmsg.o : src/cloudchatmsg.cpp
 
 src/cloudchatgroup.o : src/cloudchatgroup.cpp
 	g++ -g -c src/cloudchatgroup.cpp -I include -o src/cloudchatgroup.o
+
+src/cloudchatservice.o : src/cloudchatservice.cpp
+	g++ -g -c src/cloudchatservice.cpp -I include -o src/cloudchatservice.o
 
 clean:
 	rm -f cloudchat_server

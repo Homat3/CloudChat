@@ -110,10 +110,29 @@ void OnClose(websocketpp::connection_hdl hdl) {	// 客户端断开连接时服�
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	// TODO: 收到客户端的消息并解析处理
 	std::string JSON_msg = msg->get_payload();
-	ProtocalMsg* protocal_msg = parse_protocal_msg(JSON_msg);
-	std::string type = protocal_msg->get_type();
+	ClientMsg* client_msg = parse_protocal_msg(JSON_msg);
+	std::string type = client_msg->get_type();
 
-	if (type == LOGIN) Login(hdl, (LoginMsg*)protocal_msg);
-	else if (type == LOGIN_BY_TOKEN) LoginByToken(hdl, (LoginByTokenMsg*)protocal_msg);
-    else if (type == REGISTER) Register(hdl, (RegisterMsg*)protocal_msg);
+	if (type == LOGIN) Login(g_cloudchat_srv, hdl, msg, (LoginMsg*)client_msg);
+	else if (type == LOGIN_BY_TOKEN)
+		LoginByToken(g_cloudchat_srv, hdl, msg, (LoginByTokenMsg*)client_msg);
+    else if (type == REGISTER) Register(g_cloudchat_srv, hdl, msg, (RegisterMsg*)client_msg);
+	else if (type == LOGOUT) Logout(g_cloudchat_srv, hdl, msg, (LogoutMsg*)client_msg);
+	else if (type == UPDATE_PROFILE)
+		UpdateProfile(g_cloudchat_srv, hdl, msg, (UpdateProfileMsg*)client_msg);
+	else if (type == LOAD_CONTACTS)
+		LoadContacts(g_cloudchat_srv, hdl, msg, (LoadContactsMsg*)client_msg);
+	else if (type == ADD_CONTACT)
+		AddContact(g_cloudchat_srv, hdl, msg, (AddContactMsg*)client_msg);
+	else if (type == DELETE_CONTACT)
+		DeleteContact(g_cloudchat_srv, hdl, msg, (DeleteContactMsg*)client_msg);
+	else if (type == LOAD_MESSAGES)
+		LoadMessages(g_cloudchat_srv, hdl, msg, (LoadMessagesMsg*)client_msg);
+	else if (type == SEND_MESSAGE)
+		SendMessage(g_cloudchat_srv, hdl, msg, (SendMessageMsg*)client_msg);
+	else if (type == SEND_FILE) SendFile(g_cloudchat_srv, hdl, msg, (SendFileMsg*)client_msg);
+	else if (type == SEND_IMAGE) SendImage(g_cloudchat_srv, hdl, msg, (SendImageMsg*)client_msg);
+	else if (type == MARK_READ) MarkRead(g_cloudchat_srv, hdl, msg, (MarkReadMsg*)client_msg);
+	else if (type == CLEAR_MESSAGES)
+		ClearMessages(g_cloudchat_srv, hdl, msg, (ClearMessagesMsg*)client_msg);
 }

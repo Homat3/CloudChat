@@ -1,11 +1,12 @@
 import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Contact } from '../../core/models';
+import {Contact, Message} from '../../core/models';
 import { RequestService } from '../../core/services/request.service';
 import { ResponseService } from '../../core/services/response.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
+import {MessageService} from '../../core/services/message.service';
 
 @Component({
   selector: 'app-contact-list',
@@ -23,7 +24,8 @@ export class ContactListComponent implements OnInit, OnDestroy {
   constructor(
     private requestService: RequestService,
     private responseService: ResponseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit() {
@@ -59,19 +61,23 @@ export class ContactListComponent implements OnInit, OnDestroy {
     this.contactSelected.emit(contact);
   }
 
-  getLastMessage(contact: Contact): string {
-    // Placeholder: Real implementation would require a message store service
-    return '';
+  getLastMessage(contact: Contact): Message | undefined {
+    let messages = this.messageService.messagesMapValue?.get(contact.contactId)
+    if (messages) {
+      return messages[messages.length - 1];
+    }
+    return undefined;
   }
 
-  getLastMessageTime(contact: Contact): string {
-    // Placeholder
-    return '';
+  getLastMessageContent(contact: Contact): string | undefined {
+    return this.getLastMessage(contact)?.content;
+  }
+  getLastMessageTime(contact: Contact): string | undefined {
+    return this.getLastMessage(contact)?.timestamp;
   }
 
   getUnreadCount(contact: Contact): number {
-    // Placeholder
-    return 0;
+    return this.messageService.messagesMapValue?.get(contact.contactId)?.filter(m => m.status === 'sent').length || 0;
   }
 
   ngOnDestroy() {
