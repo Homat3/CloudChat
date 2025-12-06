@@ -147,8 +147,6 @@ CloudChatDatabase* CloudChatDatabase::GetInstance() {
 	return &instance_;
 }
 
-
-
 CloudChatUser* CloudChatDatabase::GetUserById(int id){
 	try{
 		sql::PreparedStatement *pstmt = connection_->prepareStatement(
@@ -221,7 +219,7 @@ bool CloudChatDatabase::DeleteUser(int id){
 	}
 }
 
-bool CloudDatabase::UpdateUser(CloudChatUser *user){ 
+bool CloudChatDatabase::UpdateUser(CloudChatUser *user){ 
 	if(user == nullptr){
 		std::cerr << "update-failed: user is null" << std::endl;
 		return false;

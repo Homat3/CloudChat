@@ -18,7 +18,7 @@ private:
 
 public:
 	CloudChatUser(int id, std::string username, std::string password, std::string avatar,
-				  std::string token);
+				  std::string token, std::string email);
 	// getter
 	int get_id();
 	std::string get_user_name();

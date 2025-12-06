@@ -41,12 +41,13 @@ void CloudChatUser::SetToken(std::string token) {
 }
 
 CloudChatUser::CloudChatUser(int id, std::string username, std::string password, std::string avatar,
-							 std::string token) {
+							 std::string token, std::string email) {
 	id_ = id;
 	username_ = username;
 	password_ = password;
 	avatar_   = avatar;
 	token_    = token;
+	email_    = email;
 }
 
 std::string CloudChatUser::get_email() {
