@@ -1,6 +1,6 @@
 /** cloudchat.h
  * CloudChat 数据库相关头文件
- */
+*/
 
 #ifndef CLOUDCHATDAT_H
 #define CLOUDCHATDAT_H
@@ -13,6 +13,7 @@
 #define DATABASE_INITIALIZATION_FAILED -1        // 数据库初始化失败
 
 #include "cloudchatsys.h"
+#include "cloudchatuser.h"
 
 class CloudChatDatabase { // CloudChat 数据库类
 private:
@@ -25,6 +26,11 @@ private:
 public:
 	static CloudChatDatabase* GetInstance(); // 获取单例模式实例
 	// TODO: 编写数据库操作接口
+
+	bool AddUser(CloudChatUser& user);//addUser
+	CloudChatUser* GetUserById(int id);//
+	bool UpdateUser(CloudChatUser* user);//
+	bool DeleteUser(int id);
 };
 
 #endif // CLOUDCHATDAT_H

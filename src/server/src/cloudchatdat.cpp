@@ -146,3 +146,103 @@ CloudChatDatabase* CloudChatDatabase::GetInstance() {
 	static CloudChatDatabase instance_;   // 单例模式实例
 	return &instance_;
 }
+
+CloudChatUser* CloudChatDatabase::GetUserById(int id){
+	try{
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT* FROM users WHERE id = ?"
+		);
+		pstmt->setInt(1,id);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		CloudChatUser* user = nullptr;
+
+		if(res->next()){
+			user = new CloudChatUser(
+				res->getInt("id"),
+				res->getString("username"),
+				res->getString("password"),
+				res->getString("avatar"),
+				res->getString("token"),
+				res->getString("email")
+			);
+		}
+
+		delete res;
+		delete pstmt;
+		return user;
+	}catch(sql::SQLException &e){
+		std::cerr << "getById-failed:" << e.what() << std::endl;
+		std::cerr << "wrong-code:" << e.getErrorCode() << std::endl;
+		return nullptr;
+	}
+}
+
+bool CloudChatDatabase::AddUser(CloudChatUser& user){ 
+	try{
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"INSERT INTO users(username,email,password,avatar,token)"
+			"VALUES(?,?,?,?,?)"
+		);
+		
+		pstmt->setString(1,user.get_user_name());
+		pstmt->setString(2,user.get_email());
+		pstmt->setString(3,user.get_password());
+		pstmt->setString(4,user.get_avatar());
+		pstmt->setString(5,user.get_token());
+		pstmt->setInt(6,user.get_id());
+
+		return pstmt->executeUpdate() > 0;
+
+		delete pstmt;
+
+	}catch(sql::SQLException &e){
+		std::cerr << "add-failed:" << e.what() << std::endl;
+		std::cerr << "wrong-code:" << e.getErrorCode() << std::endl;
+		return false;
+	}
+}
+
+bool CloudChatDatabase::DeleteUser(int id){
+	try{
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"DELETE FROM users WHERE id = ?"
+		);
+		pstmt->setInt(1,id);
+
+		int affectedRows = pstmt->executeUpdate();
+		delete pstmt;
+		return affectedRows > 0;
+	}catch(sql::SQLException &e){
+		std::cerr << "delete-failed:" << e.what() << std::endl;
+		return false;
+	}
+}
+
+bool CloudChatDatabase::UpdateUser(CloudChatUser *user){ 
+	if(user == nullptr){
+		std::cerr << "update-failed: user is null" << std::endl;
+		return false;
+	}
+	try{
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"UPDATE users SET username = ?, email = ?, password = ?, avatar = ?, token = ?, WHERE id = ?"
+		);
+		pstmt->setString(1,user->get_user_name());
+		pstmt->setString(2,user->get_email());
+		pstmt->setString(3,user->get_password());
+		pstmt->setString(4,user->get_avatar());
+		pstmt->setString(5,user->get_token());
+		pstmt->setInt(6,user->get_id());
+
+		int rowsAffected = pstmt->executeUpdate();
+		delete pstmt;
+		return rowsAffected;
+
+	}catch(sql::SQLException &e){
+		std::cout << "# ERR: SQLException in " << std::endl;
+		return false;
+	}
+}
+
+

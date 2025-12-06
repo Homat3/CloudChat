@@ -3,10 +3,12 @@
 
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
-#include "cloudchatsys.h"
 
-void Login(websocketpp::connection_hdl hdl, LoginMsg* msg);
-void LoginByToken(websocketpp::connection_hdl hdl, LoginByTokenMsg* msg);
-void Register(websocketpp::connection_hdl hdl, RegisterMsg* msg);
+void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,
+		   LoginMsg* login_msg);
+void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+				  server_t::message_ptr msg, LoginByTokenMsg* login_by_token_msg);
+void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,
+			  RegisterMsg* register_msg);
 
 #endif // CLOUDCHAT_SERVICE
