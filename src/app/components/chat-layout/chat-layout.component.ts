@@ -1,7 +1,7 @@
 import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ContactListComponent } from '../contact-list/contact-list.component';
-import { Contact } from '../../core/models/models';
+import { Contact } from '../../core/models';
 import { ChatAreaComponent } from '../chat-area/chat-area.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 

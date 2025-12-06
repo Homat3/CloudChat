@@ -28,7 +28,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.currentUserValue) {
-      this.router.navigate(['/chat']);
+      this.router.navigate(['/']);
     }
   }
 

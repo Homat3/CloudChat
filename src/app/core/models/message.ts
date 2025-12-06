@@ -3,7 +3,7 @@ export interface Message {
   id: number;
   senderId: number;
   receiverId: number;
-  content: string | string[];
+  content: string;
   timestamp: string;
   status: 'sending' | 'sent' | 'read';
   type: 'text' | 'image' | 'file';
@@ -39,7 +39,7 @@ export class ImageMessage implements Message {
   id: number;
   senderId: number;
   receiverId: number;
-  content: string[];
+  content: string;
   timestamp: string;
   status: 'sending' | 'sent' | 'read';
   readonly type: 'text' | 'image' | 'file' = 'image';
@@ -48,7 +48,7 @@ export class ImageMessage implements Message {
     id: number,
     senderId: number,
     receiverId: number,
-    content: string[],
+    content: string,
     timestamp: string,
     status: 'sending' | 'sent' | 'read' = 'sent'
   ){
@@ -65,7 +65,7 @@ export class FileMessage implements Message {
   id: number;
   senderId: number;
   receiverId: number;
-  content: string[];
+  content: string;
   timestamp: string;
   status: 'sending' | 'sent' | 'read';
   readonly type: 'text' | 'image' | 'file' = 'file';
@@ -74,7 +74,7 @@ export class FileMessage implements Message {
     id: number,
     senderId: number,
     receiverId: number,
-    content: string[],
+    content: string,
     timestamp: string,
     status: 'sending' | 'sent' | 'read' = 'sent'
   ){

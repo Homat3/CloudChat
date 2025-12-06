@@ -19,14 +19,14 @@ export class AuthService {
             const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
             this.currentUserSubject.next(user);
             localStorage.setItem('token', payload.token);
-            this.router.navigate(['/chat']); // Assuming '/chat' is the main route
+            this.router.navigate(['/']); // Assuming '/chat' is the main route
         });
 
         this.responseService.registerSuccess$.subscribe(payload => {
             const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
             this.currentUserSubject.next(user);
             localStorage.setItem('token', payload.token);
-            this.router.navigate(['/chat']);
+            this.router.navigate(['/']);
         });
 
         this.responseService.logoutSuccess$.subscribe(() => {

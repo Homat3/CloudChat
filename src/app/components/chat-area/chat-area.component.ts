@@ -6,15 +6,15 @@ import {
   ViewChild,
   ElementRef,
   AfterViewChecked,
-  OnDestroy
+  OnDestroy, OnInit
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Message, TextMessage, ImageMessage, FileMessage } from '../../core/models';
 import { Contact } from '../../core/models';
 import { RequestService } from '../../core/services/request.service';
-import { ResponseService } from '../../core/services/response.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MessageService } from '../../core/services/message.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -34,28 +34,14 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
 
   constructor(
     private requestService: RequestService,
-    private responseService: ResponseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private messageService: MessageService
   ) {
     this.subscriptions.push(
-      this.responseService.messagesLoaded$.subscribe(payload => {
-        this.messages = payload.messages.map(msg => this.mapToMessage(msg));
-        this.scrollToBottom();
-      }),
-      this.responseService.messageReceivedSelf$.subscribe(payload => {
-        // We might need to fetch the full message or optimistically add it.
-        // For now, let's assume we handle optimistic updates in sendMessage
-        // or we reload/wait for the echo.
-        // Actually, the protocol says MESSAGE_RECEIVED_SELF returns { messageId }.
-        // It doesn't return the full content.
-        // So we should probably add the message to the list when we send it,
-        // and maybe update its status when we get this confirmation.
-      }),
-      this.responseService.messageReceivedOther$.subscribe(payload => {
-        if (this.selectedContact && payload.senderId === this.selectedContact.contactId) {
-          this.messages.push(this.mapToMessage(payload));
-          this.scrollToBottom();
-          this.markMessagesAsRead(<number>this.authService.currentUserValue?.userId, this.selectedContact.contactId);
+      this.messageService.messageMap$.subscribe(messagesMap => {
+        let refreshedMessages = messagesMap.get(<number>this.currentContact?.contactId);
+        if (refreshedMessages){
+          this.messages = refreshedMessages;
         }
       })
     );
@@ -69,14 +55,21 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
     if (changes['selectedContact'] && changes['selectedContact'].currentValue) {
       this.newMessage = '';
       const contactId = changes['selectedContact'].currentValue.contactId;
-      this.loadContactMessages(<number>this.authService.currentUserValue?.userId, contactId);
+      this.loadContactMessages(contactId);
+      let toMark = false
+      this.messages.forEach((message) => {
+        toMark ||= message.status != 'read'
+        if (toMark) return;
+      });
+      if (toMark){
+        this.markMessagesAsRead(this.authService.currentUserValue?.userId || 0, contactId);
+      }
       console.log('切换到联系人:', changes['selectedContact'].currentValue.username);
     }
   }
 
-  private loadContactMessages(contactId: number, targetId: number): void {
-    this.messages = []; // Clear current messages
-    this.requestService.loadMessages({ userId: contactId, targetId: targetId });
+  private loadContactMessages(targetId: number): void {
+    this.messages = this.messageService.messagesMapValue?.get(targetId) || [];
   }
 
   private markMessagesAsRead(userId: number, targetId: number): void {
