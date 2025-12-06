@@ -6,13 +6,11 @@
 #define CLOUDCHATMSG_H
 
 #include "cloudchatsys.h"
-#include <string>
-#include <vector>
 
 // 聊天消息类型宏
-#define TEXT_MESSAGE  "text"	// 文本消息
-#define IMAGE_MESSAGE "image"	// 图片
-#define FILE_MESSAGE  "file"	// 文件
+#define TEXT_MESSAGE  0	// 文本消息
+#define IMAGE_MESSAGE 1	// 图片
+#define FILE_MESSAGE  2	// 文件
 
 // 通信消息发送结果
 #define SEND_SUCCESSFUL	 0		// 发送成功
@@ -67,6 +65,21 @@ private:
 	std::string file_path_; // 文件路径
 	bool        is_read_;   // 消息是否已读
 	time_t      created_at_; // 发送时间
+
+public:
+	// getter
+	int get_id();
+	bool get_is_group();
+	int get_type();
+	std::string get_type_str();
+	int get_sender_id();
+	int get_receiver_id();
+	std::string get_content();
+	std::string get_file_name();
+	int         get_file_size();
+	std::string get_file_path();
+	bool        get_is_read();
+	time_t      get_created_at();
 };
 
 // 客户端和服务端之间通信的消息类
@@ -129,6 +142,7 @@ private:
 
 public:
 	LogoutMsg(int user_id);
+	static LogoutMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class UpdateProfileMsg : public ClientMsg { // 更新用户信息消息
@@ -192,11 +206,12 @@ private:
 	int sender_id_;				// 发送者 id
 	int receiver_id_;			// 接收者 id
 	std::string file_name_;		// 文件名
-	std::vector<std::string> file_content_; // 文件内容
+	std::string file_content_;  // 文件内容
 
 public:
 	SendFileMsg(int message_id, int sender_id, int recever_id, std::string file_name,
-				std::vector<std::string> file_content);
+				std::string file_content);
+	static SendFileMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class SendImageMsg : public ClientMsg { // 发送图片消息
@@ -205,11 +220,12 @@ private:
 	int sender_id_;				// 发送者 id
 	int receiver_id_;			// 接收者 id
 	std::string image_name_;	// 图片文件名
-	std::vector<std::string> image_content_; // 图片内容
+	std::string image_content_; // 图片内容
 
 public:
 	SendImageMsg(int message_id, int sender_id, int receiver_id, std::string image_name,
-				 std::vector<std::string> image_content);
+				 std::string image_content);
+	static SendImageMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class LoadMessagesMsg : public ClientMsg { // 加载聊天记录消息
@@ -219,6 +235,7 @@ private:
 
 public:
 	LoadMessagesMsg(int user_id, int target_id);
+	static LoadMessagesMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class MarkReadMsg : public ClientMsg { // 标记为已读消息
@@ -228,6 +245,7 @@ private:
 
 public:
 	MarkReadMsg(int user_id, int target_id);
+	static MarkReadMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class ClearMessagesMsg : public ClientMsg { // 清空聊天记录
@@ -237,6 +255,7 @@ private:
 
 public:
 	ClearMessagesMsg(int requester_user_id, int target_user_id);
+	static ClearMessagesMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class LoginSuccessMsg : public ServerMsg { // 登录成功消息
@@ -414,8 +433,10 @@ int parse_int_from_json(std::string JSON, int begin, int end); // 从 JSON 字�
 // 从 JSON 字符串中解析出转义后的字符串
 std::string parse_str_from_json(std::string JSON, int begin, int end);
 std::string to_JSON_string(std::string str); // 转为 JSON 字符串（添加转义字符）
+std::string c_str_to_JSON_string(const char* c_str);
 // 向客户端发送消息
 int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					server_t::message_ptr msg, ServerMsg* srv_msg);
+int find_field_pos(std::string JSON, std::string target); // 在 JSON 中找出字段位置
 
 #endif // CLOUDCHATMSG_H

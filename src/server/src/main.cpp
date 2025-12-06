@@ -117,4 +117,22 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	else if (type == LOGIN_BY_TOKEN)
 		LoginByToken(g_cloudchat_srv, hdl, msg, (LoginByTokenMsg*)client_msg);
     else if (type == REGISTER) Register(g_cloudchat_srv, hdl, msg, (RegisterMsg*)client_msg);
+	else if (type == LOGOUT) Logout(g_cloudchat_srv, hdl, msg, (LogoutMsg*)client_msg);
+	else if (type == UPDATE_PROFILE)
+		UpdateProfile(g_cloudchat_srv, hdl, msg, (UpdateProfileMsg*)client_msg);
+	else if (type == LOAD_CONTACTS)
+		LoadContacts(g_cloudchat_srv, hdl, msg, (LoadContactsMsg*)client_msg);
+	else if (type == ADD_CONTACT)
+		AddContact(g_cloudchat_srv, hdl, msg, (AddContactMsg*)client_msg);
+	else if (type == DELETE_CONTACT)
+		DeleteContact(g_cloudchat_srv, hdl, msg, (DeleteContactMsg*)client_msg);
+	else if (type == LOAD_MESSAGES)
+		LoadMessages(g_cloudchat_srv, hdl, msg, (LoadMessagesMsg*)client_msg);
+	else if (type == SEND_MESSAGE)
+		SendMessage(g_cloudchat_srv, hdl, msg, (SendMessageMsg*)client_msg);
+	else if (type == SEND_FILE) SendFile(g_cloudchat_srv, hdl, msg, (SendFileMsg*)client_msg);
+	else if (type == SEND_IMAGE) SendImage(g_cloudchat_srv, hdl, msg, (SendImageMsg*)client_msg);
+	else if (type == MARK_READ) MarkRead(g_cloudchat_srv, hdl, msg, (MarkReadMsg*)client_msg);
+	else if (type == CLEAR_MESSAGES)
+		ClearMessages(g_cloudchat_srv, hdl, msg, (ClearMessagesMsg*)client_msg);
 }

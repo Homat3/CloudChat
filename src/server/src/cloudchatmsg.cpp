@@ -121,7 +121,7 @@ SendMessageMsg::SendMessageMsg(int message_id, int sender_id, int receiver_id,
 }
 
 SendFileMsg::SendFileMsg(int message_id, int sender_id, int receiver_id, std::string file_name,
-						 std::vector<std::string> file_content) : ClientMsg(SEND_FILE) {
+						 std::string file_content) : ClientMsg(SEND_FILE) {
 	message_id_ = message_id;
 	sender_id_  = sender_id;
 	receiver_id_ = receiver_id;
@@ -130,7 +130,7 @@ SendFileMsg::SendFileMsg(int message_id, int sender_id, int receiver_id, std::st
 }
 
 SendImageMsg::SendImageMsg(int message_id, int sender_id, int receiver_id, std::string image_name,
-						   std::vector<std::string> image_content) : ClientMsg(SEND_IMAGE) {
+						   std::string image_content) : ClientMsg(SEND_IMAGE) {
 	message_id_ = message_id;
 	sender_id_  = sender_id;
 	receiver_id_ = receiver_id;
@@ -244,88 +244,171 @@ std::string RegisterFailureMsg::to_JSON() {
 }
 
 std::string ProfileUpdatedSuccessMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"userId\":%d,\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"avatar\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), user_id_, to_JSON_string(username_).c_str(),
+			to_JSON_string(password_).c_str(), to_JSON_string(email_).c_str(),
+			to_JSON_string(avatar_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ProfileUpdatedFailedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
+			to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ContactsLoadedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	std::string contacts_json = "[";
+	for (size_t i = 0; i < contacts_.size(); i++) {
+		char contact_buff[BUFF_LEN] = "";
+		sprintf(contact_buff,
+				"{\"contactId\":%d,\"username\":\"%s\",\"avatar\":\"%s\",\"online\":%s}",
+				contacts_[i].contact_id, to_JSON_string(contacts_[i].username).c_str(),
+				to_JSON_string(contacts_[i].avatar).c_str(),
+				contacts_[i].online ? "true" : "false");
+		contacts_json += contact_buff;
+		if (i != contacts_.size() - 1) {
+			contacts_json += ",";
+		}
+	}
+	contacts_json += "]";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"contacts\":%s}}", to_JSON_string(type_).c_str(),
+			contacts_json.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ContactsLoadedFailedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
+			to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ContactAddedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"contactId\":%d,\"username\":\"%s\",\"avatar\":\"%s\",\"online\":%s}}",
+			to_JSON_string(type_).c_str(), contact_id_, to_JSON_string(username_).c_str(),
+			to_JSON_string(avatar_).c_str(), online_ ? "true" : "false");
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ContactAddedFailedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
+			to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ContactDeletedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{}}", to_JSON_string(type_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ContactDeletedFailedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
+			to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string SelfMessageReceivedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"messageId\":%d}}",
+			to_JSON_string(type_).c_str(), message_id_);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string ToSelfMessageReceivedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	std::time_t created_at = message_.get_created_at();
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"id\":%d,\"senderId\":%d,\"receiverId\":%d,\"content\":\"%s\",\"timestamp\":\"%s\",\"status\":\"%s\",\"type\":\"%s\"}}",
+			to_JSON_string(type_).c_str(),
+			message_.get_id(),
+			message_.get_sender_id(),
+			message_.get_receiver_id(),
+			to_JSON_string(message_.get_content()).c_str(),
+			c_str_to_JSON_string(ctime(&created_at)).c_str(),
+			message_.get_is_read()? "read" : "sent",
+			to_JSON_string(message_.get_type_str()).c_str()
+	);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 std::string MessagesLoadedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	std::string messages_json = "[";
+	for (size_t i = 0; i < messages_.size(); i++) {
+		char message_buff[BUFF_LEN] = "";
+		std::time_t created_at = messages_[i].get_created_at();
+		sprintf(message_buff,
+				"{\"id\":%d,\"senderId\":%d,\"receiverId\":%d,\"content\":\"%s\",\"timestamp\":\"%s\",\"status\":\"%s\",\"type\":\"%s\"}",
+				messages_[i].get_id(),
+				messages_[i].get_sender_id(),
+				messages_[i].get_receiver_id(),
+				to_JSON_string(messages_[i].get_content()).c_str(),
+				c_str_to_JSON_string(ctime(&created_at)).c_str(),
+				messages_[i].get_is_read()? "read" : "sent",
+				to_JSON_string(messages_[i].get_type_str()).c_str()
+		);
+		messages_json += message_buff;
+		if (i != messages_.size() - 1) {
+			messages_json += ",";
+		}
+	}
+	messages_json += "]";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"targetId\":%d,\"messages\":%s}}",
+			to_JSON_string(type_).c_str(), target_id_, messages_json.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 
 std::string MessagesClearedMsg::to_JSON() {
-	
+	char buff[BUFF_LEN] = "";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"userId\":%d,\"targetId\":%d}}",
+			to_JSON_string(type_).c_str(), user_id_, target_id_);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }
 
 ClientMsg* parse_protocal_msg(std::string JSON) {
 	int len = JSON.length();
 	// 找到 "type" 字段的位置
-	int type_pos = 0;
-	for (int i = 0; i + 5 < len; i++) {
-		std::string target = "\"type\"";
-		bool flag = true;
-		for (int j = 0; j < 6; j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			type_pos = i + 6;
-			break;
-		}
-	}
+	int type_pos = find_field_pos(JSON, "\"type\"");
 	// 找到 "payload" 字段的位置
-	int payload_pos = 0;
-	for (int i = 0; i + 8 < len; i++) {
-		std::string target = "\"payload\"";
-		bool flag = true;
-		for (int j = 0; j < 9; j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			payload_pos = i + 9;
-			break;
-		}
-	}
+	int payload_pos = find_field_pos(JSON, "\"payload\"");
 	// 提取 type 值
     std::string type = parse_str_from_json(JSON, type_pos, len - 1);
 	// 根据 type 值提取相应类型对象
@@ -342,38 +425,10 @@ ClientMsg* parse_protocal_msg(std::string JSON) {
 LoginMsg* LoginMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	int len = JSON.length();
 	// 找到 username 字段的位置
-	int username_pos = 0;
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"username\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			username_pos = i + target.length();
-			break;
-		}
-	}
+	int username_pos = find_field_pos(JSON, "\"username\"");
 	std::string username = parse_str_from_json(JSON, username_pos, len - 1); // 提取 username 值
 	// 找到 password 字段的位置
-	int password_pos = 0;
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"password\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			password_pos = i + target.length();
-			break;
-		}
-	}
+	int password_pos = find_field_pos(JSON, "\"password\"");
 	std::string password = parse_str_from_json(JSON, password_pos, len - 1); // 提取 password 值
 	return new LoginMsg(username, password);
 }
@@ -381,94 +436,23 @@ LoginMsg* LoginMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 LoginByTokenMsg* LoginByTokenMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	int len = JSON.length();
 	// 提取 username 字段值
-	int username_pos = 0;
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"username\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			username_pos = i + target.length();
-			break;
-		}
-	}
+	int username_pos = find_field_pos(JSON, "\"username\"");
 	std::string username = parse_str_from_json(JSON, username_pos, len - 1);
 	// 提取 token 字段值
-	int token_pos = 0;
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"token\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			token_pos = i + target.length();
-			break;
-		}
-	}
+	int token_pos = find_field_pos(JSON, "\"token\"");
 	std::string token = parse_str_from_json(JSON, token_pos, len - 1);
 	return new LoginByTokenMsg(username, token);
 }
 
 RegisterMsg* RegisterMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 	int len = JSON.length();
-	int username_pos = 0;
-	// 找到 username 字段的位置
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"username\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			username_pos = i + target.length();
-			break;
-		}
-	}
+	int username_pos = find_field_pos(JSON, "\"username\"");
 	std::string username = parse_str_from_json(JSON, username_pos, len - 1); // 提取 username 值
 	// 找到 password 字段的位置
-	int password_pos = 0;
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"password\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			password_pos = i + target.length();
-			break;
-		}
-	}
+	int password_pos = find_field_pos(JSON, "\"password\"");
 	std::string password = parse_str_from_json(JSON, password_pos, len - 1); // 提取 password 值
 	// 找到 email 字段的位置
-	int email_pos = 0;
-	for (int i = payload_pos; i < len; i++) {
-		std::string target = "\"email\"";
-		bool flag = true;
-		for (int j = 0; j < target.length(); j++) {
-			if (JSON[i + j] != target[j]) {
-				flag = false;
-				break;
-			}
-		}
-		if (flag) {
-			email_pos = i + target.length();
-			break;
-		}
-	}
+	int email_pos = find_field_pos(JSON, "\"email\"");
 	std::string email = parse_str_from_json(JSON, email_pos, len - 1); // 提取 email 值
 	return new RegisterMsg(username, password, email);
 }
@@ -498,23 +482,44 @@ std::string ServerMsg::to_JSON() {
 }
 
 UpdateProfileMsg* UpdateProfileMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	
+	int end = JSON.length() - 1;
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""), end);
+	std::string username = parse_str_from_json(JSON, find_field_pos(JSON, "\"username\""), end);
+	std::string password = parse_str_from_json(JSON, find_field_pos(JSON, "\"password\""), end);
+	std::string email = parse_str_from_json(JSON, find_field_pos(JSON, "\"email\""), end);
+	std::string avatar = parse_str_from_json(JSON, find_field_pos(JSON, "\"avatar\""), end);
+	return new UpdateProfileMsg(user_id, username, password, email, avatar);
 }
 
 LoadContactsMsg* LoadContactsMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""), JSON.length() - 1);
+	return new LoadContactsMsg(user_id);
 }
 
 AddContactMsg* AddContactMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""), JSON.length() - 1);
+	int target_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"targetId\""),
+										JSON.length() - 1);
+	return new AddContactMsg(user_id, target_id);
 }
 
 DeleteContactMsg* DeleteContactMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""), JSON.length() - 1);
+	int target_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"targetId\""),
+										JSON.length() - 1);
+	return new DeleteContactMsg(user_id, target_id);
 }
 
 SendMessageMsg* SendMessageMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	
+	int message_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"messageId\""),
+										JSON.length() - 1);
+	int sender_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"senderId\""),
+										JSON.length() - 1);
+	int receiver_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"receiverId\""),
+										JSON.length() - 1);
+	std::string content = parse_str_from_json(JSON, find_field_pos(JSON, "\"content\""),
+											JSON.length() - 1);
+	return new SendMessageMsg(message_id, sender_id, receiver_id, content);
 }
 
 int parse_int_from_json(std::string JSON, int begin, int end) {
@@ -583,4 +588,150 @@ int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 		return SEND_FAILED;
 	}
 	return SEND_SUCCESSFUL;
+}
+
+LogoutMsg* LogoutMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int user_id_pos = find_field_pos(JSON, "\"userId\"");
+	int user_id = parse_int_from_json(JSON, user_id_pos, JSON.length() - 1);
+	return new LogoutMsg(user_id);
+}
+
+int find_field_pos(std::string JSON, std::string target) {
+	int len = JSON.length();
+	for (int i = 0; i + target.length() < len; i++) {
+		bool flag = true;
+		for (int j = 0; j < target.length(); j++) {
+			if (JSON[i + j] != target[j]) {
+				flag = false;
+				break;
+			}
+		}
+		if (flag) return i + target.length();
+	}
+	return 0;
+}
+
+SendFileMsg* SendFileMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int len = JSON.length();
+	int message_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"messageId\""),
+										JSON.length() - 1);
+	int sender_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"senderId\""),
+										JSON.length() - 1);
+	int receiver_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"receiverId\""),
+										JSON.length() - 1);
+	std::string file_name = parse_str_from_json(JSON, find_field_pos(JSON, "\"fileName\""),
+											   JSON.length() - 1);
+	std::string file_content = parse_str_from_json(JSON,
+												   find_field_pos(JSON, "\"fileContent\""),
+												   JSON.length() - 1);
+	return new SendFileMsg(message_id, sender_id, receiver_id, file_name, file_content);
+}
+
+SendImageMsg* SendImageMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int len = JSON.length();
+	int message_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"messageId\""),
+										JSON.length() - 1);
+	int sender_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"senderId\""),
+										JSON.length() - 1);
+	int receiver_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"receiverId\""),
+										JSON.length() - 1);
+	std::string image_name = parse_str_from_json(JSON, find_field_pos(JSON, "\"imageName\""),
+												JSON.length() - 1);
+	std::string image_content = parse_str_from_json(JSON,
+													find_field_pos(JSON, "\"imageContent\""),
+													JSON.length() - 1);
+	return new SendImageMsg(message_id, sender_id, receiver_id, image_name, image_content);
+}
+
+LoadMessagesMsg* LoadMessagesMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""),
+									 JSON.length() - 1);
+	int target_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"targetId\""),
+									   JSON.length() - 1);
+	return new LoadMessagesMsg(user_id, target_id);
+}
+
+MarkReadMsg* MarkReadMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""),
+									 JSON.length() - 1);
+	int target_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"targetId\""),
+									   JSON.length() - 1);
+	return new MarkReadMsg(user_id, target_id);
+}
+
+ClearMessagesMsg* ClearMessagesMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int requester_user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"requesterUserId\""),
+											   JSON.length() - 1);
+	int target_user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"targetUserId\""),
+											JSON.length() - 1);
+	return new ClearMessagesMsg(requester_user_id, target_user_id);
+}
+
+int CloudChatMessage::get_id() {
+	return id_;
+}
+
+bool CloudChatMessage::get_is_group() {
+	return is_group_;
+}
+
+int CloudChatMessage::get_type() {
+	return type_;
+}
+
+int CloudChatMessage::get_sender_id() {
+	return sender_id_;
+}
+
+int CloudChatMessage::get_receiver_id() {
+	return receiver_id_;
+}
+
+std::string CloudChatMessage::get_content() {
+	return content_;
+}
+
+std::string CloudChatMessage::get_file_name() {
+	return file_name_;
+}
+
+int CloudChatMessage::get_file_size() {
+	return file_size_;
+}
+
+std::string CloudChatMessage::get_file_path() {
+	return file_path_;
+}
+
+bool CloudChatMessage::get_is_read() {
+	return is_read_;
+}
+
+time_t CloudChatMessage::get_created_at() {
+	return created_at_;
+}
+
+std::string CloudChatMessage::get_type_str() {
+	switch (type_) {
+		case TEXT_MESSAGE:
+			return "text";
+		case IMAGE_MESSAGE:
+			return "image";
+		case FILE_MESSAGE:
+			return "file";
+		default:
+			return "unknown";
+	}
+}
+
+std::string c_str_to_JSON_string(const char* c_str) {
+	std::string JSON;
+	for (int i = 0; i < strlen(c_str); i++) {
+		if (c_str[i] == '\\') JSON.append("\\\\");
+		else if (c_str[i] == '\t') JSON.append("\\t");
+		else if (c_str[i] == '\n') JSON.append("\\n");
+		else if (c_str[i] == '\r') JSON.append("\\r");
+		else JSON.push_back(c_str[i]);
+	}
+	return JSON;
 }
