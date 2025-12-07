@@ -61,9 +61,27 @@ void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 }
 
 void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,
-			  RegisterMsg* register_msg) {
-	// TODO: 注册业务
-	
+			  RegisterMsg* register_msg) { // 注册业务
+	std::string username = register_msg->get_username();
+	std::string password = register_msg->get_password();
+	std::string email = register_msg->get_email();
+	std::cout << "用户注册消息：" << std::endl;
+	std::cout << "username: " << username << std::endl;
+	std::cout << "password: " << password << std::endl;
+	std::cout << "email: " << email << std::endl;
+	// 检查用户名是否存在
+	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserByName(username);
+	if (user != nullptr) { // 用户名已存在
+		SendMsgToClient(cloudchat_srv, hdl, msg, new RegisterFailureMsg("用户名已存在"));
+		return;
+	}
+	// 用户不存在，注册成功
+	user = new CloudChatUser(0, username, password, DEFAULT_AVATAR_URL, generate_token(), email);
+	CloudChatDatabase::GetInstance()->AddUser(*user);
+	user = CloudChatDatabase::GetInstance()->GetUserByName(username);
+	SendMsgToClient(cloudchat_srv, hdl, msg, new RegisterSuccessMsg(user->get_id(), username, email,
+																	user->get_avatar(),
+																	user->get_token()));
 }
 
 void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,

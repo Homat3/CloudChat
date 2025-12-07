@@ -1,6 +1,8 @@
 #ifndef CLOUDCHAT_SERVICE
 #define CLOUDCHAT_SERVICE
 
+#define DEFAULT_AVATAR_URL "cloudchat.infinomat.com/default.png"	// 默认用户头像 URL
+
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 

@@ -190,7 +190,6 @@ bool CloudChatDatabase::AddUser(CloudChatUser& user){
 		pstmt->setString(3,user.get_password());
 		pstmt->setString(4,user.get_avatar());
 		pstmt->setString(5,user.get_token());
-		pstmt->setInt(6,user.get_id());
 
 		return pstmt->executeUpdate() > 0;
 
@@ -272,5 +271,6 @@ CloudChatUser* CloudChatDatabase::GetUserByName(std::string username){
 		std::cout << "# ERR: SQLException in " << std::endl;
 		return nullptr;
 	}
+	return nullptr;
 }
 
