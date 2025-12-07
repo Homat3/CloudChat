@@ -123,6 +123,8 @@ private:
 public:
 	LoginByTokenMsg(std::string username, std::string token);
 	static LoginByTokenMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	std::string get_username();
+	std::string get_token();
 };
 
 class RegisterMsg : public ClientMsg { // 注册消息
@@ -134,6 +136,9 @@ private:
 public:
 	RegisterMsg(std::string username, std::string password, std::string email);
 	static RegisterMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	std::string get_username();
+	std::string get_password();
+	std::string get_email();
 };
 
 class LogoutMsg : public ClientMsg { // 退出登录消息

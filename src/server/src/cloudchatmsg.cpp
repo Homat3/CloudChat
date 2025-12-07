@@ -735,3 +735,11 @@ std::string c_str_to_JSON_string(const char* c_str) {
 	}
 	return JSON;
 }
+
+std::string LoginByTokenMsg::get_username() {
+	return username_;
+}
+
+std::string LoginByTokenMsg::get_token() {
+	return token_;
+}

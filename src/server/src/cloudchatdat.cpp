@@ -245,7 +245,7 @@ bool CloudChatDatabase::UpdateUser(CloudChatUser *user){
 	}
 }
 
-CloudchatUser* CloudchatDatabase::GetUserByName(std::string username){
+CloudChatUser* CloudChatDatabase::GetUserByName(std::string username){
 	try{
 		sql::PreparedStatement *pstmt = connection_->prepareStatement(
 			"SELECT * FROM users WHERE username = ?"
