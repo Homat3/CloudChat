@@ -13,6 +13,7 @@ export enum ServiceMessageType {
   LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
   CONTACTS_LOADED = 'CONTACTS_LOADED',
   CONTACTS_LOADED_FAILED = 'CONTACTS_LOADED_FAILED',
+  SEARCH_FOR_USER_RESULT = 'SEARCH_FOR_USER_RESULT',
   CONTACT_ADDED = 'CONTACT_ADDED',
   CONTACT_ADDED_FAILED = 'CONTACT_ADDED_FAILED',
   CONTACT_DELETED = 'CONTACT_DELETED',
@@ -33,6 +34,7 @@ export type ServicePayload =
   LogoutSuccessPayload |
   ContactsLoadedPayload |
   ContactsLoadedFailedPayload |
+  SearchForUserResultPayload |
   ContactAddedPayload |
   ContactAddedFailedPayload |
   ContactDeletedPayload |
@@ -91,6 +93,15 @@ export interface ContactsLoadedPayload {
 
 export interface ContactsLoadedFailedPayload {
   error: string;
+}
+
+export interface SearchForUserResultPayload {
+  users: Array<{
+    contactId: number;
+    username: string;
+    online: boolean;
+    avatar: string;
+  }>;
 }
 
 export interface ContactAddedPayload {

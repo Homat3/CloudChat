@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterContentInit, Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RequestService } from '../../core/services/request.service';
 import { AuthService } from '../../core/services/auth.service';
+import {timeout} from 'rxjs';
+import {timeoutProvider} from 'rxjs/internal/scheduler/timeoutProvider';
 
 @Component({
     selector: 'app-login',
@@ -12,7 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterContentInit {
     username = '';
     password = '';
     isLoading = false;
@@ -24,30 +26,36 @@ export class LoginComponent implements OnInit {
         private authService: AuthService
     ) { }
 
+    ngAfterContentInit(): void {
+        let subscription = this.authService.isReady$.subscribe(isReady => {
+          if (isReady) {
+            this.tryToken();
+            subscription.unsubscribe();
+          }
+        });
+    }
+
     ngOnInit(): void {
         if (this.authService.currentUser$) {
             this.router.navigate(['/']);
         }
-        let localToken = localStorage.getItem('localToken');
-        let localUserId = localStorage.getItem('localUserId');
-        if (localToken && localUserId) {
-          let localUserIdNum = parseInt(localUserId);
-          if (!isNaN(localUserIdNum)) {
-            this.requestService.loginByToken(
-              { token: localToken, userId: localUserIdNum },
-              (payload) => {
-                this.isLoading = false;
-                // Navigation is handled in AuthService
-                localStorage.setItem('localToken', payload.token)
-                localStorage.setItem('localUserId', payload.userId.toString())
-              },
-              (error) => {
-                this.isLoading = false;
-                this.errorMessage = error;
-              }
-            );
+    }
+
+    async tryToken(): Promise<void> {
+      let localToken = localStorage.getItem('localToken');
+      let localUsername = localStorage.getItem('localUsername');
+      if (localToken && localUsername) {
+        this.requestService.loginByToken(
+          { token: localToken, username: localUsername },
+          () => {
+            this.isLoading = false;
+          },
+          (error) => {
+            this.isLoading = false;
+            this.errorMessage = error;
           }
-        }
+        );
+      }
     }
 
     onLogin(): void {
@@ -61,11 +69,8 @@ export class LoginComponent implements OnInit {
 
         this.requestService.login(
             { username: this.username, password: this.password },
-            (payload) => {
+            () => {
                 this.isLoading = false;
-                // Navigation is handled in AuthService
-                localStorage.setItem('localToken', payload.token)
-                localStorage.setItem('localUserId', payload.userId.toString())
             },
             (error) => {
                 this.isLoading = false;

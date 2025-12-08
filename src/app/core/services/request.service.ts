@@ -1,19 +1,40 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from './socket.service';
 import { ResponseService } from './response.service';
-import { ClientMessageType, LoginPayload, LoginByTokenPayload, RegisterPayload, UpdateProfilePayload, LogoutPayload, LoadContactsPayload, AddContactPayload, DeleteContactPayload, LoadMessagesPayload, SendMessagePayload, SendFilePayload, SendImagePayload, MarkReadPayload, ClearMessagesPayload } from '../protocol/client.protocol';
+import {
+  ClientMessageType,
+  LoginPayload,
+  LoginByTokenPayload,
+  RegisterPayload,
+  UpdateProfilePayload,
+  LogoutPayload,
+  LoadContactsPayload,
+  AddContactPayload,
+  DeleteContactPayload,
+  LoadMessagesPayload,
+  SendMessagePayload,
+  SendFilePayload,
+  SendImagePayload,
+  MarkReadPayload,
+  ClearMessagesPayload,
+  SearchForUserByIdPayload, SearchForUserByUserNamePayload
+} from '../protocol/client.protocol';
 import { filter, take } from 'rxjs/operators';
 import {LoginSuccessPayload} from '../protocol/service.protocol';
+import {Observable, timeout} from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RequestService {
+    public isReady$: Observable<boolean>;
 
     constructor(
         private socketService: SocketService,
         private responseService: ResponseService
-    ) { }
+    ) {
+        this.isReady$ = this.socketService.connectionStatus$;
+    }
 
     login(payload: LoginPayload, onSuccess?: (payload: LoginSuccessPayload) => void, onError?: (err: string) => void) {
         this.socketService.sendMessage({ type: ClientMessageType.LOGIN, payload });
@@ -66,6 +87,28 @@ export class RequestService {
         this.socketService.sendMessage({ type: ClientMessageType.LOAD_CONTACTS, payload });
         if (onSuccess) {
             this.responseService.contactsLoaded$.pipe(take(1)).subscribe(() => onSuccess());
+        }
+    }
+
+    searchForUserById(payload: SearchForUserByIdPayload, onSuccess?: (result: Array<{
+      contactId: number;
+      username: string;
+      avatar: string;
+    }>) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.SEARCH_FOR_USER_BY_ID, payload });
+        if (onSuccess) {
+            this.responseService.searchForUserResult$.pipe(take(1)).subscribe((result) => onSuccess(result.users));
+        }
+    }
+
+    searchForUserByName(payload: SearchForUserByUserNamePayload, onSuccess?: (result: Array<{
+      contactId: number;
+      username: string;
+      avatar: string;
+    }>) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.SEARCH_FOR_USER_BY_NAME, payload });
+        if (onSuccess) {
+            this.responseService.searchForUserResult$.pipe(take(1)).subscribe((result) => onSuccess(result.users));
         }
     }
 

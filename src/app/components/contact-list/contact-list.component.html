@@ -2,10 +2,16 @@
   <!-- 顶部搜索区 -->
   <div class="search-section">
     <input type="text" class="search-input" placeholder="搜索联系人 / 聊天记录">
-    <a routerLink="/settings" class="settings-btn" title="设置">
-      S
-      <i class="fas fa-cog"></i>
-    </a>
+    <div class="action-buttons">
+      <button class="settings-btn" title="添加联系人" (click)="showAddContact()">
+        +
+        <i class="fas fa-user-plus"></i>
+      </button>
+      <a routerLink="/settings" class="settings-btn" title="设置">
+        S
+        <i class="fas fa-cog"></i>
+      </a>
+    </div>
   </div>
 
   <!-- 联系人列表 -->

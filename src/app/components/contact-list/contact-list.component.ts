@@ -7,6 +7,7 @@ import { ResponseService } from '../../core/services/response.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
 import {MessageService} from '../../core/services/message.service';
+import { ContactService } from '../../core/services/contact.service';
 
 @Component({
   selector: 'app-contact-list',
@@ -25,7 +26,8 @@ export class ContactListComponent implements OnInit, OnDestroy {
     private requestService: RequestService,
     private responseService: ResponseService,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private contactService: ContactService
   ) { }
 
   ngOnInit() {
@@ -35,12 +37,10 @@ export class ContactListComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.push(
-      this.responseService.contactsLoaded$.subscribe(payload => {
-        this.contactsList = payload.contacts.map(c => new Contact(c.contactId, c.username, c.online, c.avatar));
+      this.contactService.contactList$.subscribe(contacts => {
+        this.contactsList = contacts;
       }),
-      this.responseService.contactAdded$.subscribe(payload => {
-        this.contactsList.push(new Contact(payload.contactId, payload.userName, payload.online, payload.avatar));
-      }),
+      
       this.responseService.contactDeleted$.subscribe(() => {
         // Reload contacts or remove locally if we had the ID.
         // The protocol for delete success doesn't return the ID, so we might need to reload.
@@ -78,6 +78,13 @@ export class ContactListComponent implements OnInit, OnDestroy {
 
   getUnreadCount(contact: Contact): number {
     return this.messageService.messagesMapValue?.get(contact.contactId)?.filter(m => m.status === 'sent').length || 0;
+  }
+
+  showAddContact() {
+    // 触发显示添加联系人模态框
+    // 使用自定义事件方式触发
+    const event = new CustomEvent('showAddContactDialog');
+    window.dispatchEvent(event);
   }
 
   ngOnDestroy() {

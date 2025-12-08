@@ -12,6 +12,7 @@ export class SocketService {
   private messageSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
   private errorSubject = new Subject<string>();
+  public connectionStatus$ = this.connectionStatusSubject.asObservable();
 
   constructor() {
     this.connect();
@@ -25,7 +26,6 @@ export class SocketService {
         this.isConnected = true;
         this.connectionStatusSubject.next(true);
         console.log('WebSocket连接已建立');
-        window.alert('已与服务器建立连接！');
       };
 
       this.socket.onmessage = (event) => {
@@ -83,10 +83,6 @@ export class SocketService {
 
   public getMessages(): Observable<any> {
     return this.messageSubject.asObservable();
-  }
-
-  public getConnectionStatus(): Observable<boolean> {
-    return this.connectionStatusSubject.asObservable();
   }
 
   public getConnectionErrors(): Observable<string> {

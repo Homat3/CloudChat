@@ -10,6 +10,8 @@ export enum ClientMessageType {
   UPDATE_PROFILE = 'UPDATE_PROFILE',
   LOGOUT = 'LOGOUT',
   LOAD_CONTACTS = 'LOAD_CONTACTS',
+  SEARCH_FOR_USER_BY_ID = 'SEARCH_FOR_USER_BY_ID',
+  SEARCH_FOR_USER_BY_NAME = 'SEARCH_FOR_USER_BY_NAME',
   ADD_CONTACT = 'ADD_CONTACT',
   DELETE_CONTACT = 'DELETE_CONTACT',
   LOAD_MESSAGES = 'LOAD_MESSAGES',
@@ -27,6 +29,8 @@ type ClientPayload =
   | UpdateProfilePayload
   | LogoutPayload
   | LoadContactsPayload
+  | SearchForUserByIdPayload
+  | SearchForUserByUserNamePayload
   | AddContactPayload
   | DeleteContactPayload
   | LoadMessagesPayload
@@ -42,10 +46,9 @@ export interface LoginPayload {
 }
 
 export interface LoginByTokenPayload {
+  username: string;
   token: string;
-  userId: number;
 }
-
 
 export interface RegisterPayload {
   username: string;
@@ -65,9 +68,16 @@ export interface UpdateProfilePayload {
   avatar: string;
 }
 
-
 export interface LoadContactsPayload {
   userId: number;
+}
+
+export interface SearchForUserByIdPayload {
+  userId: number;
+}
+
+export interface SearchForUserByUserNamePayload {
+  username: string;
 }
 
 export interface AddContactPayload {

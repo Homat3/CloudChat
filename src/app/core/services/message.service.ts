@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import {Message} from '../models';
 import { ResponseService } from './response.service';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
+  public isReady$: Observable<boolean>;
+
   private messageMapSubject: BehaviorSubject<Map<number, Message[]>> = new BehaviorSubject(new Map)
   public messageMap$ = this.messageMapSubject.asObservable();
 
@@ -40,6 +42,8 @@ export class MessageService {
     this.responseService.messagesCleared$.subscribe(payload => {
 
     });
+
+    this.isReady$ = this.responseService.isReady$;
   }
 
   public get messagesMapValue(): Map<number, Message[]> | null {

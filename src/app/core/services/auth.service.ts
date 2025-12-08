@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
     providedIn: 'root'
 })
 export class AuthService {
+    public isReady$: Observable<boolean>;
+
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -18,22 +20,27 @@ export class AuthService {
         this.responseService.loginSuccess$.subscribe(payload => {
             const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
             this.currentUserSubject.next(user);
-            localStorage.setItem('token', payload.token);
+            localStorage.setItem('localToken', payload.token)
+            localStorage.setItem('localUsername', payload.username)
             this.router.navigate(['/']); // Assuming '/chat' is the main route
         });
 
         this.responseService.registerSuccess$.subscribe(payload => {
             const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
             this.currentUserSubject.next(user);
-            localStorage.setItem('token', payload.token);
+            localStorage.setItem('localToken', payload.token)
+            localStorage.setItem('localUsername', payload.username)
             this.router.navigate(['/']);
         });
 
         this.responseService.logoutSuccess$.subscribe(() => {
             this.currentUserSubject.next(null);
-            localStorage.removeItem('token');
+            localStorage.removeItem('localToken')
+            localStorage.removeItem('localUsername')
             this.router.navigate(['/login']);
         });
+
+        this.isReady$ = this.responseService.isReady$;
     }
 
     public get currentUserValue(): User | null {

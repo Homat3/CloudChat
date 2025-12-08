@@ -15,6 +15,7 @@
 {
   "type": "LOGIN_BY_TOKEN",
   "payload": {
+    "username": "string",
     "token": "string"
   }
 }
@@ -143,6 +144,23 @@
   }
 }
 ```
+### 请求搜索联系人
+```json
+{
+  "type": "SEARCH_FOR_USER_BY_ID",
+  "payload": {
+    "userId": "int"
+  }
+}
+```
+```json
+{
+  "type": "SEARCH_FOR_USER_BY_NAME",
+  "payload": {
+    "username": "string"
+  }
+}
+```
 ### 请求添加联系人
 ```json
 {
@@ -202,9 +220,28 @@
   "type": "CONTACT_ADDED",
   "payload": {
     "contactId": "int",
-    "userName": "string",
+    "username": "string",
     "online": "boolean",
     "avatar": "string"
+  }
+}
+```
+### 搜索联系人结果
+```json
+{
+  "type": "SEARCH_FOR_USER_RESULT",
+  "payload": {
+    "users": [
+      {
+        "contactId": "int",
+        "username": "string",
+        "avatar": "string"
+      },{
+        "contactId": "int",
+        "username": "string",
+        "avatar": "string"
+      }
+    ]
   }
 }
 ```

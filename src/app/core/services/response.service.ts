@@ -1,12 +1,33 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import { SocketService } from './socket.service';
-import { ServiceMessageType, ServicePayload, LoginSuccessPayload, LoginFailurePayload, RegisterSuccessPayload, RegisterFailurePayload, ProfileUpdatedSuccessPayload, ProfileUpdatedFailedPayload, ContactsLoadedPayload, ContactsLoadedFailedPayload, ContactAddedPayload, ContactAddedFailedPayload, ContactDeletedPayload, ContactDeletedFailedPayload, MessagesLoadedPayload, SelfMessageReceivedPayload, ToSelfMessageReceivedPayload, MessagesClearedPayload } from '../protocol/service.protocol';
+import {
+  ServiceMessageType,
+  ServicePayload,
+  LoginSuccessPayload,
+  LoginFailurePayload,
+  RegisterSuccessPayload,
+  RegisterFailurePayload,
+  ProfileUpdatedSuccessPayload,
+  ProfileUpdatedFailedPayload,
+  ContactsLoadedPayload,
+  ContactsLoadedFailedPayload,
+  ContactAddedPayload,
+  ContactAddedFailedPayload,
+  ContactDeletedPayload,
+  ContactDeletedFailedPayload,
+  MessagesLoadedPayload,
+  SelfMessageReceivedPayload,
+  ToSelfMessageReceivedPayload,
+  MessagesClearedPayload,
+  SearchForUserResultPayload
+} from '../protocol/service.protocol';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ResponseService {
+    public isReady$: Observable<boolean>;
 
     public loginSuccess$ = new Subject<LoginSuccessPayload>();
     public loginFailure$ = new Subject<LoginFailurePayload>();
@@ -17,6 +38,7 @@ export class ResponseService {
     public logoutSuccess$ = new Subject<void>();
     public contactsLoaded$ = new Subject<ContactsLoadedPayload>();
     public contactsLoadedFailed$ = new Subject<ContactsLoadedFailedPayload>();
+    public searchForUserResult$ = new Subject<SearchForUserResultPayload>();
     public contactAdded$ = new Subject<ContactAddedPayload>();
     public contactAddedFailed$ = new Subject<ContactAddedFailedPayload>();
     public contactDeleted$ = new Subject<ContactDeletedPayload>();
@@ -30,6 +52,7 @@ export class ResponseService {
         this.socketService.getMessages().subscribe(message => {
             this.handleMessage(message);
         });
+        this.isReady$ = this.socketService.connectionStatus$;
     }
 
     private handleMessage(message: any) {
@@ -63,6 +86,9 @@ export class ResponseService {
                 break;
             case ServiceMessageType.CONTACTS_LOADED_FAILED:
                 this.contactsLoadedFailed$.next(message.payload);
+                break;
+            case ServiceMessageType.SEARCH_FOR_USER_RESULT:
+                this.searchForUserResult$.next(message.payload);
                 break;
             case ServiceMessageType.CONTACT_ADDED:
                 this.contactAdded$.next(message.payload);
