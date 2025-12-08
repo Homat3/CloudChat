@@ -4,7 +4,7 @@ int CloudChatUser::get_id() {
 	return id_;
 }
 
-std::string CloudChatUser::get_user_name() {
+std::string CloudChatUser::get_username() {
 	return username_;
 }
 
@@ -18,6 +18,10 @@ std::string CloudChatUser::get_avatar() {
 
 std::string CloudChatUser::get_token() {
 	return token_;
+}
+
+bool CloudChatUser::is_online() {
+	return is_online_;
 }
 
 void CloudChatUser::SetId(int id) {
@@ -41,13 +45,14 @@ void CloudChatUser::SetToken(std::string token) {
 }
 
 CloudChatUser::CloudChatUser(int id, std::string username, std::string password, std::string avatar,
-							 std::string token, std::string email) {
+							 std::string token, std::string email, bool is_online) {
 	id_ = id;
 	username_ = username;
 	password_ = password;
 	avatar_   = avatar;
 	token_    = token;
 	email_    = email;
+	is_online_ = is_online;
 }
 
 std::string CloudChatUser::get_email() {
@@ -56,6 +61,10 @@ std::string CloudChatUser::get_email() {
 
 void CloudChatUser::SetEmail(std::string email) {
 	email_ = email;
+}
+
+void CloudChatUser::SetOnline(bool is_online) {
+	is_online_ = is_online;
 }
 
 std::string generate_token() {

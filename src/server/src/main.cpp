@@ -135,4 +135,8 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	else if (type == MARK_READ) MarkRead(g_cloudchat_srv, hdl, msg, (MarkReadMsg*)client_msg);
 	else if (type == CLEAR_MESSAGES)
 		ClearMessages(g_cloudchat_srv, hdl, msg, (ClearMessagesMsg*)client_msg);
+	else if (type == SEARCH_FOR_USER_BY_ID)
+		SearchForUserById(g_cloudchat_srv, hdl, msg, (SearchForUserByIdMsg*)client_msg);
+	else if (type == SEARCH_FOR_UESR_BY_NAME)
+		SearchForUserByName(g_cloudchat_srv, hdl, msg, (SearchForUserByNameMsg*)client_msg);
 }

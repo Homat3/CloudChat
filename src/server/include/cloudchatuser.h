@@ -15,17 +15,19 @@ private:
 	std::string avatar_;
 	std::string token_;
 	std::string email_;
+	bool        is_online_;
 
 public:
 	CloudChatUser(int id, std::string username, std::string password, std::string avatar,
-				  std::string token, std::string email);
+				  std::string token, std::string email, bool is_online);
 	// getter
 	int get_id();
-	std::string get_user_name();
+	std::string get_username();
 	std::string get_password();
 	std::string get_avatar();
 	std::string get_token();
 	std::string get_email();
+	bool        is_online();
 	// setter
 	void SetId(int id);
 	void SetUserName(std::string username);
@@ -33,6 +35,7 @@ public:
 	void SetAvatar(std::string avatar);
 	void SetToken(std::string token);
 	void SetEmail(std::string email);
+	void SetOnline(bool is_online);
 };
 
 std::string generate_token();	// 生成令牌

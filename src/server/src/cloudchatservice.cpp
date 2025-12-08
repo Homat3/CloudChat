@@ -26,6 +26,7 @@ void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::m
 	std::string avatar = user->get_avatar();
 	std::string token = generate_token();
 	user->SetToken(token);
+	user->SetOnline(true);
 	CloudChatDatabase::GetInstance()->UpdateUser(user); // 更新令牌
 	SendMsgToClient(cloudchat_srv, hdl, msg, new LoginSuccessMsg(user_id, username, email, avatar,
 																 token));
@@ -55,6 +56,7 @@ void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	std::string avatar = user->get_avatar();
 	token = generate_token();
 	user->SetToken(token);
+	user->SetOnline(true);
 	CloudChatDatabase::GetInstance()->UpdateUser(user); // 更新令牌
 	SendMsgToClient(cloudchat_srv, hdl, msg, new LoginSuccessMsg(user_id, username, email, avatar,
 																 token));
@@ -76,7 +78,8 @@ void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t
 		return;
 	}
 	// 用户不存在，注册成功
-	user = new CloudChatUser(0, username, password, DEFAULT_AVATAR_URL, generate_token(), email);
+	user = new CloudChatUser(0, username, password, DEFAULT_AVATAR_URL, generate_token(), email,
+							 true);
 	CloudChatDatabase::GetInstance()->AddUser(*user);
 	user = CloudChatDatabase::GetInstance()->GetUserByName(username);
 	SendMsgToClient(cloudchat_srv, hdl, msg, new RegisterSuccessMsg(user->get_id(), username, email,
@@ -137,4 +140,15 @@ void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 void ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				   server_t::message_ptr msg, ClearMessagesMsg* clear_messages_msg) {
 	// TODO: 清空聊天记录业务
+}
+
+void SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+					   server_t::message_ptr msg, SearchForUserByIdMsg* search_for_user_by_id_msg) {
+	// TODO: 根据 id 搜索用户
+}
+
+void SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+						 server_t::message_ptr msg,
+						 SearchForUserByNameMsg* search_for_user_by_name_msg) {
+	// TODO: 根据用户名搜索用户
 }

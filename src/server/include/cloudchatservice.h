@@ -1,7 +1,8 @@
 #ifndef CLOUDCHAT_SERVICE
 #define CLOUDCHAT_SERVICE
 
-#define DEFAULT_AVATAR_URL "cloudchat.infinomat.com/default.png"	// 默认用户头像 URL
+#include <websocketpp/common/connection_hdl.hpp>
+#define DEFAULT_AVATAR_URL "default.png"	// 默认用户头像 URL
 
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
@@ -34,5 +35,10 @@ void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 			  server_t::message_ptr msg, MarkReadMsg* mark_read_msg);
 void ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				   server_t::message_ptr msg, ClearMessagesMsg* clear_messages_msg);
+void SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+					   server_t::message_ptr msg, SearchForUserByIdMsg* search_for_user_by_id_msg);
+void SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+						 server_t::message_ptr msg,
+						 SearchForUserByNameMsg* search_for_user_by_name_msg);
 
 #endif // CLOUDCHAT_SERVICE
