@@ -31,7 +31,6 @@ public:
 	CloudChatUser* GetUserById(int id);//
 	bool UpdateUser(CloudChatUser* user);//
 	CloudChatUser* GetUserByName(std::string name);
-
 	bool DeleteUser(int id);
 };
 
