@@ -164,7 +164,8 @@ CloudChatUser* CloudChatDatabase::GetUserById(int id){
 				res->getString("password"),
 				res->getString("avatar"),
 				res->getString("token"),
-				res->getString("email")
+				res->getString("email"),
+				res->getBoolean("online")
 			);
 		}
 
@@ -181,15 +182,16 @@ CloudChatUser* CloudChatDatabase::GetUserById(int id){
 bool CloudChatDatabase::AddUser(CloudChatUser& user){ 
 	try{
 		sql::PreparedStatement *pstmt = connection_->prepareStatement(
-			"INSERT INTO users(username,email,password,avatar,token)"
-			"VALUES(?,?,?,?,?)"
+			"INSERT INTO users(username,email,password,avatar,token,online)"
+			"VALUES(?,?,?,?,?,?)"
 		);
 		
-		pstmt->setString(1,user.get_user_name());
+		pstmt->setString(1,user.get_username());
 		pstmt->setString(2,user.get_email());
 		pstmt->setString(3,user.get_password());
 		pstmt->setString(4,user.get_avatar());
 		pstmt->setString(5,user.get_token());
+		pstmt->setBoolean(6,user.is_online());
 
 		return pstmt->executeUpdate() > 0;
 
@@ -225,21 +227,22 @@ bool CloudChatDatabase::UpdateUser(CloudChatUser *user){
 	}
 	try{
 		sql::PreparedStatement *pstmt = connection_->prepareStatement(
-			"UPDATE users SET username = ?, email = ?, password = ?, avatar = ?, token = ?, WHERE id = ?"
+			"UPDATE users SET username = ?, email = ?, password = ?, avatar = ?, token = ?, online = ?  WHERE id = ?"
 		);
-		pstmt->setString(1,user->get_user_name());
+		pstmt->setString(1,user->get_username());
 		pstmt->setString(2,user->get_email());
 		pstmt->setString(3,user->get_password());
 		pstmt->setString(4,user->get_avatar());
 		pstmt->setString(5,user->get_token());
-		pstmt->setInt(6,user->get_id());
+		pstmt->setBoolean(6, user->is_online());
+		pstmt->setInt(7,user->get_id());
 
 		int rowsAffected = pstmt->executeUpdate();
 		delete pstmt;
 		return rowsAffected;
 
 	}catch(sql::SQLException &e){
-		std::cout << "# ERR: SQLException in " << std::endl;
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
 		return false;
 	}
 }
@@ -261,14 +264,15 @@ CloudChatUser* CloudChatDatabase::GetUserByName(std::string username){
 				res->getString("password"),
 				res->getString("avatar"),
 				res->getString("token"),
-				res->getString("email")
+				res->getString("email"),
+				res->getBoolean("online")
 			);
 			delete res;
 			delete pstmt;
 			return user;
 		}
 	}catch(sql::SQLException &e){
-		std::cout << "# ERR: SQLException in " << std::endl;
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
 		return nullptr;
 	}
 	return nullptr;

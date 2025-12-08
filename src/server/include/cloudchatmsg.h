@@ -5,7 +5,7 @@
 #ifndef CLOUDCHATMSG_H
 #define CLOUDCHATMSG_H
 
-#include "cloudchatsys.h"
+#include "cloudchatuser.h"
 
 // 聊天消息类型宏
 #define TEXT_MESSAGE  0	// 文本消息
@@ -25,24 +25,27 @@
 #define UPDATE_PROFILE "UPDATE_PROFILE" // 更新个人信息
 #define LOGOUT         "LOGOUT"			// 退出登录
 #define LOAD_CONTACTS  "LOAD_CONTACTS"	// 加载联系人列表
-#define ADD_CONTACT    "ADD_CONTACT"	// 添加联系人
-#define DELETE_CONTACT "DELETE_CONTACT" // 删除联系人
-#define LOAD_MESSAGES  "LOAD_MESSAGES"	// 加载聊天记录
-#define SEND_MESSAGE   "SEND_MESSAGE"	// 发送聊天消息
-#define SEND_FILE      "SEND_FILE"		// 发送文件
-#define SEND_IMAGE     "SEND_IMAGE"		// 发送图片
-#define MARK_READ      "MARK_READ"		// 标记为已读
-#define CLEAR_MESSAGES "CLEAR_MESSAGES" // 清空聊天记录
+#define SEARCH_FOR_USER_BY_ID "SEARCH_FOR_USER_BY_ID"	  // 根据用户 id 搜索用户
+#define SEARCH_FOR_UESR_BY_NAME "SEARCH_FOR_USER_BY_NAME" // 根据用户名搜索用户
+#define ADD_CONTACT             "ADD_CONTACT"			  // 添加联系人
+#define DELETE_CONTACT          "DELETE_CONTACT"		  // 删除联系人
+#define LOAD_MESSAGES           "LOAD_MESSAGES"			  // 加载聊天记录
+#define SEND_MESSAGE            "SEND_MESSAGE"			  // 发送聊天消息
+#define SEND_FILE               "SEND_FILE"				  // 发送文件
+#define SEND_IMAGE              "SEND_IMAGE"			  // 发送图片
+#define MARK_READ               "MARK_READ"				  // 标记为已读
+#define CLEAR_MESSAGES          "CLEAR_MESSAGES"		  // 清空聊天记录
 // 服务端消息
-#define LOGIN_SUCCESS  "LOGIN_SUCCESS" // 登录成功
-#define LOGIN_FAILURE  "LOGIN_FAILURE" // 登录失败
-#define REGISTER_SUCCESS "REGISTER_SUCCESS" // 注册成功
-#define REGISTER_FAILURE "REGISTER_FAILURE" // 注册失败
+#define LOGIN_SUCCESS           "LOGIN_SUCCESS"			  // 登录成功
+#define LOGIN_FAILURE           "LOGIN_FAILURE"			  // 登录失败
+#define REGISTER_SUCCESS        "REGISTER_SUCCESS"		  // 注册成功
+#define REGISTER_FAILURE        "REGISTER_FAILURE"		  // 注册失败
 #define PROFILE_UPDATED_SUCCESS "PROFILE_UPDATED_SUCCESS" // 成功更新个人信息
 #define PROFILE_UPDATED_FAILED  "PROFILE_UPDATED_FAILED"  // 更新个人信息失败
 #define LOGOUT_SUCCESS          "LOGOUT_SUCCESS"		  // 退出登录成功
 #define CONTACTS_LOADED         "CONTACTS_LOADED"		  // 已加载联系人列表
 #define CONTACTS_LOADED_FAILED  "CONTACTS_LOADED_FAILED"  // 加载联系人列表失败
+#define SEARCH_FOR_USER_RESULT  "SEARCH_FOR_USER_RESULT"  // 搜索联系人结果
 #define CONTACT_ADDED           "CONTACT_ADDED"			  // 已添加联系人
 #define CONTACT_ADDED_FAILED    "CONTACT_ADDED_FAILED"	  // 添加联系人失败
 #define CONTACT_DELETED         "CONTACT_DELETED"		  // 已删除联系人
@@ -171,6 +174,22 @@ private:
 public:
 	LoadContactsMsg(int user_id);
 	static LoadContactsMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class SearchForUserByIdMsg : public ClientMsg { // 根据 id 搜索用户
+private:
+	int user_id_;				// 目标用户 id
+public:
+	SearchForUserByIdMsg(int user_id);
+	static SearchForUserByIdMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class SearchForUserByNameMsg : public ClientMsg { // 根据用户名搜索用户
+private:
+	std::string username_;
+public:
+	SearchForUserByNameMsg(std::string username);
+	static SearchForUserByNameMsg* parse_from_JSON(std::string JSON, int payload_pos);
 };
 
 class AddContactMsg : public ClientMsg { // 添加联系人消息
@@ -339,16 +358,10 @@ public:
 
 class ContactsLoadedMsg : public ServerMsg { // 已加载联系人消息
 private:
-	struct Contact { // 联系人结构体
-		int contact_id; // 联系人用户 id
-		std::string username; // 联系人用户名
-		std::string avatar;	  // 联系人头像文件地址
-		bool        online;	  // 联系人在线状态
-	};
-	std::vector<Contact> contacts_; // 联系人列表
+	std::vector<CloudChatUser> contacts_; // 联系人列表
 
 public:
-	ContactsLoadedMsg(std::vector<Contact> contacts);
+	ContactsLoadedMsg(std::vector<CloudChatUser> contacts);
 	std::string to_JSON() override;
 };
 
@@ -358,6 +371,14 @@ private:
 
 public:
 	ContactsLoadedFailedMsg(std::string error);
+	std::string to_JSON() override;
+};
+
+class SearchForUserResultMsg : public ServerMsg { // 搜索联系人结果
+private:
+	std::vector<CloudChatUser> users_;
+public:
+	SearchForUserResultMsg(std::vector<CloudChatUser> users);
 	std::string to_JSON() override;
 };
 

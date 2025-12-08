@@ -82,7 +82,7 @@ LoadContactsMsg::LoadContactsMsg(int user_id) : ClientMsg(LOAD_CONTACTS) {
 	user_id_ = user_id;
 }
 
-ContactsLoadedMsg::ContactsLoadedMsg(std::vector<Contact> contacts) : ServerMsg(
+ContactsLoadedMsg::ContactsLoadedMsg(std::vector<CloudChatUser> contacts) : ServerMsg(
 	CONTACTS_LOADED
 	) {
 	contacts_ = contacts;
@@ -271,9 +271,9 @@ std::string ContactsLoadedMsg::to_JSON() {
 		char contact_buff[BUFF_LEN] = "";
 		sprintf(contact_buff,
 				"{\"contactId\":%d,\"username\":\"%s\",\"avatar\":\"%s\",\"online\":%s}",
-				contacts_[i].contact_id, to_JSON_string(contacts_[i].username).c_str(),
-				to_JSON_string(contacts_[i].avatar).c_str(),
-				contacts_[i].online ? "true" : "false");
+				contacts_[i].get_id(), to_JSON_string(contacts_[i].get_username()).c_str(),
+				to_JSON_string(contacts_[i].get_avatar()).c_str(),
+				contacts_[i].is_online() ? "true" : "false");
 		contacts_json += contact_buff;
 		if (i != contacts_.size() - 1) {
 			contacts_json += ",";
@@ -291,6 +291,29 @@ std::string ContactsLoadedFailedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
 	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
 			to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+std::string SearchForUserResultMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	std::string users_json = "[";
+	for (size_t i = 0; i < users_.size(); i++) {
+		char contact_buff[BUFF_LEN] = "";
+		sprintf(contact_buff,
+				"{\"contactId\":%d,\"username\":\"%s\",\"avatar\":\"%s\",\"online\":%s}",
+				users_[i].get_id(), to_JSON_string(users_[i].get_username()).c_str(),
+				to_JSON_string(users_[i].get_avatar()).c_str(),
+				users_[i].is_online() ? "true" : "false");
+		users_json += contact_buff;
+		if (i != users_.size() - 1) {
+			users_json += ",";
+		}
+	}
+	users_json += "]";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"contacts\":%s}}", to_JSON_string(type_).c_str(),
+			users_json.c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -418,6 +441,32 @@ ClientMsg* parse_protocal_msg(std::string JSON) {
 		return LoginByTokenMsg::parse_from_JSON(JSON, payload_pos);
 	} else if (type == REGISTER) {
 		return RegisterMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == UPDATE_PROFILE) {
+		return UpdateProfileMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == LOAD_CONTACTS) {
+		return LoadContactsMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == ADD_CONTACT) {
+		return AddContactMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == DELETE_CONTACT) {
+		return DeleteContactMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == LOAD_MESSAGES) {
+		return LoadMessagesMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == SEND_MESSAGE) {
+		return SendMessageMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == LOGOUT) {
+		return LogoutMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == CLEAR_MESSAGES) {
+		return ClearMessagesMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == SEND_FILE) {
+		return SendFileMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == SEND_IMAGE) {
+		return SendImageMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == MARK_READ) {
+		return MarkReadMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == SEARCH_FOR_USER_BY_ID) {
+		return SearchForUserByIdMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == SEARCH_FOR_UESR_BY_NAME) {
+		return SearchForUserByNameMsg::parse_from_JSON(JSON, payload_pos);
 	}
 	return new ClientMsg(ILLEGAL_MSG);
 }
@@ -754,4 +803,31 @@ std::string RegisterMsg::get_password() {
 
 std::string RegisterMsg::get_email() {
 	return email_;
+}
+
+SearchForUserByIdMsg::SearchForUserByIdMsg(int user_id) : ClientMsg(SEARCH_FOR_USER_BY_ID) {
+	user_id_ = user_id;
+}
+
+SearchForUserByIdMsg* SearchForUserByIdMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""), JSON.length() - 1);
+	return new SearchForUserByIdMsg(user_id);
+}
+
+SearchForUserByNameMsg::SearchForUserByNameMsg(std::string username) : ClientMsg(
+	SEARCH_FOR_UESR_BY_NAME) {
+	username_ = username;
+}
+
+SearchForUserByNameMsg* SearchForUserByNameMsg::parse_from_JSON(std::string JSON,
+																int payload_pos) {
+	std::string username = parse_str_from_json(JSON, find_field_pos(JSON, "\"username\""),
+											  JSON.length() - 1);
+	return new SearchForUserByNameMsg(username);
+}
+
+SearchForUserResultMsg::SearchForUserResultMsg(std::vector<CloudChatUser> users) : ServerMsg(
+	SEARCH_FOR_USER_RESULT
+	){
+	users_ = users;
 }
