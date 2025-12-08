@@ -8,6 +8,41 @@
 
     <div class="settings-content">
         <div class="settings-section">
+            <h2>个人信息</h2>
+            @if (currentUser){
+              <div class="setting-item">
+                <div class="setting-info">
+                  @if (currentUser.avatar){
+                    <div class="w-48 h-48 rounded-full bg-gradient-to-br items-center justify-center text-white text-3xl font-bold">
+                      <img src="{{currentUser.avatar}}" alt="{{ currentUser.username.charAt(0) || '?' }}" style="border-radius: 50%; width: 20%; height: 20%">
+                    </div>
+                  } @else {
+                    <label>{{ currentUser.username.charAt(0) || '?' }}</label>
+                  }
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">用户名</span>
+                  <span class="setting-desc">{{ currentUser.username }}</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">用户ID</span>
+                  <span class="setting-desc">{{ currentUser.userId }}</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">邮箱</span>
+                  <span class="setting-desc">{{ currentUser.email }}</span>
+                </div>
+              </div>
+            }
+        </div>
+
+        <div class="settings-section">
             <h2>账号</h2>
             <div class="setting-item">
                 <div class="setting-info">

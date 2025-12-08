@@ -8,7 +8,7 @@ import {
   AfterViewChecked,
   OnDestroy, OnInit
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Message, TextMessage, ImageMessage, FileMessage } from '../../core/models';
 import { Contact } from '../../core/models';
@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './chat-area.component.html',
   styleUrls: ['./chat-area.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, NgOptimizedImage]
 })
 export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy {
   @Input() selectedContact: Contact | null = null;

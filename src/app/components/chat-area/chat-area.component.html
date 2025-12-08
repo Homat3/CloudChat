@@ -3,7 +3,13 @@
   <!-- 顶部信息栏 -->
   <div class="chat-header">
     <div class="contact-info">
-      <div class="avatar">{{ selectedContact?.username?.charAt(0) || 'U' }}</div>
+      <div class="avatar">
+        @if (selectedContact?.avatar){
+          <img ngSrc="{{selectedContact?.avatar}}" alt="{{ selectedContact?.username?.charAt(0) || '?' }}" fill>
+        } @else {
+          <label>{{ selectedContact?.username?.charAt(0) || '?' }}</label>
+        }
+      </div>
       <div class="contact-details">
         <div class="contact-name">{{ selectedContact?.username || '请选择一个联系人' }}</div>
         <div class="contact-status">{{ selectedContact?.online || '' }}</div>

@@ -3,71 +3,86 @@
     <h2>添加联系人</h2>
     <div class="search-options">
       <div class="search-option" [class.active]="searchType === 'id'">
-        <input 
-          type="radio" 
-          id="searchById" 
-          name="searchType" 
-          value="id" 
+        <input
+          type="radio"
+          id="searchById"
+          name="searchType"
+          value="id"
           [(ngModel)]="searchType"
           (change)="onSearchTypeChange()">
         <label for="searchById">通过ID搜索</label>
       </div>
       <div class="search-option" [class.active]="searchType === 'username'">
-        <input 
-          type="radio" 
-          id="searchByUsername" 
-          name="searchType" 
-          value="username" 
+        <input
+          type="radio"
+          id="searchByUsername"
+          name="searchType"
+          value="username"
           [(ngModel)]="searchType"
           (change)="onSearchTypeChange()">
         <label for="searchByUsername">通过用户名搜索</label>
       </div>
     </div>
-    
+
     <div class="search-input-container">
-      <input 
-        *ngIf="searchType === 'id'" 
-        type="number" 
-        [(ngModel)]="searchId" 
-        placeholder="输入用户ID"
-        class="search-input">
-        
-      <input 
-        *ngIf="searchType === 'username'" 
-        type="text" 
-        [(ngModel)]="searchUsername" 
-        placeholder="输入用户名"
-        class="search-input">
-        
+      @if (searchType === 'id'){
+        <input
+          type="number"
+          [(ngModel)]="searchId"
+          placeholder="🔎输入用户ID"
+          class="search-input">
+      } @else if (searchType === 'username'){
+        <input
+          type="text"
+          [(ngModel)]="searchUsername"
+          placeholder="🔎输入用户名"
+          class="search-input">
+      } @else {
+        <label> Error </label>
+      }
+
       <button (click)="searchContact()" class="search-button">搜索</button>
     </div>
-    
-    <div *ngIf="searchResult && searchResult.length > 0" class="search-result">
-      <div class="result-header">
-        <h3>搜索结果</h3>
-        <select [(ngModel)]="selectedContactId" class="contact-select">
-          <option value="">请选择要添加的联系人</option>
-          <option *ngFor="let contact of searchResult" [value]="contact.contactId">
-            {{ contact.username }} (ID: {{ contact.contactId }})
-          </option>
-        </select>
-        <button 
-          (click)="addSelectedContact()" 
-          [disabled]="!selectedContactId" 
-          class="add-button">
-          添加联系人
-        </button>
+
+    @if (searchResult && searchResult.length > 0){
+      <div class="search-result">
+        <div class="result-header">
+          <h3>搜索结果</h3>
+          <select [(ngModel)]="selectedContactId" class="contact-select">
+            <option value="">请选择要添加的联系人</option>
+            @for (contact of searchResult; track contact.contactId){
+              <option>
+                @if (contact.avatar){
+                  <img ngSrc="{{contact.avatar}}" alt="{{ contact.username.charAt(0) || '?' }}" fill>
+                } @else {
+                  <label>{{ contact.username.charAt(0) || '?' }}</label>
+                }
+                {{ contact.username }} <br> (ID: {{ contact.contactId }})
+              </option>
+            }
+          </select>
+          <button
+            (click)="addSelectedContact()"
+            [disabled]="!selectedContactId"
+            class="add-button">
+            添加联系人
+          </button>
+        </div>
       </div>
-    </div>
-    
-    <div *ngIf="searchResult && searchResult.length === 0" class="no-results">
-      未找到匹配的用户
-    </div>
-    
-    <div *ngIf="searchError" class="error-message">
-      {{ searchError }}
-    </div>
-    
+    }
+
+    @if (searchResult && searchResult.length === 0){
+      <div class="no-results">
+        未找到匹配的用户
+      </div>
+    }
+
+    @if (searchError){
+      <div class="error-message">
+        {{ searchError }}
+      </div>
+    }
+
     <div class="modal-actions">
       <button (click)="close()" class="cancel-button">取消</button>
     </div>

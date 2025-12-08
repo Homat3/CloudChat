@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RequestService } from '../../core/services/request.service';
 import { AuthService } from '../../core/services/auth.service';
+import { User } from '../../core/models/models';
 
 @Component({
     selector: 'app-settings',
@@ -20,6 +21,7 @@ export class SettingsComponent implements OnInit {
     isLoading = false;
     errorMessage = '';
     successMessage = '';
+    currentUser: User | null = null;
 
     constructor(
         private requestService: RequestService,
@@ -29,6 +31,7 @@ export class SettingsComponent implements OnInit {
     ngOnInit() {
         const user = this.authService.currentUserValue;
         if (user) {
+            this.currentUser = user;
             this.username = user.username;
             this.email = user.email;
             this.avatar = user.avatar;

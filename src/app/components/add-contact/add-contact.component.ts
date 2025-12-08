@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RequestService } from '../../core/services/request.service';
 import { ResponseService } from '../../core/services/response.service';
@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './add-contact.component.html',
   styleUrls: ['./add-contact.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, NgOptimizedImage]
 })
 export class AddContactComponent {
   @Output() closeAddContact = new EventEmitter<void>();
@@ -35,7 +35,7 @@ export class AddContactComponent {
   }
 
   searchContact() {
-    this.searchResult = [];
+    this.searchResult = null;
     this.searchError = '';
     this.selectedContactId = null;
 
