@@ -6,6 +6,7 @@
 #define CLOUDCHATSYS_H
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
@@ -18,7 +19,6 @@
 #include <cppconn/prepared_statement.h>
 #include <time.h>
 #include <cstdlib>
-#include <iostream>
 #include <websocketpp/common/connection_hdl.hpp>
 #include <websocketpp/error.hpp>
 #include <websocketpp/logger/levels.hpp>

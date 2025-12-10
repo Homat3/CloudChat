@@ -7,38 +7,43 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 
-void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,
-		   LoginMsg* login_msg);
+extern std::map<int, websocketpp::connection_hdl> g_online_users_hdl;
+extern std::map<websocketpp::connection_hdl, int> g_online_users_id;
+
+void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* login_msg);
 void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				  server_t::message_ptr msg, LoginByTokenMsg* login_by_token_msg);
-void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,
-			  RegisterMsg* register_msg);
-void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, server_t::message_ptr msg,
-			LogoutMsg* logout_msg);
+				  LoginByTokenMsg* login_by_token_msg);
+void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, RegisterMsg* register_msg);
+void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LogoutMsg* logout_msg);
 void UpdateProfile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				   server_t::message_ptr msg, UpdateProfileMsg* update_profile_msg);
+				   UpdateProfileMsg* update_profile_msg);
 void LoadContacts(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				  server_t::message_ptr msg, LoadContactsMsg* load_contacts_msg);
+				  LoadContactsMsg* load_contacts_msg);
 void AddContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				server_t::message_ptr msg, AddContactMsg* add_contact_msg);
+				AddContactMsg* add_contact_msg);
 void DeleteContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				   server_t::message_ptr msg, DeleteContactMsg* delete_contact_msg);
+				   DeleteContactMsg* delete_contact_msg);
 void LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				  server_t::message_ptr msg, LoadMessagesMsg* load_messages_msg);
+				  LoadMessagesMsg* load_messages_msg);
 void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				 server_t::message_ptr msg, SendMessageMsg* send_message_msg);
-void SendFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-			  server_t::message_ptr msg, SendFileMsg* send_file_msg);
+				 SendMessageMsg* send_message_msg);
+void SendFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, SendFileMsg* send_file_msg);
 void SendImage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-			   server_t::message_ptr msg, SendImageMsg* send_image_msg);
-void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-			  server_t::message_ptr msg, MarkReadMsg* mark_read_msg);
+			   SendImageMsg* send_image_msg);
+void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, MarkReadMsg* mark_read_msg);
 void ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				   server_t::message_ptr msg, ClearMessagesMsg* clear_messages_msg);
+				   ClearMessagesMsg* clear_messages_msg);
 void SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-					   server_t::message_ptr msg, SearchForUserByIdMsg* search_for_user_by_id_msg);
+					   SearchForUserByIdMsg* search_for_user_by_id_msg);
 void SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-						 server_t::message_ptr msg,
 						 SearchForUserByNameMsg* search_for_user_by_name_msg);
+void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+					  AddFriendRequestClientMsg* add_friend_request_client_msg);
+void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+						 RefuseFriendRequestClientMsg* refuse_friend_request_client_msg);
+void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+						 AcceptFriendRequestClientMsg* accept_friend_request_client_msg);
+void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+					   LoadFriendRequestMsg* load_friend_request_msg);
 
 #endif // CLOUDCHAT_SERVICE

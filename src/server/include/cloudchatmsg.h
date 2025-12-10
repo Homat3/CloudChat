@@ -17,7 +17,11 @@
 #define SEND_FAILED	    -1		// 发送失败
 
 // 通信消息类型宏
+// 两端通用
 #define ILLEGAL_MSG "ILLEGAL_MSG"						  // 无效消息
+#define ADD_FRIEND_REQUEST "ADD_FRIEND_REQUEST"			  // 添加好友请求
+#define REFUSE_FRIEND_REQUEST "REFUSE_FRIEND_REQUEST"	  // 拒绝好友请求
+#define ACCEPT_FRIEND_REQUEST "ACCEPT_FRIEND_REQUEST"	  // 通过好友请求
 // 客户端消息
 #define LOGIN "LOGIN"			// 账密登录
 #define LOGIN_BY_TOKEN "LOGIN_BY_TOKEN" // 令牌登录
@@ -35,6 +39,7 @@
 #define SEND_IMAGE              "SEND_IMAGE"			  // 发送图片
 #define MARK_READ               "MARK_READ"				  // 标记为已读
 #define CLEAR_MESSAGES          "CLEAR_MESSAGES"		  // 清空聊天记录
+#define LOAD_FRIEND_REQUEST     "LOAD_FRIEND_REQUEST"	  // 加载好友请求列表
 // 服务端消息
 #define LOGIN_SUCCESS           "LOGIN_SUCCESS"			  // 登录成功
 #define LOGIN_FAILURE           "LOGIN_FAILURE"			  // 登录失败
@@ -54,6 +59,14 @@
 #define MESSAGE_RECEIVED_SELF   "MESSAGE_RECEIVED_SELF"	  // 客户端发送的聊天消息已被服务器接收
 #define MESSAGE_RECEIVED_OTHER  "MESSAGE_RECEIVED_OTHER"  // 有其他用户向客户端发送聊天消息（新消息提醒）
 #define MESSAGES_CLEARD         "MESSAGES_CLEARD"		  // 已清空聊天记录
+#define FRIEND_REQUEST_LOADED   "FRIEND_REQUEST_LOADED"	  // 已加载好友请求列表
+#define FRIEND_REQUEST_LOADED_FAILED "FRIEND_REQUEST_LOADED_FAILED"	// 加载好友请求列表失败
+#define FRIEND_REQUEST_ADDED         "FRIEND_REQUEST_ADDED"			// 已添加好友请求
+#define FRIEND_REQUEST_ADDED_FAILED  "FRIEND_REQUEST_ADDED_FAILED"	// 添加好友请求失败
+#define FRIEND_REQUEST_REFUSED       "FRIEND_REQUEST_REFUSED"		// 已拒绝好友请求
+#define FRIEND_REQUEST_REFUSED_FAILED "FRIEND_REQUEST_REFUSED_FAILED" // 拒绝好友请求失败
+#define FRIEND_REQUEST_ACCEPTED       "FRIEND_REQUEST_ACCEPTED"		  // 已通过好友请求
+#define FRIEND_REQUEST_ACCEPTED_FAILED "FRIEND_REQUEST_ACCEPTED_FAILED" // 通过好友请求失败
 
 class CloudChatMessage { // 聊天消息类
 private:
@@ -151,6 +164,7 @@ private:
 public:
 	LogoutMsg(int user_id);
 	static LogoutMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
 };
 
 class UpdateProfileMsg : public ClientMsg { // 更新用户信息消息
@@ -182,6 +196,7 @@ private:
 public:
 	SearchForUserByIdMsg(int user_id);
 	static SearchForUserByIdMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
 };
 
 class SearchForUserByNameMsg : public ClientMsg { // 根据用户名搜索用户
@@ -190,6 +205,7 @@ private:
 public:
 	SearchForUserByNameMsg(std::string username);
 	static SearchForUserByNameMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	std::string get_username();
 };
 
 class AddContactMsg : public ClientMsg { // 添加联系人消息
@@ -454,6 +470,141 @@ public:
 	std::string to_JSON() override;
 };
 
+class LoadFriendRequestMsg : public ClientMsg { // 加载好友请求列表
+private:
+	int userId_;				// 请求加载好友请求列表的用户 id
+
+public:
+	LoadFriendRequestMsg(int userId);
+	static LoadFriendRequestMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class AddFriendRequestClientMsg : public ClientMsg { // 添加好友请求
+private:
+	FriendRequest friend_request_;
+
+public:
+	AddFriendRequestClientMsg(FriendRequest friend_request);
+	static AddFriendRequestClientMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class AddFriendRequestServerMsg : public ServerMsg { // 添加好友请求
+private:
+	FriendRequest friend_request_;
+
+public:
+	AddFriendRequestServerMsg(FriendRequest friend_request);
+	std::string to_JSON() override;
+};
+
+class RefuseFriendRequestClientMsg : public ClientMsg { // 拒绝好友请求
+private:
+	int id_;					// 被拒绝的好友请求 id
+
+public:
+	RefuseFriendRequestClientMsg(int id);
+	static RefuseFriendRequestClientMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class RefuseFriendRequestServerMsg : public ServerMsg { // 拒绝好友请求
+private:
+	int id_;					// 被拒绝的好友请求 id
+
+public:
+	RefuseFriendRequestServerMsg(int id);
+	std::string to_JSON() override;
+};
+
+class AcceptFriendRequestClientMsg : public ClientMsg { // 通过好友请求
+private:
+	int id_;					// 被通过的好友请求 id
+
+public:
+	AcceptFriendRequestClientMsg(int id);
+	static AcceptFriendRequestClientMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class AcceptFriendRequestServerMsg : public ServerMsg { // 通过好友请求
+private:
+	int id_;					// 被通过的好友请求 id
+	
+public:
+	AcceptFriendRequestServerMsg(int id);
+	std::string to_JSON() override;
+};
+
+class FriendRequestLoadedMsg : public ServerMsg { // 已加载好友请求列表
+private:
+	std::vector<FriendRequest> requestList_; // 好友请求列表
+
+public:
+	FriendRequestLoadedMsg(std::vector<FriendRequest> requestList);
+	std::string to_JSON() override;
+};
+
+class FriendRequestAddedMsg : public ServerMsg { // 已添加好友请求
+private:
+	FriendRequest friend_request_; // 添加的好友请求
+
+public:
+	FriendRequestAddedMsg(FriendRequest friend_request);
+	std::string to_JSON() override;
+};
+
+class FriendRequestAddedFailedMsg : public ServerMsg { // 好友请求添加失败
+private:
+	std::string error_;			// 错误信息
+
+public:
+	FriendRequestAddedFailedMsg(std::string error);
+	std::string to_JSON() override;
+};
+
+class FriendRequestRefusedMsg : public ServerMsg { // 已拒绝好友请求
+private:
+	int id_;					// 好友请求 id
+
+public:
+	FriendRequestRefusedMsg(int id);
+	std::string to_JSON() override;
+};
+
+class FriendRequestRefusedFailedMsg : public ServerMsg { // 好友请求拒绝失败
+private:
+	std::string error_;			// 错误信息
+
+public:
+	FriendRequestRefusedFailedMsg(std::string error);
+	std::string to_JSON() override;
+};
+
+class FriendRequestAcceptedMsg : public ServerMsg { // 已通过好友请求
+private:
+	int id_;					// 好友请求 id
+
+public:
+	FriendRequestAcceptedMsg(int id);
+	std::string to_JSON() override;
+};
+
+class FriendRequestAcceptedFailedMsg : public ServerMsg { // 好友请求通过失败
+private:
+	std::string error_;			// 错误信息
+
+public:
+	FriendRequestAcceptedFailedMsg(std::string error);
+	std::string to_JSON() override;
+};
+
+class FriendRequestLoadedFailedMsg : public ServerMsg { // 加载好友请求列表失败
+private:
+	std::string error_;			// 错误信息
+
+public:
+	FriendRequestLoadedFailedMsg(std::string error);
+	std::string to_JSON() override;
+};
+
 ClientMsg* parse_protocal_msg(std::string JSON); // 将 JSON 字符串解析为 ClientMsg 对象
 int parse_int_from_json(std::string JSON, int begin, int end); // 从 JSON 字符串中解析出 int 整数
 // 从 JSON 字符串中解析出转义后的字符串
@@ -461,8 +612,7 @@ std::string parse_str_from_json(std::string JSON, int begin, int end);
 std::string to_JSON_string(std::string str); // 转为 JSON 字符串（添加转义字符）
 std::string c_str_to_JSON_string(const char* c_str);
 // 向客户端发送消息
-int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-					server_t::message_ptr msg, ServerMsg* srv_msg);
+int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, ServerMsg* srv_msg);
 int find_field_pos(std::string JSON, std::string target); // 在 JSON 中找出字段位置
 
 #endif // CLOUDCHATMSG_H

@@ -1,4 +1,6 @@
 #include "cloudchatdat.h"
+#include <cppconn/exception.h>
+#include <cppconn/prepared_statement.h>
 
 CloudChatDatabase::CloudChatDatabase() {
 	try {
@@ -21,7 +23,7 @@ CloudChatDatabase::CloudChatDatabase() {
 			username varchar(50) not null unique,
 			email varchar(50) not null unique,
 			password varchar(50) not null,
-			avatar varchar(50) not null unique,
+			avatar varchar(50) not null,
 			token varchar(50) not null,
 			online boolean default false,  
 			last_active timestamp,         
@@ -278,3 +280,29 @@ CloudChatUser* CloudChatDatabase::GetUserByName(std::string username){
 	return nullptr;
 }
 
+std::vector<CloudChatUser> CloudChatDatabase::SearchUsersByName(std::string username) {
+	std::vector<CloudChatUser> results;
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"select * from users where username like ?"
+			);
+		pstmt->setString(1, "%" + username + "%");
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		while (res->next()) {
+			results.push_back(*(new CloudChatUser(res->getInt("id"),
+												  res->getString("username"),
+												  res->getString("password"),
+												  res->getString("avatar"),
+												  res->getString("token"),
+												  res->getString("email"),
+												  res->getBoolean("online"))));
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+		return results;
+	}
+	return results;
+}
