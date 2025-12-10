@@ -1,10 +1,9 @@
-import {AfterContentInit, Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RequestService } from '../../core/services/request.service';
-import { ResponseService } from '../../core/services/response.service';
-import {Contact, FriendRequest, FriendRequestInfo, User} from '../../core/models';
-import { AuthService } from '../../core/services/auth.service';
+import {AfterContentInit, Component, EventEmitter, Output} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {RequestService} from '../../core/services/request.service';
+import {FriendRequest, FriendRequestInfo, User} from '../../core/models';
+import {AuthService} from '../../core/services/auth.service';
 import {FriendRequestService} from '../../core/services/friend_request.service';
 
 @Component({

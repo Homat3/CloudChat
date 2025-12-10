@@ -1,10 +1,10 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { ContactListComponent } from '../contact-list/contact-list.component';
-import { Contact } from '../../core/models';
-import { ChatAreaComponent } from '../chat-area/chat-area.component';
-import { SidebarComponent } from '../sidebar/sidebar.component';
-import { AddContactComponent } from '../add-contact/add-contact.component';
+import {Component, Inject, PLATFORM_ID} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {ContactListComponent} from '../contact-list/contact-list.component';
+import {Contact} from '../../core/models';
+import {ChatAreaComponent} from '../chat-area/chat-area.component';
+import {SidebarComponent} from '../sidebar/sidebar.component';
+import {AddContactComponent} from '../add-contact/add-contact.component';
 
 // 定义视图部分枚举
 enum ActiveView {
@@ -35,7 +35,7 @@ export class ChatLayoutComponent {
       window.addEventListener('resize', () => {
         this.isMobile = window.innerWidth <= 768;
       });
-      
+
       // 监听显示添加联系人对话框事件
       window.addEventListener('showAddContactDialog', () => {
         this.showAddContactDialog();
@@ -65,7 +65,7 @@ export class ChatLayoutComponent {
   setActiveView(view: ActiveView) {
     this.activeView = view;
   }
-  
+
   // 显示添加联系人对话框
   showAddContactDialog() {
     this.showAddContact = true;

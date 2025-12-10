@@ -1,13 +1,13 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterLink} from '@angular/router';
 import {Contact, Message} from '../../core/models';
-import { RequestService } from '../../core/services/request.service';
-import { ResponseService } from '../../core/services/response.service';
-import { AuthService } from '../../core/services/auth.service';
-import { Subscription } from 'rxjs';
+import {RequestService} from '../../core/services/request.service';
+import {ResponseService} from '../../core/services/response.service';
+import {AuthService} from '../../core/services/auth.service';
+import {Subscription} from 'rxjs';
 import {MessageService} from '../../core/services/message.service';
-import { ContactService } from '../../core/services/contact.service';
+import {ContactService} from '../../core/services/contact.service';
 
 @Component({
   selector: 'app-contact-list',

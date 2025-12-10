@@ -1,25 +1,29 @@
-import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
-import { ResponseService } from './response.service';
+import {Injectable} from '@angular/core';
+import {SocketService} from './socket.service';
+import {ResponseService} from './response.service';
 import {
+  AcceptFriendRequestPayload,
+  AddFriendRequestPayload,
+  ClearMessagesPayload,
   ClientMessageType,
-  LoginPayload,
-  LoginByTokenPayload,
-  RegisterPayload,
-  UpdateProfilePayload,
-  LogoutPayload,
   LoadContactsPayload,
-  SendMessagePayload,
+  LoadMessagesPayload,
+  LoginByTokenPayload,
+  LoginPayload,
+  LogoutPayload,
+  MarkReadPayload,
+  RefuseFriendRequestPayload,
+  RegisterPayload,
+  SearchForUserByIdPayload,
+  SearchForUserByUserNamePayload,
   SendFilePayload,
   SendImagePayload,
-  MarkReadPayload,
-  ClearMessagesPayload,
-  SearchForUserByIdPayload, SearchForUserByUserNamePayload, AddFriendRequestPayload, AcceptFriendRequestPayload,
-  RefuseFriendRequestPayload, LoadMessagesPayload
+  SendMessagePayload,
+  UpdateProfilePayload
 } from '../protocol/client.protocol';
-import { filter, take } from 'rxjs/operators';
+import {filter, take} from 'rxjs/operators';
 import {LoginSuccessPayload} from '../protocol/service.protocol';
-import {Observable, timeout} from 'rxjs';
+import {Observable} from 'rxjs';
 import {Message} from '../models';
 
 @Injectable({

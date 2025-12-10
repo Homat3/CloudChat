@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Contact } from '../../core/models';
-import { RequestService } from '../../core/services/request.service';
-import { AuthService } from '../../core/services/auth.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Contact} from '../../core/models';
+import {RequestService} from '../../core/services/request.service';
+import {AuthService} from '../../core/services/auth.service';
 
 interface SharedFile {
   id: number;

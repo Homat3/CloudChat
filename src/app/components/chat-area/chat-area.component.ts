@@ -1,21 +1,20 @@
 import {
+  AfterViewChecked,
   Component,
+  ElementRef,
   Input,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
-  ViewChild,
-  ElementRef,
-  AfterViewChecked,
-  OnDestroy, OnInit
+  ViewChild
 } from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Message, TextMessage, ImageMessage, FileMessage } from '../../core/models';
-import { Contact } from '../../core/models';
-import { RequestService } from '../../core/services/request.service';
-import { AuthService } from '../../core/services/auth.service';
-import { MessageService } from '../../core/services/message.service';
-import { Subscription } from 'rxjs';
+import {FormsModule} from '@angular/forms';
+import {Contact, FileMessage, ImageMessage, Message, TextMessage} from '../../core/models';
+import {RequestService} from '../../core/services/request.service';
+import {AuthService} from '../../core/services/auth.service';
+import {MessageService} from '../../core/services/message.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-chat-area',

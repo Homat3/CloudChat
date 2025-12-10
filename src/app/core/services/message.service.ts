@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Message} from '../models';
-import { ResponseService } from './response.service';
+import {ResponseService} from './response.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({

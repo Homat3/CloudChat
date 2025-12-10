@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { Message as ProtocolMessage } from '../protocol/client.protocol';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {Message as ProtocolMessage} from '../protocol/client.protocol';
 
 @Injectable({
   providedIn: 'root'

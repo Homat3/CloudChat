@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {Contact, FriendRequest, FriendRequestInfo} from '../models';
-import { ResponseService } from './response.service';
+import {FriendRequest, FriendRequestInfo} from '../models';
+import {ResponseService} from './response.service';
 
 @Injectable({
   providedIn: 'root'

@@ -1,24 +1,32 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import { SocketService } from './socket.service';
+import {SocketService} from './socket.service';
 import {
-  ServiceMessageType,
-  LoginSuccessPayload,
-  LoginFailurePayload,
-  RegisterSuccessPayload,
-  RegisterFailurePayload,
-  ProfileUpdatedSuccessPayload,
-  ProfileUpdatedFailedPayload,
-  ContactsLoadedPayload,
+  AcceptFriendRequestPayload,
+  AddFriendRequestPayload,
+  ContactAddedPayload,
   ContactsLoadedFailedPayload,
-  MessagesLoadedPayload,
-  SelfMessageReceivedPayload,
-  ToSelfMessageReceivedPayload,
+  ContactsLoadedPayload,
+  FriendRequestAcceptedFailedPayload,
+  FriendRequestAcceptedPayload,
+  FriendRequestAddedFailedPayload,
+  FriendRequestAddedPayload,
+  FriendRequestLoadedFailedPayload,
+  FriendRequestLoadedPayload,
+  FriendRequestRefusedPayload,
+  LoginFailurePayload,
+  LoginSuccessPayload,
   MessagesClearedPayload,
-  SearchForUserResultPayload, ContactAddedPayload, FriendRequestLoadedPayload, FriendRequestAddedPayload,
-  FriendRequestAddedFailedPayload, AddFriendRequestPayload, FriendRequestRefusedPayload, FriendRequestAcceptedPayload,
-  FriendRequestAcceptedFailedPayload, RefuseFriendRequestPayload, AcceptFriendRequestPayload,
-  FriendRequestLoadedFailedPayload
+  MessagesLoadedPayload,
+  ProfileUpdatedFailedPayload,
+  ProfileUpdatedSuccessPayload,
+  RefuseFriendRequestPayload,
+  RegisterFailurePayload,
+  RegisterSuccessPayload,
+  SearchForUserResultPayload,
+  SelfMessageReceivedPayload,
+  ServiceMessageType,
+  ToSelfMessageReceivedPayload
 } from '../protocol/service.protocol';
 
 @Injectable({

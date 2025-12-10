@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { RequestService } from '../../core/services/request.service';
-import { AuthService } from '../../core/services/auth.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {Router} from '@angular/router';
+import {RequestService} from '../../core/services/request.service';
+import {AuthService} from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',

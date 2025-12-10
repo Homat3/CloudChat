@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { RequestService } from '../../core/services/request.service';
-import { AuthService } from '../../core/services/auth.service';
-import { User } from '../../core/models/models';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterLink} from '@angular/router';
+import {FormsModule} from '@angular/forms';
+import {RequestService} from '../../core/services/request.service';
+import {AuthService} from '../../core/services/auth.service';
+import {User} from '../../core/models/models';
 
 @Component({
     selector: 'app-settings',
