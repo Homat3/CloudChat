@@ -5,6 +5,7 @@
     height: 100vh;
     background-color: #f5f7fb;
     font-family: 'Inter', sans-serif;
+    overflow-y: auto; /* 添加垂直滚动条 */
 }
 
 .settings-header {

@@ -1,0 +1,74 @@
+<div class="profile-update-container">
+    <div class="profile-update-header">
+        <a (click)="onBack()" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+        <h1>修改个人信息</h1>
+    </div>
+
+    <div class="profile-update-content">
+        <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+            <div class="profile-update-section">
+                <h2>头像</h2>
+                <div class="avatar-options">
+                  @for (avatar of presetAvatars; track avatar; let i = $index){
+                    <div
+                      class="avatar-option"
+                      (click)="selectPresetAvatar(avatar, i)"
+                      [class.selected]="selectedPresetAvatar === i">
+                      <img [src]="avatar" [alt]="'Avatar ' + i">
+                    </div>
+                  }
+                </div>
+                <div class="avatar-upload-description">
+                    从预设头像中选择一个作为您的新头像
+                </div>
+            </div>
+
+            <div class="profile-update-section">
+                <h2>基本信息</h2>
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        [(ngModel)]="username"
+                        class="form-control"
+                        placeholder="请输入用户名"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        [(ngModel)]="email"
+                        class="form-control"
+                        placeholder="请输入邮箱"
+                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                        required>
+                </div>
+
+              @if (errorMessage){
+                <div class="error-message">
+                    {{ errorMessage }}
+                </div>
+              }
+              @if (successMessage){
+                <div class="success-message">
+                    {{ successMessage }}
+                </div>
+              }
+            </div>
+
+            <div class="profile-update-actions">
+                <button type="submit" class="save-btn" [disabled]="isLoading">
+                  <span>{{isLoading ? "保存中..." : "保存"}}</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

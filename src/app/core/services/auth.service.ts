@@ -24,6 +24,10 @@ export class AuthService {
 
         this.responseService.registerSuccess$.subscribe((payload) => this.login(payload, this.currentUserSubject));
 
+        this.responseService.profileUpdatedSuccess$.subscribe((payload) => {
+          this.currentUserSubject.next(new User(payload.userId, payload.username, payload.email, payload.avatar));
+        });
+
         this.isReady$ = this.responseService.isReady$;
     }
 
