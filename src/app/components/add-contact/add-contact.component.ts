@@ -1,10 +1,11 @@
-import {AfterContentInit, Component, EventEmitter, Output} from '@angular/core';
+import {AfterContentInit, Component, EventEmitter, OnDestroy, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {RequestService} from '../../core/services/request.service';
 import {FriendRequest, FriendRequestInfo, User} from '../../core/models';
 import {AuthService} from '../../core/services/auth.service';
 import {FriendRequestService} from '../../core/services/friend_request.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-add-contact',
@@ -13,7 +14,7 @@ import {FriendRequestService} from '../../core/services/friend_request.service';
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class AddContactComponent implements AfterContentInit  {
+export class AddContactComponent implements AfterContentInit, OnDestroy {
   @Output() closeAddContact = new EventEmitter<void>();
 
   searchType: 'id' | 'username' = 'id';
@@ -23,6 +24,8 @@ export class AddContactComponent implements AfterContentInit  {
   searchError: string = '';
   selectedContact: { contactId: number; username: string; avatar: string; } | null = null;
 
+  private subscriptions: Subscription[] = [];
+
   friendRequests: Map<number, FriendRequestInfo> | undefined;
 
   constructor(
@@ -31,20 +34,25 @@ export class AddContactComponent implements AfterContentInit  {
     private authService: AuthService
   ) {}
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
   ngAfterContentInit(): void {
-    let subscription = this.requestService.isReady$.subscribe(isReady => {
-      if (isReady) {
-        this.loadFriendRequests();
-        subscription.unsubscribe();
-      }
-    });
-    this.friendRequestService.isReady$.subscribe(isReady => {
-      if (isReady) {
-        this.friendRequestService.friendRequestMap$.subscribe(requests => {
-          this.friendRequests = requests;
-        })
-      }
-    })
+    this.subscriptions.push(
+      this.requestService.isReady$.subscribe(isReady => {
+        if (isReady) {
+          this.loadFriendRequests();
+        }
+      }),
+      this.friendRequestService.isReady$.subscribe(isReady => {
+        if (isReady) {
+          this.friendRequestService.friendRequestMap$.subscribe(requests => {
+            this.friendRequests = requests;
+          })
+        }
+      })
+    );
   }
 
   loadFriendRequests(): void {

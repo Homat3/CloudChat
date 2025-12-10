@@ -3,6 +3,9 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {User} from '../models';
 import {ResponseService} from './response.service';
 import {Router} from '@angular/router';
+import {LoginSuccessPayload, RegisterSuccessPayload} from '../protocol/service.protocol';
+
+type LoginPayload = LoginSuccessPayload | RegisterSuccessPayload;
 
 @Injectable({
     providedIn: 'root'
@@ -17,33 +20,29 @@ export class AuthService {
         private responseService: ResponseService,
         private router: Router
     ) {
-        this.responseService.loginSuccess$.subscribe(payload => {
-            const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
-            this.currentUserSubject.next(user);
-            localStorage.setItem('localToken', payload.token)
-            localStorage.setItem('localUsername', payload.username)
-            this.router.navigate(['/']); // Assuming '/chat' is the main route
-        });
+        this.responseService.loginSuccess$.subscribe((payload) => this.login(payload, this.currentUserSubject));
 
-        this.responseService.registerSuccess$.subscribe(payload => {
-            const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
-            this.currentUserSubject.next(user);
-            localStorage.setItem('localToken', payload.token)
-            localStorage.setItem('localUsername', payload.username)
-            this.router.navigate(['/']);
-        });
-
-        this.responseService.logoutSuccess$.subscribe(() => {
-            this.currentUserSubject.next(null);
-            localStorage.removeItem('localToken')
-            localStorage.removeItem('localUsername')
-            this.router.navigate(['/login']);
-        });
+        this.responseService.registerSuccess$.subscribe((payload) => this.login(payload, this.currentUserSubject));
 
         this.isReady$ = this.responseService.isReady$;
     }
 
+    private login(payload: LoginPayload, currentUserSubject: BehaviorSubject<User | null>){
+      const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
+      currentUserSubject.next(user);
+      localStorage.setItem('localToken', payload.token)
+      localStorage.setItem('localUsername', payload.username)
+      this.router.navigate(['/']);
+    }
+
     public get currentUserValue(): User | null {
         return this.currentUserSubject.value;
+    }
+
+    public logout() {
+        this.currentUserSubject.next(null);
+        localStorage.removeItem('localToken')
+        localStorage.removeItem('localUsername')
+        this.router.navigate(['/login']);
     }
 }

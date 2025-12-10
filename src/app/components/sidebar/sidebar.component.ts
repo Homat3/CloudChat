@@ -41,12 +41,6 @@ export class SidebarComponent {
           console.log('清空聊天记录');
         }
         break;
-      case 'logout':
-        const user = this.authService.currentUserValue;
-        if (user) {
-          this.requestService.logout({ userId: user.userId });
-        }
-        break;
       default:
         console.log('未定义的设置:', setting);
     }

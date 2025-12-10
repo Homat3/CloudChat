@@ -41,13 +41,12 @@ export class ResponseService {
     public registerFailure$ = new Subject<RegisterFailurePayload>();
     public profileUpdatedSuccess$ = new Subject<ProfileUpdatedSuccessPayload>();
     public profileUpdatedFailed$ = new Subject<ProfileUpdatedFailedPayload>();
-    public logoutSuccess$ = new Subject<void>();
     public contactsLoaded$ = new Subject<ContactsLoadedPayload>();
     public contactsLoadedFailed$ = new Subject<ContactsLoadedFailedPayload>();
     public contactAdded$ = new Subject<ContactAddedPayload>();
     public searchForUserResult$ = new Subject<SearchForUserResultPayload>();
-    public friendRequestsLoaded$ = new Subject<FriendRequestLoadedPayload>();
-    public friendRequestsLoadedFailed$ = new Subject<FriendRequestLoadedFailedPayload>();
+    public friendRequestLoaded$ = new Subject<FriendRequestLoadedPayload>();
+    public friendRequestLoadedFailed$ = new Subject<FriendRequestLoadedFailedPayload>();
     public friendRequestAdded$ = new Subject<FriendRequestAddedPayload>();
     public friendRequestAddedFailed$ = new Subject<FriendRequestAddedFailedPayload>();
     public addFriendRequest$ = new Subject<AddFriendRequestPayload>();
@@ -92,9 +91,6 @@ export class ResponseService {
             case ServiceMessageType.PROFILE_UPDATED_FAILED:
                 this.profileUpdatedFailed$.next(message.payload);
                 break;
-            case ServiceMessageType.LOGOUT_SUCCESS:
-                this.logoutSuccess$.next();
-                break;
             case ServiceMessageType.CONTACTS_LOADED:
                 this.contactsLoaded$.next(message.payload);
                 break;
@@ -107,11 +103,11 @@ export class ResponseService {
             case ServiceMessageType.SEARCH_FOR_USER_RESULT:
                 this.searchForUserResult$.next(message.payload);
                 break;
-            case ServiceMessageType.FRIEND_REQUESTS_LOADED:
-                this.friendRequestsLoaded$.next(message.payload);
+            case ServiceMessageType.FRIEND_REQUEST_LOADED:
+                this.friendRequestLoaded$.next(message.payload);
                 break;
-            case ServiceMessageType.FRIEND_REQUESTS_LOADED_FAILED:
-                this.friendRequestsLoadedFailed$.next(message.payload);
+            case ServiceMessageType.FRIEND_REQUEST_LOADED_FAILED:
+                this.friendRequestLoadedFailed$.next(message.payload);
                 break;
             case ServiceMessageType.FRIEND_REQUEST_ADDED:
                 this.friendRequestAdded$.next(message.payload);

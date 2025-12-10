@@ -1,9 +1,10 @@
-import {AfterContentInit, Component, OnInit} from '@angular/core';
+import {AfterContentInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {RequestService} from '../../core/services/request.service';
 import {AuthService} from '../../core/services/auth.service';
+import {Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-login',
@@ -12,11 +13,13 @@ import {AuthService} from '../../core/services/auth.service';
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit, AfterContentInit {
+export class LoginComponent implements OnInit, AfterContentInit, OnDestroy {
     username = '';
     password = '';
     isLoading = false;
     errorMessage = '';
+
+    private subscriptions: Subscription[] = [];
 
     constructor(
         private router: Router,
@@ -24,13 +27,18 @@ export class LoginComponent implements OnInit, AfterContentInit {
         private authService: AuthService
     ) { }
 
+    ngOnDestroy(): void {
+      this.subscriptions.forEach(sub => sub.unsubscribe());
+    }
+
     ngAfterContentInit(): void {
-        let subscription = this.authService.isReady$.subscribe(isReady => {
-          if (isReady) {
-            this.tryToken();
-            subscription.unsubscribe();
-          }
-        });
+        this.subscriptions.push(
+          this.requestService.isReady$.subscribe(isReady => {
+            if (isReady) {
+              this.tryToken();
+            }
+          })
+        );
     }
 
     ngOnInit(): void {
@@ -39,7 +47,7 @@ export class LoginComponent implements OnInit, AfterContentInit {
         }
     }
 
-    async tryToken(): Promise<void> {
+    tryToken() {
       let localToken = localStorage.getItem('localToken');
       let localUsername = localStorage.getItem('localUsername');
       if (localToken && localUsername) {

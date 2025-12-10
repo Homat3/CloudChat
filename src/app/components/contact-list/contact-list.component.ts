@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {Contact, Message} from '../../core/models';
+import {Contact, Message, User} from '../../core/models';
 import {RequestService} from '../../core/services/request.service';
 import {ResponseService} from '../../core/services/response.service';
 import {AuthService} from '../../core/services/auth.service';
@@ -20,20 +20,20 @@ export class ContactListComponent implements OnInit, OnDestroy {
   @Output() contactSelected = new EventEmitter<Contact>();
   selectedContactId: number | null = null;
   contactsList: Contact[] = [];
+  currentUser: User | null = null;
   private subscriptions: Subscription[] = [];
 
   constructor(
     private requestService: RequestService,
-    private responseService: ResponseService,
     private authService: AuthService,
     private messageService: MessageService,
     private contactService: ContactService
   ) { }
 
   ngOnInit() {
-    const currentUser = this.authService.currentUserValue;
-    if (currentUser) {
-      this.requestService.loadContacts({ userId: currentUser.userId });
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser) {
+      this.requestService.loadContacts({ userId: this.currentUser.userId });
     }
 
     this.subscriptions.push(

@@ -5,6 +5,7 @@ import {Contact} from '../../core/models';
 import {ChatAreaComponent} from '../chat-area/chat-area.component';
 import {SidebarComponent} from '../sidebar/sidebar.component';
 import {AddContactComponent} from '../add-contact/add-contact.component';
+import {Subscription} from 'rxjs';
 
 // 定义视图部分枚举
 enum ActiveView {

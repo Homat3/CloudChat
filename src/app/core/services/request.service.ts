@@ -82,7 +82,7 @@ export class RequestService {
     logout(payload: LogoutPayload, onSuccess?: () => void) {
         this.socketService.sendMessage({ type: ClientMessageType.LOGOUT, payload });
         if (onSuccess) {
-            this.responseService.logoutSuccess$.pipe(take(1)).subscribe(() => onSuccess());
+            onSuccess()
         }
     }
 
@@ -127,10 +127,10 @@ export class RequestService {
     }>) => void, onError?: (err: string) => void) {
         this.socketService.sendMessage({ type: ClientMessageType.LOAD_FRIEND_REQUEST, payload });
         if (onSuccess) {
-            this.responseService.friendRequestsLoaded$.pipe(take(1)).subscribe((result) => onSuccess(result.requestList));
+            this.responseService.friendRequestLoaded$.pipe(take(1)).subscribe((result) => onSuccess(result.requests));
         }
         if (onError) {
-            this.responseService.friendRequestsLoadedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
+            this.responseService.friendRequestLoadedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
         }
     }
 

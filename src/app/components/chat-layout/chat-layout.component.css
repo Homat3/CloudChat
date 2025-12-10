@@ -9,7 +9,7 @@
 }
 
 .contacts-panel {
-  width: 300px;
+  width: 320px;
   background-color: var(--bg-primary);
   border-right: 1px solid var(--border-color);
   transition: transform var(--transition-normal);

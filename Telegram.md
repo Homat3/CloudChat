@@ -52,13 +52,6 @@
   }
 }
 ```
-### 登出成功
-```json
-{
-  "type": "LOGOUT_SUCCESS",
-  "payload": {}
-}
-```
 # 注册模块
 ## 客户端->服务端
 ### 请求注册
@@ -274,9 +267,9 @@
 ### 已加载好友请求
 ```json
 {
-  "type": "FRIEND_REQUESTS_LOADED",
+  "type": "FRIEND_REQUEST_LOADED",
   "payload": {
-    "requestList": [
+    "requests": [
       {
         "id": "int",
         "requesterId": "int",
@@ -294,7 +287,7 @@
 ### 加载好友请求失败
 ```json
 {
-  "type": "FRIEND_REQUESTS_LOADED_FAILED",
+  "type": "FRIEND_REQUEST_LOADED_FAILED",
   "payload": {
     "error": "string"
   }

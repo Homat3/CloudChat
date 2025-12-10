@@ -4,7 +4,7 @@ import {RouterLink} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {RequestService} from '../../core/services/request.service';
 import {AuthService} from '../../core/services/auth.service';
-import {User} from '../../core/models/models';
+import {User} from '../../core/models';
 
 @Component({
     selector: 'app-settings',
@@ -42,6 +42,7 @@ export class SettingsComponent implements OnInit {
         const user = this.authService.currentUserValue;
         if (user) {
             this.requestService.logout({ userId: user.userId });
+            this.authService.logout();
         }
     }
 

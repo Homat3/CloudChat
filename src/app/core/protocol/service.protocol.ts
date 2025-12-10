@@ -10,13 +10,12 @@ export enum ServiceMessageType {
   REGISTER_FAILURE = 'REGISTER_FAILURE',
   PROFILE_UPDATED_SUCCESS = 'PROFILE_UPDATED_SUCCESS',
   PROFILE_UPDATED_FAILED = 'PROFILE_UPDATED_FAILED',
-  LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
   CONTACT_ADDED = 'CONTACT_ADDED',
   CONTACTS_LOADED = 'CONTACTS_LOADED',
   CONTACTS_LOADED_FAILED = 'CONTACTS_LOADED_FAILED',
   SEARCH_FOR_USER_RESULT = 'SEARCH_FOR_USER_RESULT',
-  FRIEND_REQUESTS_LOADED = 'FRIEND_REQUESTS_LOADED',
-  FRIEND_REQUESTS_LOADED_FAILED = 'FRIEND_REQUESTS_LOADED_FAILED',
+  FRIEND_REQUEST_LOADED = 'FRIEND_REQUEST_LOADED',
+  FRIEND_REQUEST_LOADED_FAILED = 'FRIEND_REQUEST_LOADED_FAILED',
   FRIEND_REQUEST_ADDED = 'FRIEND_REQUEST_ADDED',
   FRIEND_REQUEST_ADDED_FAILED = 'FRIEND_REQUEST_ADDED_FAILED',
   ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST',
@@ -39,7 +38,6 @@ export type ServicePayload =
   RegisterFailurePayload |
   ProfileUpdatedSuccessPayload |
   ProfileUpdatedFailedPayload |
-  LogoutSuccessPayload |
   ContactAddedPayload |
   ContactsLoadedPayload |
   ContactsLoadedFailedPayload |
@@ -71,8 +69,6 @@ export interface LoginSuccessPayload {
 export interface LoginFailurePayload {
   error: string;
 }
-
-export interface LogoutSuccessPayload {}
 
 export interface RegisterSuccessPayload {
   userId: number;
@@ -128,7 +124,7 @@ export interface SearchForUserResultPayload {
 }
 
 export interface FriendRequestLoadedPayload {
-  requestList: Array<{
+  requests: Array<{
     id: number;
     requesterId: number;
     targetId: number;

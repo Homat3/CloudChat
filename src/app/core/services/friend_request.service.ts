@@ -14,9 +14,9 @@ export class FriendRequestService {
 
   constructor(private responseService: ResponseService) {
     // 监听好友请求相关事件并更新好友请求列表
-    this.responseService.friendRequestsLoaded$.subscribe(payload => {
+    this.responseService.friendRequestLoaded$.subscribe(payload => {
       let newFriendRequests = new Map<number, FriendRequestInfo>();
-      payload.requestList.forEach(r => newFriendRequests.set(r.id, r));
+      payload.requests.forEach(r => newFriendRequests.set(r.id, r));
       this.friendRequestMapSubject.next(newFriendRequests);
     });
 
