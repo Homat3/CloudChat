@@ -21,7 +21,7 @@ import {Subscription} from 'rxjs';
   templateUrl: './chat-area.component.html',
   styleUrls: ['./chat-area.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, NgOptimizedImage]
+  imports: [CommonModule, FormsModule]
 })
 export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy {
   @Input() selectedContact: Contact | null = null;

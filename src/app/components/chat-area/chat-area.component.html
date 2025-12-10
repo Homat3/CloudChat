@@ -5,7 +5,7 @@
     <div class="contact-info">
       <div class="avatar">
         @if (selectedContact?.avatar){
-          <img ngSrc="{{selectedContact?.avatar}}" alt="{{ selectedContact?.username?.charAt(0) || '?' }}" fill>
+          <img src="{{selectedContact?.avatar}}" alt="{{ selectedContact?.username?.charAt(0) || '?' }}" style="border-radius: 50%; width: 100%; height: 100%">
         } @else {
           <label>{{ selectedContact?.username?.charAt(0) || '?' }}</label>
         }
@@ -19,7 +19,6 @@
 
   <!-- 中间消息区 -->
   <div class="chat-messages" #chatMessagesContainer *ngIf="selectedContact; else noContactSelected">
-    <div class="date-divider">今天</div>
     @for (message of messages; track message.id) {
     <div class="message-bubble" [class.own-message]="isNewMessage(message)"
       [class.other-message]="isNewReceivedMessage(message)" [class.new-message]="isNewMessage(message)"
