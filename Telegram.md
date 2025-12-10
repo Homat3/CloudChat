@@ -161,27 +161,19 @@
   }
 }
 ```
-### 请求添加联系人
-```json
-{
-  "type": "ADD_CONTACT",
-  "payload": {
-    "userId": "int",
-    "targetId": "int"
-  }
-}
-```
-### 请求删除联系人
-```json
-{
-  "type": "DELETE_CONTACT",
-  "payload": {
-    "userId": "int",
-    "targetId": "int"
-  }
-}
-```
 ## 服务端->客户端
+### 联系人已添加
+```json
+{
+  "type": "CONTACT_ADDED",
+  "payload": {
+    "userId": "int",
+    "username": "string",
+    "online": "boolean",
+    "avater": "string"
+  }
+}
+```
 ### 联系人加载成功
 ```json
 {
@@ -214,18 +206,6 @@
   }
 }
 ```
-### 联系人添加成功
-```json
-{
-  "type": "CONTACT_ADDED",
-  "payload": {
-    "contactId": "int",
-    "username": "string",
-    "online": "boolean",
-    "avatar": "string"
-  }
-}
-```
 ### 搜索联系人结果
 ```json
 {
@@ -245,31 +225,179 @@
   }
 }
 ```
-### 联系人添加失败
+# 好友请求模块
+## 客户端->服务端
+### 请求加载好友请求
 ```json
 {
-  "type": "CONTACT_ADDED_FAILED",
+  "type": "LOAD_FRIEND_REQUEST",
+  "payload": {
+    "userId": "int"
+  }
+}
+```
+### 请求发送好友请求
+```json
+{
+  "type": "ADD_FRIEND_REQUEST",
+  "payload": {
+    "id": "int",
+    "requesterId": "int",
+    "targetId": "int",
+    "requesterUsername": "string",
+    "targetUsername": "string",
+    "requesterAvatar": "string",
+    "targetAvatar": "string",
+    "status": "string"
+  }
+}
+```
+### 请求拒绝好友请求
+```json
+{
+  "type": "REFUSE_FRIEND_REQUEST",
+  "payload": {
+    "id": "int"
+  }
+}
+```
+### 请求同意好友请求
+```json
+{
+  "type": "ACCEPT_FRIEND_REQUEST",
+  "payload": {
+    "id": "int"
+  }
+}
+```
+## 服务端->客户端
+### 已加载好友请求
+```json
+{
+  "type": "FRIEND_REQUESTS_LOADED",
+  "payload": {
+    "requestList": [
+      {
+        "id": "int",
+        "requesterId": "int",
+        "targetId": "int",
+        "requesterUsername": "string",
+        "targetUsername": "string",
+        "requesterAvatar": "string",
+        "targetAvatar": "string",
+        "status": "string"
+      }
+    ]
+  }
+}
+```
+### 加载好友请求失败
+```json
+{
+  "type": "FRIEND_REQUESTS_LOADED_FAILED",
   "payload": {
     "error": "string"
   }
 }
 ```
-### 联系人删除成功
+### 服务端已收到好友请求
 ```json
 {
-  "type": "CONTACT_DELETED",
-  "payload": {}
+  "type": "FRIEND_REQUEST_ADDED",
+  "payload": {
+    "id": "int",
+    "requesterId": "int",
+    "targetId": "int",
+    "requesterUsername": "string",
+    "targetUsername": "string",
+    "requesterAvatar": "string",
+    "targetAvatar": "string",
+    "status": "string"
+  }
 }
 ```
-### 联系人删除失败
+### 服务端收到好友请求失败
 ```json
 {
-  "type": "CONTACT_DELETED_FAILED",
+  "type": "FRIEND_REQUEST_ADDED_FAILED",
   "payload": {
     "error": "string"
   }
 }
 ```
+### 有新的好友请求
+```json
+{
+  "type": "ADD_FRIEND_REQUEST",
+  "payload": {
+    "id": "int",
+    "requesterId": "int",
+    "targetId": "int",
+    "requesterUsername": "string",
+    "targetUsername": "string",
+    "requesterAvatar": "string",
+    "targetAvatar": "string",
+    "status": "string"
+  }
+}
+```
+### 拒绝好友请求成功
+```json
+{
+  "type": "FRIEND_REQUEST_REFUSED",
+  "payload": {
+    "id": "int"
+  }
+}
+```
+### 同意好友请求成功
+```json
+{
+  "type": "FRIEND_REQUEST_ACCEPTED",
+  "payload": {
+    "id": "int"
+  }
+}
+```
+### 拒绝好友请求失败
+```json
+{
+  "type": "FRIEND_REQUEST_REFUSED_FAILED",
+  "payload": {
+    "id": "int",
+    "error": "string"
+  }
+}
+```
+### 同意好友请求失败
+```json
+{
+  "type": "FRIEND_REQUEST_ACCEPTED_FAILED",
+  "payload": {
+    "id": "int",
+    "error": "string"
+  }
+}
+```
+### 好友请求被拒绝
+```json
+{
+  "type": "REFUSE_FRIEND_REQUEST",
+  "payload": {
+    "id": "int"
+  }
+}
+ ```
+### 好友请求被同意
+```json
+{
+  "type": "ACCEPT_FRIEND_REQUEST",
+  "payload": {
+    "id": "int"
+  }
+}
+ ```
+### 
 # 消息模块
 ## 客户端->服务端
 ### 请求发送普通消息
