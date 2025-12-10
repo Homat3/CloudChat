@@ -75,3 +75,84 @@ std::string generate_token() {
 	}
 	return token;
 }
+
+FriendRequest::FriendRequest(int id, int requesterId, int targetId, std::string requesterUsername,
+							 std::string targetUsername, std::string requesterAvatar,
+							 std::string targetAvatar, std::string status) {
+	id_ = id;
+	requesterId_ = requesterId;
+	targetId_    = targetId;
+	requesterUsername_ = requesterUsername;
+	targetUsername_    = targetUsername;
+	requesterAvatar_   = requesterAvatar;
+	targetAvatar_      = targetAvatar;
+	status_            = status;
+}
+
+int FriendRequest::get_requester_id() {
+	return requesterId_;
+}
+
+int FriendRequest::get_target_id() {
+	return targetId_;
+}
+
+std::string FriendRequest::get_requester_username() {
+	return requesterUsername_;
+}
+
+std::string FriendRequest::get_target_username() {
+	return targetUsername_;
+}
+
+std::string FriendRequest::get_requester_avatar() {
+	return requesterAvatar_;
+}
+
+std::string FriendRequest::get_target_avatar() {
+	return targetAvatar_;
+}
+
+std::string FriendRequest::get_status() {
+	return status_;
+}
+
+void FriendRequest::SetRequesterId(int requesterId) {
+	requesterId_ = requesterId;
+}
+
+void FriendRequest::SetTargetId(int targetId) {
+	targetId_ = targetId;
+}
+
+void FriendRequest::SetRequesterUsername(std::string requesterUsername) {
+	requesterUsername_ = requesterUsername;
+}
+
+void FriendRequest::SetTargetUsername(std::string targetUsername) {
+	targetUsername_ = targetUsername;
+}
+
+void FriendRequest::SetRequesterAvatar(std::string requesterAvatar) {
+	requesterAvatar_ = requesterAvatar;
+}
+
+void FriendRequest::SetTargetAvatar(std::string targetAvatar) {
+	targetAvatar_ = targetAvatar;
+}
+
+void FriendRequest::SetStatus(std::string status) {
+	status_ = status;
+}
+
+int FriendRequest::get_id() {
+	return id_;
+}
+
+void FriendRequest::SetId(int id) {
+	id_ = id;
+}
+
+FriendRequest::FriendRequest() {
+	
+}

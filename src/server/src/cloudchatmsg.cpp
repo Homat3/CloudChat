@@ -1,5 +1,4 @@
 #include "cloudchatmsg.h"
-#include <websocketpp/error.hpp>
 
 ProtocalMsg::ProtocalMsg(std::string type) {
 	type_ = type;
@@ -207,8 +206,8 @@ std::string LoginSuccessMsg::to_JSON() {
 
 std::string LoginFailureMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
-			to_JSON_string(error_).c_str());
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -236,8 +235,8 @@ std::string RegisterSuccessMsg::to_JSON() {
 
 std::string RegisterFailureMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
-			to_JSON_string(error_).c_str());
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -257,8 +256,8 @@ std::string ProfileUpdatedSuccessMsg::to_JSON() {
 
 std::string ProfileUpdatedFailedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
-			to_JSON_string(error_).c_str());
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -289,7 +288,8 @@ std::string ContactsLoadedMsg::to_JSON() {
 
 std::string ContactsLoadedFailedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
 			to_JSON_string(error_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
@@ -312,7 +312,7 @@ std::string SearchForUserResultMsg::to_JSON() {
 		}
 	}
 	users_json += "]";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"contacts\":%s}}", to_JSON_string(type_).c_str(),
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"users\":%s}}", to_JSON_string(type_).c_str(),
 			users_json.c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
@@ -332,8 +332,8 @@ std::string ContactAddedMsg::to_JSON() {
 
 std::string ContactAddedFailedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
-			to_JSON_string(error_).c_str());
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -349,8 +349,8 @@ std::string ContactDeletedMsg::to_JSON() {
 
 std::string ContactDeletedFailedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}", to_JSON_string(type_).c_str(),
-			to_JSON_string(error_).c_str());
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -467,6 +467,12 @@ ClientMsg* parse_protocal_msg(std::string JSON) {
 		return SearchForUserByIdMsg::parse_from_JSON(JSON, payload_pos);
 	} else if (type == SEARCH_FOR_UESR_BY_NAME) {
 		return SearchForUserByNameMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == ADD_FRIEND_REQUEST) {
+		return AddFriendRequestClientMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == REFUSE_FRIEND_REQUEST) {
+		return RefuseFriendRequestClientMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == ACCEPT_FRIEND_REQUEST) {
+		return AcceptFriendRequestClientMsg::parse_from_JSON(JSON, payload_pos);
 	}
 	return new ClientMsg(ILLEGAL_MSG);
 }
@@ -628,10 +634,14 @@ std::string to_JSON_string(std::string str) {
 	return JSON;
 }
 
-int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-					server_t::message_ptr msg, ServerMsg* srv_msg) {
+int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, ServerMsg* srv_msg) {
 	try {
-		cloudchat_srv.send(hdl, srv_msg->to_JSON(), msg->get_opcode());
+		websocketpp::lib::error_code ec;
+		cloudchat_srv.send(hdl, srv_msg->to_JSON(), websocketpp::frame::opcode::text, ec);
+		if (ec) {
+			std::cout << "发送失败：" << ec.message() << std::endl;
+			return SEND_FAILED;
+		}
 	} catch (websocketpp::exception e) {
 		std::cout << "发送失败：" << e.code() << ": " << e.what() << std::endl;
 		return SEND_FAILED;
@@ -830,4 +840,270 @@ SearchForUserResultMsg::SearchForUserResultMsg(std::vector<CloudChatUser> users)
 	SEARCH_FOR_USER_RESULT
 	){
 	users_ = users;
+}
+
+int SearchForUserByIdMsg::get_user_id() {
+	return user_id_;
+}
+
+std::string SearchForUserByNameMsg::get_username() {
+	return username_;
+}
+
+int LogoutMsg::get_user_id() {
+	return user_id_;
+}
+
+LoadFriendRequestMsg::LoadFriendRequestMsg(int userId) : ClientMsg(LOAD_FRIEND_REQUEST) {
+	userId_ = userId;
+}
+
+LoadFriendRequestMsg* LoadFriendRequestMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int userId = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""),
+									 JSON.length() - 1);
+	return new LoadFriendRequestMsg(userId);
+}
+
+AddFriendRequestClientMsg::AddFriendRequestClientMsg(FriendRequest friend_request) : ClientMsg(
+	ADD_FRIEND_REQUEST
+	) {
+	friend_request_ = friend_request;
+}
+
+AddFriendRequestClientMsg* AddFriendRequestClientMsg::parse_from_JSON(std::string JSON,
+																	  int payload_pos) {
+	int end = JSON.length() - 1;
+    int requesterId = parse_int_from_json(JSON, find_field_pos(JSON, "\"requesterId\""), end);
+	int targetId = parse_int_from_json(JSON, find_field_pos(JSON, "\"targetId\""), end);
+	std::string requesterUsername = parse_str_from_json(JSON,
+														find_field_pos(JSON,
+																	   "\"requesterUsername\""),
+														end);
+	std::string targetUsername = parse_str_from_json(JSON, find_field_pos(JSON,
+																		  "\"targetUsername\""),
+													 end);
+	std::string requesterAvatar = parse_str_from_json(JSON, find_field_pos(JSON,
+																		   "\"requesterAvatar\""),
+													  end);
+	std::string targetAvatar = parse_str_from_json(JSON, find_field_pos(JSON,
+																		"\"targetAvatar\""),
+												   end);
+	FriendRequest friend_request(0, requesterId, targetId, requesterUsername, targetUsername,
+								 requesterAvatar, targetAvatar, FRIEND_REQUEST_STATUS_PENDING);
+	return new AddFriendRequestClientMsg(friend_request);
+}
+
+AddFriendRequestServerMsg::AddFriendRequestServerMsg(FriendRequest friend_request) : ServerMsg(
+	ADD_FRIEND_REQUEST
+	) {
+	friend_request_ = friend_request;
+}
+
+std::string AddFriendRequestServerMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, 
+			"{\"type\":\"%s\",\"payload\":{\"id\":%d,\"requesterId\":%d,\"targetId\":%d,\"requesterUsername\":\"%s\",\"targetUsername\":\"%s\",\"requesterAvatar\":\"%s\",\"targetAvatar\":\"%s\",\"status\":\"%s\"}}",
+			to_JSON_string(type_).c_str(),
+			friend_request_.get_id(),
+			friend_request_.get_requester_id(),
+			friend_request_.get_target_id(),
+			to_JSON_string(friend_request_.get_requester_username()).c_str(),
+			to_JSON_string(friend_request_.get_target_username()).c_str(),
+			to_JSON_string(friend_request_.get_requester_avatar()).c_str(),
+			to_JSON_string(friend_request_.get_target_avatar()).c_str(),
+			to_JSON_string(friend_request_.get_status()).c_str()
+	);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+RefuseFriendRequestClientMsg::RefuseFriendRequestClientMsg(int id) : ClientMsg(
+	REFUSE_FRIEND_REQUEST) {
+	id_ = id;
+}
+
+RefuseFriendRequestClientMsg* RefuseFriendRequestClientMsg::parse_from_JSON(std::string JSON,
+																			int payload_pos) {
+	int end = JSON.length() - 1;
+	int id = parse_int_from_json(JSON, find_field_pos(JSON, "\"id\""), end);
+	return new RefuseFriendRequestClientMsg(id);
+}
+
+RefuseFriendRequestServerMsg::RefuseFriendRequestServerMsg(int id) : ServerMsg(
+	REFUSE_FRIEND_REQUEST
+	) {
+	id_ = id;
+}
+
+std::string RefuseFriendRequestServerMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"id\":%d}}", to_JSON_string(type_).c_str(), id_);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+AcceptFriendRequestClientMsg::AcceptFriendRequestClientMsg(int id) : ClientMsg(
+	ACCEPT_FRIEND_REQUEST
+	) {
+	id_ = id;
+}
+
+AcceptFriendRequestClientMsg* AcceptFriendRequestClientMsg::parse_from_JSON(std::string JSON,
+																			int payload_pos) {
+	int end = JSON.length() - 1;
+	int id = parse_int_from_json(JSON, find_field_pos(JSON, "\"id\""), end);
+	return new AcceptFriendRequestClientMsg(id);
+}
+
+AcceptFriendRequestServerMsg::AcceptFriendRequestServerMsg(int id) : ServerMsg(
+	ACCEPT_FRIEND_REQUEST
+	) {
+	id_ = id;
+}
+
+std::string AcceptFriendRequestServerMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"id\":%d}}", to_JSON_string(type_).c_str(),
+			id_);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestLoadedMsg::FriendRequestLoadedMsg(std::vector<FriendRequest> requestList) : ServerMsg(
+	FRIEND_REQUEST_LOADED
+	) {
+	requestList_ = requestList;
+}
+
+std::string FriendRequestLoadedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	std::string requests_json = "[";
+	for (size_t i = 0; i < requestList_.size(); i++) {
+		char request_buff[BUFF_LEN] = "";
+		sprintf(request_buff,
+				"{\"id\":%d,\"requesterId\":%d,\"targetId\":%d,\"requesterUsername\":\"%s\",\"targetUsername\":\"%s\",\"requesterAvatar\":\"%s\",\"targetAvatar\":\"%s\",\"status\":\"%s\"}",
+				requestList_[i].get_id(),
+				requestList_[i].get_requester_id(),
+				requestList_[i].get_target_id(),
+				to_JSON_string(requestList_[i].get_requester_username()).c_str(),
+				to_JSON_string(requestList_[i].get_target_username()).c_str(),
+				to_JSON_string(requestList_[i].get_requester_avatar()).c_str(),
+				to_JSON_string(requestList_[i].get_target_avatar()).c_str(),
+				to_JSON_string(requestList_[i].get_status()).c_str()
+		);
+		requests_json += request_buff;
+		if (i != requestList_.size() - 1) {
+			requests_json += ",";
+		}
+	}
+	requests_json += "]";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"requests\":%s}}",
+			to_JSON_string(type_).c_str(), requests_json.c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestAddedMsg::FriendRequestAddedMsg(FriendRequest friend_request) : ServerMsg(
+	FRIEND_REQUEST_ADDED) {
+	friend_request_ = friend_request;
+}
+
+std::string FriendRequestAddedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"id\":%d,\"requesterId\":%d,\"targetId\":%d,\"requesterUsername\":\"%s\",\"targetUsername\":\"%s\",\"requesterAvatar\":\"%s\",\"targetAvatar\":\"%s\",\"status\":\"%s\"}}",
+			to_JSON_string(type_).c_str(),
+			friend_request_.get_id(),
+			friend_request_.get_requester_id(),
+			friend_request_.get_target_id(),
+			to_JSON_string(friend_request_.get_requester_username()).c_str(),
+			to_JSON_string(friend_request_.get_target_username()).c_str(),
+			to_JSON_string(friend_request_.get_requester_avatar()).c_str(),
+			to_JSON_string(friend_request_.get_target_avatar()).c_str(),
+			to_JSON_string(friend_request_.get_status()).c_str()
+	);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestAddedFailedMsg::FriendRequestAddedFailedMsg(std::string error) : ServerMsg(
+	FRIEND_REQUEST_ADDED_FAILED
+	) {
+	error_ = error;
+}
+
+std::string FriendRequestAddedFailedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestRefusedMsg::FriendRequestRefusedMsg(int id) : ServerMsg(FRIEND_REQUEST_REFUSED) {
+	id_ = id;
+}
+
+std::string FriendRequestRefusedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"id\":%d}}", to_JSON_string(type_).c_str(),
+			id_);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestRefusedFailedMsg::FriendRequestRefusedFailedMsg(std::string error) : ServerMsg(
+	FRIEND_REQUEST_REFUSED_FAILED
+	) {
+	error_ = error;
+}
+
+std::string FriendRequestRefusedFailedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestAcceptedMsg::FriendRequestAcceptedMsg(int id) : ServerMsg(FRIEND_REQUEST_ACCEPTED) {
+	id_ = id;
+}
+
+FriendRequestAcceptedFailedMsg::FriendRequestAcceptedFailedMsg(std::string error) : ServerMsg(
+	FRIEND_REQUEST_ACCEPTED_FAILED
+	) {
+	error_ = error;
+}
+
+std::string FriendRequestAcceptedFailedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequestLoadedFailedMsg::FriendRequestLoadedFailedMsg(std::string error) : ServerMsg(
+	FRIEND_REQUEST_LOADED_FAILED
+	){
+	error_ = error;
+}
+
+std::string FriendRequestLoadedFailedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
 }

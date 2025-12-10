@@ -32,6 +32,7 @@ public:
 	bool UpdateUser(CloudChatUser* user);//
 	CloudChatUser* GetUserByName(std::string name);
 	bool DeleteUser(int id);
+	std::vector<CloudChatUser> SearchUsersByName(std::string username);
 };
 
 #endif // CLOUDCHATDAT_H
