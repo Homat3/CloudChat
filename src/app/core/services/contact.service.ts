@@ -18,6 +18,10 @@ export class ContactService {
       this.contactListSubject.next(payload.contacts.map(c => new Contact(c.contactId, c.username, c.online, c.avatar)));
     });
 
+    this.responseService.contactAdded$.subscribe(payload => {
+      this.contactListSubject.next([...this.contactListSubject.value, new Contact(payload.userId, payload.username, payload.online, payload.avatar)]);
+    });
+
     this.isReady$ = this.responseService.isReady$;
   }
 
