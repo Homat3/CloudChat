@@ -58,7 +58,12 @@ export class AddContactComponent implements AfterContentInit, OnDestroy {
   loadFriendRequests(): void {
     const currentUser = this.authService.currentUserValue;
     if (currentUser) {
-      this.requestService.loadFriendRequest({ userId: currentUser.userId });
+      this.requestService.loadFriendRequest({ userId: currentUser.userId },
+        () => {
+        console.log('已加载好友请求列表');
+        }, (error) => {
+        console.error('加载好友请求列表失败:', error);
+        });
     }
   }
 
@@ -107,9 +112,13 @@ export class AddContactComponent implements AfterContentInit, OnDestroy {
   addContact() {
     const currentUser = this.authService.currentUserValue;
     if (currentUser) {
-      this.requestService.addFriendRequest(this.createFriendRequest(currentUser, this.selectedContact!));
-      console.log('请求添加联系人: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + ')');
-      this.close();
+      this.requestService.addFriendRequest(this.createFriendRequest(currentUser, this.selectedContact!), (payload) => {
+        window.alert('已发送好友请求给' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + ')');
+        console.log('请求添加联系人: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + ')');
+      }, (error) => {
+        window.alert('发送好友请求失败: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + '):' + error);
+        console.error('添加联系人失败:', error);
+      });
     }
   }
 

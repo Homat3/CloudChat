@@ -153,6 +153,27 @@
   margin-left: var(--spacing-sm);
 }
 
+.no-contacts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.no-contacts-icon {
+  font-size: 48px;
+  color: #c0c4cc;
+  margin-bottom: 16px;
+}
+
+.no-contacts-text {
+  font-size: 16px;
+  color: #909399;
+  line-height: 1.5;
+}
+
 .timestamp {
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
