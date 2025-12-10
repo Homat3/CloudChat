@@ -77,6 +77,13 @@ export class LoginComponent implements OnInit, AfterContentInit {
                 this.errorMessage = error;
             }
         );
+
+        setTimeout(() => {
+          if (!this.authService.currentUserValue && !this.errorMessage) {
+            this.isLoading = false;
+            this.errorMessage = '登录超时，请重试';
+          }
+        }, 5000);
     }
 
     onRegister(): void {

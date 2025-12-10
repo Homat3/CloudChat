@@ -18,25 +18,10 @@ export class ContactService {
       this.contactListSubject.next(payload.contacts.map(c => new Contact(c.contactId, c.username, c.online, c.avatar)));
     });
 
-    this.responseService.contactAdded$.subscribe(payload => {
-      const currentContacts = this.contactListSubject.value;
-      const newContact = new Contact(payload.contactId, payload.userName, payload.online, payload.avatar);
-      this.contactListSubject.next([...currentContacts, newContact]);
-    });
-
-    this.responseService.contactDeleted$.subscribe(() => {
-      // 可以根据需要重新加载联系人或者移除特定联系人
-      // 这里暂时不处理，因为删除联系人的响应没有返回具体ID
-    });
-
     this.isReady$ = this.responseService.isReady$;
   }
 
   public get contactListValue(): Contact[] {
     return this.contactListSubject.value;
-  }
-
-  public updateContactList(contacts: Contact[]): void {
-    this.contactListSubject.next(contacts);
   }
 }

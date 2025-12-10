@@ -12,8 +12,10 @@ export enum ClientMessageType {
   LOAD_CONTACTS = 'LOAD_CONTACTS',
   SEARCH_FOR_USER_BY_ID = 'SEARCH_FOR_USER_BY_ID',
   SEARCH_FOR_USER_BY_NAME = 'SEARCH_FOR_USER_BY_NAME',
-  ADD_CONTACT = 'ADD_CONTACT',
-  DELETE_CONTACT = 'DELETE_CONTACT',
+  LOAD_FRIEND_REQUEST = 'LOAD_FRIEND_REQUEST',
+  ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST',
+  REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
+  ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
   LOAD_MESSAGES = 'LOAD_MESSAGES',
   SEND_MESSAGE = 'SEND_MESSAGE',
   SEND_FILE = 'SEND_FILE',
@@ -31,8 +33,10 @@ type ClientPayload =
   | LoadContactsPayload
   | SearchForUserByIdPayload
   | SearchForUserByUserNamePayload
-  | AddContactPayload
-  | DeleteContactPayload
+  | LoadFriendRequestPayload
+  | AddFriendRequestPayload
+  | RefuseFriendRequestPayload
+  | AcceptFriendRequestPayload
   | LoadMessagesPayload
   | SendMessagePayload
   | SendFilePayload
@@ -80,14 +84,27 @@ export interface SearchForUserByUserNamePayload {
   username: string;
 }
 
-export interface AddContactPayload {
+export interface LoadFriendRequestPayload {
   userId: number;
-  targetId: number;
 }
 
-export interface DeleteContactPayload {
-  userId: number;
-  targetUserId: number;
+export interface AddFriendRequestPayload {
+  id: number;
+  requesterId: number;
+  targetId: number;
+  requesterUsername: string;
+  targetUsername: string;
+  requesterAvatar: string;
+  targetAvatar: string;
+  status: 'pending' | 'accepted' | 'refused';
+}
+
+export interface RefuseFriendRequestPayload {
+  id: number;
+}
+
+export interface AcceptFriendRequestPayload {
+  id: number;
 }
 
 export interface SendMessagePayload {

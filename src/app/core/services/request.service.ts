@@ -9,19 +9,18 @@ import {
   UpdateProfilePayload,
   LogoutPayload,
   LoadContactsPayload,
-  AddContactPayload,
-  DeleteContactPayload,
-  LoadMessagesPayload,
   SendMessagePayload,
   SendFilePayload,
   SendImagePayload,
   MarkReadPayload,
   ClearMessagesPayload,
-  SearchForUserByIdPayload, SearchForUserByUserNamePayload
+  SearchForUserByIdPayload, SearchForUserByUserNamePayload, AddFriendRequestPayload, AcceptFriendRequestPayload,
+  RefuseFriendRequestPayload, LoadMessagesPayload
 } from '../protocol/client.protocol';
 import { filter, take } from 'rxjs/operators';
 import {LoginSuccessPayload} from '../protocol/service.protocol';
 import {Observable, timeout} from 'rxjs';
+import {Message} from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -112,30 +111,59 @@ export class RequestService {
         }
     }
 
-    addContact(payload: AddContactPayload, onSuccess?: () => void, onError?: (err: string) => void) {
-        this.socketService.sendMessage({ type: ClientMessageType.ADD_CONTACT, payload });
+    loadFriendRequest(payload: LoadContactsPayload, onSuccess?: (requestList: Array<{
+      id: number;
+      requesterId: number;
+      targetId: number;
+      requesterUsername: string;
+      targetUsername: string;
+      requesterAvatar: string;
+      targetAvatar: string;
+      status: 'pending' | 'accepted' | 'refused';
+    }>) => void, onError?: (err: string) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.LOAD_FRIEND_REQUEST, payload });
         if (onSuccess) {
-            this.responseService.contactAdded$.pipe(take(1)).subscribe(() => onSuccess());
+            this.responseService.friendRequestsLoaded$.pipe(take(1)).subscribe((result) => onSuccess(result.requestList));
         }
         if (onError) {
-            this.responseService.contactAddedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
+            this.responseService.friendRequestsLoadedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
         }
     }
 
-    deleteContact(payload: DeleteContactPayload, onSuccess?: () => void, onError?: (err: string) => void) {
-        this.socketService.sendMessage({ type: ClientMessageType.DELETE_CONTACT, payload });
+    addFriendRequest(payload: AddFriendRequestPayload, onSuccess?: (friendRequestId: number) => void, onError?: (err: string) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.ADD_FRIEND_REQUEST, payload });
         if (onSuccess) {
-            this.responseService.contactDeleted$.pipe(take(1)).subscribe(() => onSuccess());
+            this.responseService.friendRequestAdded$.pipe(take(1)).subscribe((result) => onSuccess(result.id));
         }
         if (onError) {
-            this.responseService.contactDeletedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
+            this.responseService.friendRequestAddedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
         }
     }
 
-    loadMessages(payload: LoadMessagesPayload, onSuccess?: () => void) {
+    refuseFriendRequest(payload: RefuseFriendRequestPayload, onSuccess?: (friendRequestId: number) => void, onError?: (err: string) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.REFUSE_FRIEND_REQUEST, payload });
+        if (onSuccess) {
+            this.responseService.friendRequestRefused$.pipe(take(1)).subscribe((result) => onSuccess(result.id));
+        }
+        if (onError) {
+            this.responseService.friendRequestRefusedFailed$.pipe(take(1)).subscribe(err => onError(err.error))
+        }
+    }
+
+    acceptFriendRequest(payload: AcceptFriendRequestPayload, onSuccess?: (friendRequestId: number) => void, onError?: (err: string) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.ACCEPT_FRIEND_REQUEST, payload });
+        if (onSuccess) {
+            this.responseService.friendRequestAccepted$.pipe(take(1)).subscribe((result) => onSuccess(result.id));
+        }
+        if (onError) {
+            this.responseService.friendRequestAcceptedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
+        }
+    }
+
+    loadMessages(payload: LoadMessagesPayload, onSuccess?: (messages: Array<Message>) => void) {
         this.socketService.sendMessage({ type: ClientMessageType.LOAD_MESSAGES, payload });
         if (onSuccess) {
-            this.responseService.messagesLoaded$.pipe(take(1)).subscribe(() => onSuccess());
+            this.responseService.messagesLoaded$.pipe(take(1)).subscribe((result) => onSuccess(result.messages));
         }
     }
 

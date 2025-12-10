@@ -11,13 +11,21 @@ export enum ServiceMessageType {
   PROFILE_UPDATED_SUCCESS = 'PROFILE_UPDATED_SUCCESS',
   PROFILE_UPDATED_FAILED = 'PROFILE_UPDATED_FAILED',
   LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
+  CONTACT_ADDED = 'CONTACT_ADDED',
   CONTACTS_LOADED = 'CONTACTS_LOADED',
   CONTACTS_LOADED_FAILED = 'CONTACTS_LOADED_FAILED',
   SEARCH_FOR_USER_RESULT = 'SEARCH_FOR_USER_RESULT',
-  CONTACT_ADDED = 'CONTACT_ADDED',
-  CONTACT_ADDED_FAILED = 'CONTACT_ADDED_FAILED',
-  CONTACT_DELETED = 'CONTACT_DELETED',
-  CONTACT_DELETED_FAILED = 'CONTACT_DELETED_FAILED',
+  FRIEND_REQUESTS_LOADED = 'FRIEND_REQUESTS_LOADED',
+  FRIEND_REQUESTS_LOADED_FAILED = 'FRIEND_REQUESTS_LOADED_FAILED',
+  FRIEND_REQUEST_ADDED = 'FRIEND_REQUEST_ADDED',
+  FRIEND_REQUEST_ADDED_FAILED = 'FRIEND_REQUEST_ADDED_FAILED',
+  ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST',
+  FRIEND_REQUEST_REFUSED = 'FRIEND_REQUEST_REFUSED',
+  FRIEND_REQUEST_ACCEPTED = 'FRIEND_REQUEST_ACCEPTED',
+  FRIEND_REQUEST_REFUSED_FAILED = 'FRIEND_REQUEST_REFUSED_FAILED',
+  FRIEND_REQUEST_ACCEPTED_FAILED = 'FRIEND_REQUEST_ACCEPTED_FAILED',
+  REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
+  ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
   MESSAGES_LOADED = 'MESSAGES_LOADED',
   MESSAGE_RECEIVED_SELF = 'MESSAGE_RECEIVED_SELF',
   MESSAGE_RECEIVED_OTHER = 'MESSAGE_RECEIVED_OTHER',
@@ -32,13 +40,21 @@ export type ServicePayload =
   ProfileUpdatedSuccessPayload |
   ProfileUpdatedFailedPayload |
   LogoutSuccessPayload |
+  ContactAddedPayload |
   ContactsLoadedPayload |
   ContactsLoadedFailedPayload |
+  FriendRequestLoadedPayload |
+  FriendRequestLoadedFailedPayload |
+  FriendRequestAddedPayload |
+  FriendRequestAddedFailedPayload |
+  AddFriendRequestPayload |
+  FriendRequestRefusedPayload |
+  FriendRequestAcceptedPayload |
+  FriendRequestRefusedFailedPayload |
+  FriendRequestAcceptedFailedPayload |
+  RefuseFriendRequestPayload |
+  AcceptFriendRequestPayload |
   SearchForUserResultPayload |
-  ContactAddedPayload |
-  ContactAddedFailedPayload |
-  ContactDeletedPayload |
-  ContactDeletedFailedPayload |
   MessagesLoadedPayload |
   SelfMessageReceivedPayload |
   ToSelfMessageReceivedPayload |
@@ -82,6 +98,13 @@ export interface ProfileUpdatedFailedPayload {
   error: string;
 }
 
+export interface ContactAddedPayload {
+  userId: number;
+  username: string;
+  online: boolean;
+  avatar: string;
+}
+
 export interface ContactsLoadedPayload {
   contacts: Array<{
     contactId: number;
@@ -104,24 +127,72 @@ export interface SearchForUserResultPayload {
   }>;
 }
 
-export interface ContactAddedPayload {
-  contactId: number;
-  userName: string;
-  online: boolean;
-  avatar: string;
+export interface FriendRequestLoadedPayload {
+  requestList: Array<{
+    id: number;
+    requesterId: number;
+    targetId: number;
+    requesterUsername: string;
+    targetUsername: string;
+    requesterAvatar: string;
+    targetAvatar: string;
+    status: 'pending' | 'accepted' | 'refused';
+  }>;
 }
 
-export interface ContactAddedFailedPayload {
+export interface FriendRequestLoadedFailedPayload {
   error: string;
 }
 
-export interface ContactDeletedPayload {
+export interface FriendRequestAddedPayload {
+  id: number;
+  requesterId: number;
+  targetId: number;
+  requesterUsername: string;
+  targetUsername: string;
+  requesterAvatar: string;
+  targetAvatar: string;
+  status: 'pending' | 'accepted' | 'refused';
 }
 
-export interface ContactDeletedFailedPayload {
+export interface FriendRequestAddedFailedPayload {
   error: string;
 }
 
+export interface AddFriendRequestPayload {
+  id: number;
+  requesterId: number;
+  targetId: number;
+  requesterUsername: string;
+  targetUsername: string;
+  requesterAvatar: string;
+  targetAvatar: string;
+  status: 'pending' | 'accepted' | 'refused';
+}
+
+export interface FriendRequestRefusedPayload {
+  id: number;
+}
+
+export interface FriendRequestAcceptedPayload {
+  id: number;
+}
+
+export interface FriendRequestRefusedFailedPayload {
+  error: string;
+}
+
+export interface FriendRequestAcceptedFailedPayload {
+  error: string;
+}
+
+export interface RefuseFriendRequestPayload {
+  id: number;
+}
+
+export interface AcceptFriendRequestPayload {
+  id: number;
+}
 
 export interface SelfMessageReceivedPayload {
   messageId: number;
@@ -131,7 +202,7 @@ export interface ToSelfMessageReceivedPayload {
   id: number;
   senderId: number;
   receiverId: number;
-  content: string | string[];
+  content: string;
   timestamp: string;
   status: 'sending' | 'sent' | 'read';
   type: 'text' | 'image' | 'file';
@@ -142,7 +213,7 @@ export interface MessagesLoadedPayload {
     id: number;
     senderId: number;
     receiverId: number;
-    content: string | string[];
+    content: string;
     timestamp: string;
     status: 'sending' | 'sent' | 'read';
     type: 'text' | 'image' | 'file';

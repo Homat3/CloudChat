@@ -1,19 +1,20 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {AfterContentInit, Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RequestService } from '../../core/services/request.service';
 import { ResponseService } from '../../core/services/response.service';
-import { Contact } from '../../core/models';
+import {Contact, FriendRequest, FriendRequestInfo, User} from '../../core/models';
 import { AuthService } from '../../core/services/auth.service';
+import {FriendRequestService} from '../../core/services/friend_request.service';
 
 @Component({
   selector: 'app-add-contact',
   templateUrl: './add-contact.component.html',
   styleUrls: ['./add-contact.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, NgOptimizedImage]
+  imports: [CommonModule, FormsModule]
 })
-export class AddContactComponent {
+export class AddContactComponent implements AfterContentInit  {
   @Output() closeAddContact = new EventEmitter<void>();
 
   searchType: 'id' | 'username' = 'id';
@@ -21,23 +22,49 @@ export class AddContactComponent {
   searchUsername: string = '';
   searchResult: Array<{ contactId: number; username: string; avatar: string; }> | null = null;
   searchError: string = '';
-  selectedContactId: number | null = null;
+  selectedContact: { contactId: number; username: string; avatar: string; } | null = null;
+
+  friendRequests: Map<number, FriendRequestInfo> | undefined;
 
   constructor(
     private requestService: RequestService,
+    private friendRequestService: FriendRequestService,
     private authService: AuthService
   ) {}
+
+  ngAfterContentInit(): void {
+    let subscription = this.requestService.isReady$.subscribe(isReady => {
+      if (isReady) {
+        this.loadFriendRequests();
+        subscription.unsubscribe();
+      }
+    });
+    this.friendRequestService.isReady$.subscribe(isReady => {
+      if (isReady) {
+        this.friendRequestService.friendRequestMap$.subscribe(requests => {
+          this.friendRequests = requests;
+        })
+      }
+    })
+  }
+
+  loadFriendRequests(): void {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser) {
+      this.requestService.loadFriendRequest({ userId: currentUser.userId });
+    }
+  }
 
   onSearchTypeChange() {
     this.searchResult = null;
     this.searchError = '';
-    this.selectedContactId = null;
+    this.selectedContact = null;
   }
 
   searchContact() {
     this.searchResult = null;
     this.searchError = '';
-    this.selectedContactId = null;
+    this.selectedContact = null;
 
     const currentUser = this.authService.currentUserValue;
     if (!currentUser) {
@@ -48,13 +75,15 @@ export class AddContactComponent {
     if (this.searchType === 'id' && this.searchId) {
       // 通过ID搜索
       this.requestService.searchForUserById({ userId: this.searchId },
-        result => {this.searchResult = result;}
-      );
+        result => {
+        this.searchResult = result.filter(contact => contact.contactId !== currentUser.userId);
+      });
     } else if (this.searchType === 'username' && this.searchUsername.trim()) {
       // 通过用户名搜索
       this.requestService.searchForUserByName({ username: this.searchUsername.trim() },
-        result => {this.searchResult = result;}
-      );
+        result => {
+          this.searchResult = result.filter(contact => contact.contactId !== currentUser.userId);
+        });
     } else {
       this.searchError = '请输入有效的搜索条件';
       return;
@@ -68,19 +97,46 @@ export class AddContactComponent {
     }, 5000);
   }
 
-  addSelectedContact() {
-    if (this.selectedContactId) {
-      this.addContact(this.selectedContactId);
+  addContact() {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser) {
+      this.requestService.addFriendRequest(this.createFriendRequest(currentUser, this.selectedContact!));
+      console.log('请求添加联系人: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + ')');
+      this.close();
     }
   }
 
-  addContact(targetId: number) {
+  private createFriendRequest(currentUser: User, targetContact: { contactId: number; username: string; avatar: string; }): FriendRequestInfo {
+    return {
+      id: -1,
+      requesterId: currentUser.userId,
+      requesterUsername: currentUser.username,
+      requesterAvatar: currentUser.avatar,
+      targetId: targetContact.contactId,
+      targetUsername: targetContact.username,
+      targetAvatar: targetContact.avatar,
+      status: 'pending'
+    };
+  }
+
+  // 判断是否是当前用户发起的请求
+  isCurrentUserRequester(request: FriendRequest): boolean {
     const currentUser = this.authService.currentUserValue;
-    if (currentUser) {
-      this.requestService.addContact({ userId: currentUser.userId, targetId: targetId });
-      // 可以在这里添加成功提示
-      this.close();
-    }
+    return currentUser ? request.requesterId === currentUser.userId : false;
+  }
+
+  // 接受好友请求
+  acceptRequest(request: FriendRequest): void {
+    this.requestService.acceptFriendRequest({
+      id: request.id
+    }, );
+  }
+
+  // 拒绝好友请求
+  refuseRequest(request: FriendRequest): void {
+    this.requestService.refuseFriendRequest({
+      id: request.id
+    });
   }
 
   close() {

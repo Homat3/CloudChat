@@ -15,14 +15,6 @@ export class MessageService {
   constructor(
     private responseService: ResponseService
   ) {
-    this.responseService.contactDeleted$.subscribe(payload => {
-
-    });
-
-    this.responseService.contactAdded$.subscribe(payload => {
-
-    });
-
     this.responseService.contactsLoaded$.subscribe(payload => {
 
     });

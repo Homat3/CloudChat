@@ -1,14 +1,15 @@
 <div class="contact-list-container">
   <!-- 顶部搜索区 -->
   <div class="search-section">
-    <input type="text" class="search-input" placeholder="搜索联系人 / 聊天记录">
+    <div class="search-input-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" class="search-input" placeholder="搜索联系人 / 聊天记录">
+    </div>
     <div class="action-buttons">
-      <button class="settings-btn" title="添加联系人" (click)="showAddContact()">
-        +
+      <button class="icon-button" title="添加联系人" (click)="showAddContact()">
         <i class="fas fa-user-plus"></i>
       </button>
-      <a routerLink="/settings" class="settings-btn" title="设置">
-        S
+      <a routerLink="/settings" class="icon-button" title="设置">
         <i class="fas fa-cog"></i>
       </a>
     </div>
@@ -16,24 +17,28 @@
 
   <!-- 联系人列表 -->
   <div class="contacts-list">
-    @for (contact of contacts; track contact.contactId){
-    <div class="contact-item" [class.selected]="contact.contactId === selectedContactId" (click)="selectContact(contact)">
-      <div class="avatar-container">
-        <div class="avatar" [class.online]="contact.online"></div>
-      </div>
-      <div class="contact-info">
-        <div class="contact-name">{{ contact.username }}</div>
-        <div class="last-message">{{ getLastMessageContent(contact) }}</div>
-      </div>
-      <div class="contact-meta">
-        <div class="timestamp">{{ getLastMessageTime(contact) }}</div>
-        @if (getUnreadCount(contact) > 0) {
-        <div class="unread-count">
-          {{ getUnreadCount(contact) > 99 ? '99+' : getUnreadCount(contact) }}
+    @for (contact of contacts; track contact.contactId) {
+      <div class="contact-item" 
+           [class.selected]="contact.contactId === selectedContactId" 
+           (click)="selectContact(contact)">
+        <div class="avatar-container">
+          <div class="avatar" [class.online]="contact.online">
+            {{ contact.username.charAt(0).toUpperCase() }}
+          </div>
         </div>
-        }
+        <div class="contact-info">
+          <div class="contact-name">{{ contact.username }}</div>
+          <div class="last-message">{{ getLastMessageContent(contact) || '暂无消息' }}</div>
+        </div>
+        <div class="contact-meta">
+          <div class="timestamp">{{ getLastMessageTime(contact) }}</div>
+          @if (getUnreadCount(contact) > 0) {
+            <div class="unread-count">
+              {{ getUnreadCount(contact) > 99 ? '99+' : getUnreadCount(contact) }}
+            </div>
+          }
+        </div>
       </div>
-    </div>
     }
   </div>
 </div>

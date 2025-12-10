@@ -62,5 +62,13 @@ export class RegisterComponent implements OnInit {
         this.errorMessage = error;
       }
     );
+
+
+    setTimeout(() => {
+      if (!this.authService.currentUserValue && !this.errorMessage) {
+        this.isLoading = false;
+        this.errorMessage = '注册超时，请重试';
+      }
+    }, 5000);
   }
 }

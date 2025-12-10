@@ -3,7 +3,6 @@ import {Observable, Subject} from 'rxjs';
 import { SocketService } from './socket.service';
 import {
   ServiceMessageType,
-  ServicePayload,
   LoginSuccessPayload,
   LoginFailurePayload,
   RegisterSuccessPayload,
@@ -12,15 +11,14 @@ import {
   ProfileUpdatedFailedPayload,
   ContactsLoadedPayload,
   ContactsLoadedFailedPayload,
-  ContactAddedPayload,
-  ContactAddedFailedPayload,
-  ContactDeletedPayload,
-  ContactDeletedFailedPayload,
   MessagesLoadedPayload,
   SelfMessageReceivedPayload,
   ToSelfMessageReceivedPayload,
   MessagesClearedPayload,
-  SearchForUserResultPayload
+  SearchForUserResultPayload, ContactAddedPayload, FriendRequestLoadedPayload, FriendRequestAddedPayload,
+  FriendRequestAddedFailedPayload, AddFriendRequestPayload, FriendRequestRefusedPayload, FriendRequestAcceptedPayload,
+  FriendRequestAcceptedFailedPayload, RefuseFriendRequestPayload, AcceptFriendRequestPayload,
+  FriendRequestLoadedFailedPayload
 } from '../protocol/service.protocol';
 
 @Injectable({
@@ -38,11 +36,19 @@ export class ResponseService {
     public logoutSuccess$ = new Subject<void>();
     public contactsLoaded$ = new Subject<ContactsLoadedPayload>();
     public contactsLoadedFailed$ = new Subject<ContactsLoadedFailedPayload>();
-    public searchForUserResult$ = new Subject<SearchForUserResultPayload>();
     public contactAdded$ = new Subject<ContactAddedPayload>();
-    public contactAddedFailed$ = new Subject<ContactAddedFailedPayload>();
-    public contactDeleted$ = new Subject<ContactDeletedPayload>();
-    public contactDeletedFailed$ = new Subject<ContactDeletedFailedPayload>();
+    public searchForUserResult$ = new Subject<SearchForUserResultPayload>();
+    public friendRequestsLoaded$ = new Subject<FriendRequestLoadedPayload>();
+    public friendRequestsLoadedFailed$ = new Subject<FriendRequestLoadedFailedPayload>();
+    public friendRequestAdded$ = new Subject<FriendRequestAddedPayload>();
+    public friendRequestAddedFailed$ = new Subject<FriendRequestAddedFailedPayload>();
+    public addFriendRequest$ = new Subject<AddFriendRequestPayload>();
+    public friendRequestRefused$ = new Subject<FriendRequestRefusedPayload>();
+    public friendRequestAccepted$ = new Subject<FriendRequestAcceptedPayload>();
+    public friendRequestRefusedFailed$ = new Subject<FriendRequestAddedFailedPayload>();
+    public friendRequestAcceptedFailed$ = new Subject<FriendRequestAcceptedFailedPayload>();
+    public refuseFriendRequest$ = new Subject<RefuseFriendRequestPayload>();
+    public acceptFriendRequest$ = new Subject<AcceptFriendRequestPayload>();
     public messagesLoaded$ = new Subject<MessagesLoadedPayload>();
     public messageReceivedSelf$ = new Subject<SelfMessageReceivedPayload>();
     public messageReceivedOther$ = new Subject<ToSelfMessageReceivedPayload>();
@@ -87,20 +93,44 @@ export class ResponseService {
             case ServiceMessageType.CONTACTS_LOADED_FAILED:
                 this.contactsLoadedFailed$.next(message.payload);
                 break;
-            case ServiceMessageType.SEARCH_FOR_USER_RESULT:
-                this.searchForUserResult$.next(message.payload);
-                break;
             case ServiceMessageType.CONTACT_ADDED:
                 this.contactAdded$.next(message.payload);
                 break;
-            case ServiceMessageType.CONTACT_ADDED_FAILED:
-                this.contactAddedFailed$.next(message.payload);
+            case ServiceMessageType.SEARCH_FOR_USER_RESULT:
+                this.searchForUserResult$.next(message.payload);
                 break;
-            case ServiceMessageType.CONTACT_DELETED:
-                this.contactDeleted$.next(message.payload);
+            case ServiceMessageType.FRIEND_REQUESTS_LOADED:
+                this.friendRequestsLoaded$.next(message.payload);
                 break;
-            case ServiceMessageType.CONTACT_DELETED_FAILED:
-                this.contactDeletedFailed$.next(message.payload);
+            case ServiceMessageType.FRIEND_REQUESTS_LOADED_FAILED:
+                this.friendRequestsLoadedFailed$.next(message.payload);
+                break;
+            case ServiceMessageType.FRIEND_REQUEST_ADDED:
+                this.friendRequestAdded$.next(message.payload);
+                break;
+            case ServiceMessageType.FRIEND_REQUEST_ADDED_FAILED:
+                this.friendRequestAddedFailed$.next(message.payload);
+                break;
+            case ServiceMessageType.ADD_FRIEND_REQUEST:
+                this.addFriendRequest$.next(message.payload);
+                break;
+            case ServiceMessageType.FRIEND_REQUEST_REFUSED:
+                this.friendRequestRefused$.next(message.payload);
+                break;
+            case ServiceMessageType.FRIEND_REQUEST_REFUSED_FAILED:
+                this.friendRequestRefusedFailed$.next(message.payload);
+                break;
+            case ServiceMessageType.FRIEND_REQUEST_ACCEPTED:
+                this.friendRequestAccepted$.next(message.payload);
+                break;
+            case ServiceMessageType.FRIEND_REQUEST_ACCEPTED_FAILED:
+                this.friendRequestAcceptedFailed$.next(message.payload);
+                break;
+            case ServiceMessageType.REFUSE_FRIEND_REQUEST:
+                this.refuseFriendRequest$.next(message.payload);
+                break;
+            case ServiceMessageType.ACCEPT_FRIEND_REQUEST:
+                this.acceptFriendRequest$.next(message.payload);
                 break;
             case ServiceMessageType.MESSAGES_LOADED:
                 this.messagesLoaded$.next(message.payload);

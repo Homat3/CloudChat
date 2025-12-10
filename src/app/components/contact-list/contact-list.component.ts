@@ -40,15 +40,6 @@ export class ContactListComponent implements OnInit, OnDestroy {
       this.contactService.contactList$.subscribe(contacts => {
         this.contactsList = contacts;
       }),
-      
-      this.responseService.contactDeleted$.subscribe(() => {
-        // Reload contacts or remove locally if we had the ID.
-        // The protocol for delete success doesn't return the ID, so we might need to reload.
-        const currentUser = this.authService.currentUserValue;
-        if (currentUser) {
-          this.requestService.loadContacts({ userId: currentUser.userId });
-        }
-      })
     );
   }
 
