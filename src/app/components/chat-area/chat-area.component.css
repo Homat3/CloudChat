@@ -49,15 +49,32 @@
   font-size: var(--font-size-lg);
 }
 
-.contact-details .contact-status {
+.contact-details .contact-status-online {
   font-size: var(--font-size-sm);
-  color: var(--success-color);
   display: flex;
   align-items: center;
   gap: 4px;
+  color: var(--online-color);
 }
 
-.contact-details .contact-status::before {
+.contact-details .contact-status-offline {
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--error-color);
+}
+
+.contact-details .contact-status-online::before {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.contact-details .contact-status-offline::before {
   content: "";
   display: block;
   width: 8px;

@@ -11,6 +11,9 @@
   --warning-color: #f59e0b; /* Amber 500 */
   --error-color: #ef4444; /* Red 500 */
 
+  --online-color: #10b981;
+  --offline-color: #ef4444;
+
   /* 灰色系列 - Slate */
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;

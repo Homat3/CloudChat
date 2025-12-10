@@ -30,8 +30,11 @@
            [class.selected]="contact.contactId === selectedContactId"
            (click)="selectContact(contact)">
         <div class="avatar-container">
-          <div class="avatar" [class.online]="contact.online">
-            {{ contact.username.charAt(0).toUpperCase() }}
+          <div class="avatar" [class.online]="contact.online">@if (contact?.avatar){
+            <img src="{{contact?.avatar}}" alt="{{ contact?.username?.charAt(0) || '?' }}" style="border-radius: 50%; width: 95%; height: 95%">
+          } @else {
+            <label>{{ contact?.username?.charAt(0) || '?' }}</label>
+          }
           </div>
         </div>
         <div class="contact-info">

@@ -12,7 +12,11 @@
       </div>
       <div class="contact-details">
         <div class="contact-name">{{ selectedContact?.username || '请选择一个联系人' }}</div>
-        <div class="contact-status">{{ selectedContact?.online || '' }}</div>
+        @if (selectedContact){
+          <div class="contact-status-{{selectedContact.online ? 'online' : 'offline'}}"> {{selectedContact.online ? '在线' : '离线'}} </div>
+        } @else {
+          <div class="contact-status-offline"> 无联系人选择 </div>
+        }
       </div>
     </div>
   </div>
