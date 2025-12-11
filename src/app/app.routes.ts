@@ -4,7 +4,7 @@ import {LoginComponent} from './components/login/login.component';
 import {SettingsComponent} from './components/settings/settings.component';
 import {authGuard} from './core/guards/auth.guard';
 import {RegisterComponent} from './components/register/register.component';
-import {ProfileUpdateComponent} from './components/settings/profile-update.component';
+import {ProfileUpdateComponent} from './components/settings/profile-update/profile-update.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },

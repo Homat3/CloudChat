@@ -565,3 +565,35 @@
   }
 }
 ```
+# 文件操作模块
+## 客户端->服务端
+### 上传文件
+```json
+{
+  "type": "UPLOAD_FILE",
+  "payload": {
+    "filePath": "string",
+    "dataStream": "string"
+  }
+}
+```
+## 服务端->客户端
+### 文件上传成功
+```json
+{
+  "type": "FILE_UPLOADED",
+  "payload": {
+    "filePath": "string"
+  }
+}
+```
+### 文件上传失败
+```json
+{
+  "type": "FILE_UPLOAD_FAILED",
+  "payload": {
+    "filePath": "string",
+    "error": "string"
+  }
+}
+```

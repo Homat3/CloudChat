@@ -6,7 +6,7 @@ import {
   AddFriendRequestPayload,
   ContactAddedPayload,
   ContactsLoadedFailedPayload,
-  ContactsLoadedPayload,
+  ContactsLoadedPayload, FileUploadedFailedPayload, FileUploadedPayload,
   FriendRequestAcceptedFailedPayload,
   FriendRequestAcceptedPayload,
   FriendRequestAddedFailedPayload,
@@ -60,6 +60,8 @@ export class ResponseService {
     public messageReceivedSelf$ = new Subject<SelfMessageReceivedPayload>();
     public messageReceivedOther$ = new Subject<ToSelfMessageReceivedPayload>();
     public messagesCleared$ = new Subject<MessagesClearedPayload>();
+    public fileUploaded$ = new Subject<FileUploadedPayload>();
+    public fileUploadedFailed$ = new Subject<FileUploadedFailedPayload>();
 
     constructor(private socketService: SocketService) {
         this.socketService.getMessages().subscribe(message => {
@@ -147,6 +149,12 @@ export class ResponseService {
                 break;
             case ServiceMessageType.MESSAGES_CLEARED:
                 this.messagesCleared$.next(message.payload);
+                break;
+            case ServiceMessageType.FILE_UPLOADED:
+                this.fileUploaded$.next(message.payload);
+                break;
+            case ServiceMessageType.FILE_UPLOADED_FAILED:
+                this.fileUploadedFailed$.next(message.payload);
                 break;
             default:
                 console.warn('Unknown message type:', message.type);
