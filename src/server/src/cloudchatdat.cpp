@@ -21,11 +21,11 @@ CloudChatDatabase::CloudChatDatabase() {
 		statement->execute(R"(
 			create table if not exists users (
 			id int auto_increment primary key,
-			username varchar(50) not null unique,
-			email varchar(50) not null unique,
-			password varchar(50) not null,
-			avatar varchar(50) not null,
-			token varchar(50) not null,
+			username varchar(255) not null unique,
+			email varchar(255) not null unique,
+			password varchar(255) not null,
+			avatar varchar(255) not null,
+			token varchar(255) not null,
 			online boolean default false,  
 			last_active timestamp,         
 			created_at timestamp default current_timestamp

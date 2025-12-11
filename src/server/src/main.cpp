@@ -1,7 +1,6 @@
 #include "cloudchatdat.h"
+#include "cloudchatmsg.h"
 #include "cloudchatservice.h"
-#include <boost/system/system_error.hpp>
-#include <websocketpp/common/connection_hdl.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
@@ -169,4 +168,6 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 		AcceptFriendRequest(g_cloudchat_srv, hdl, (AcceptFriendRequestClientMsg*)client_msg);
 	else if (type == LOAD_FRIEND_REQUEST)
 		LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
+	else if (type == UPLOAD_FILE)
+		UploadFile(g_cloudchat_srv, hdl, (UploadFileMsg*)client_msg);
 }
