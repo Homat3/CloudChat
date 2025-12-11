@@ -1,4 +1,5 @@
 #include "cloudchatdat.h"
+#include "cloudchatuser.h"
 #include <cppconn/exception.h>
 #include <cppconn/prepared_statement.h>
 
@@ -38,7 +39,6 @@ CloudChatDatabase::CloudChatDatabase() {
 			create table if not exists friends (
 			user_id1 int not null,
 			user_id2 int not null,
-			created_at timestamp default current_timestamp,
 			primary key (user_id1, user_id2),
 			foreign key (user_id1) references users(id) on delete cascade,
 			foreign key (user_id2) references users(id) on delete cascade
@@ -121,15 +121,16 @@ CloudChatDatabase::CloudChatDatabase() {
 		statement->execute(R"(
 			create table if not exists friend_requests (
 			id int auto_increment primary key,
-			sender_id int not null,
-			receiver_id int not null,
-			status enum('pending', 'accepted', 'rejected') default 'pending',
-			message varchar(255),          
-			created_at timestamp default current_timestamp,
-			updated_at timestamp default current_timestamp on update current_timestamp,
-			foreign key (sender_id) references users(id) on delete cascade,
-			foreign key (receiver_id) references users(id) on delete cascade,
-			unique key unique_friend_request (sender_id, receiver_id)  
+			requester_id int not null,
+			target_id int not null,
+            requester_username varchar(255) not null,
+            target_username varchar(255) not null,
+            requester_avatar varchar(255) not null,
+            target_avatar varchar(255) not null,
+			status enum('pending', 'accepted', 'refused') default 'pending',
+			foreign key (requester_id) references users(id) on delete cascade,
+			foreign key (target_id) references users(id) on delete cascade,
+			unique key unique_friend_request (requester_id, target_id)  
 			)
 			)"
 		);
@@ -305,4 +306,212 @@ std::vector<CloudChatUser> CloudChatDatabase::SearchUsersByName(std::string user
 		return results;
 	}
 	return results;
+}
+
+bool CloudChatDatabase::AddFriendRequest(FriendRequest friend_request) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"INSERT INTO friend_requests(requester_id, target_id, requester_username, target_username, requester_avatar, target_avatar)"
+			"VALUES(?,?,?,?,?,?)"
+		);
+		
+		pstmt->setInt(1, friend_request.get_requester_id());
+		pstmt->setInt(2, friend_request.get_target_id());
+		pstmt->setString(3, friend_request.get_requester_username());
+		pstmt->setString(4, friend_request.get_target_username());
+		pstmt->setString(5, friend_request.get_requester_avatar());
+		pstmt->setString(6, friend_request.get_target_avatar());
+
+		return pstmt->executeUpdate() > 0;
+
+		delete pstmt;
+
+	} catch (sql::SQLException &e) {
+		std::cerr << "add-failed:" << e.what() << std::endl;
+		std::cerr << "wrong-code:" << e.getErrorCode() << std::endl;
+		return false;
+	}
+}
+
+std::vector<FriendRequest> CloudChatDatabase::GetFriendRequestsByUserId(int user_id) {
+	std::vector<FriendRequest> results;
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM friend_requests WHERE requester_id = ? or target_id = ?"
+		);
+		pstmt->setInt(1, user_id);
+		pstmt->setInt(2, user_id);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		while (res->next()) {
+			results.push_back(*(new FriendRequest(res->getInt("id"),
+												  res->getInt("requester_id"),
+												  res->getInt("target_id"),
+												  res->getString("requester_username"),
+												  res->getString("target_username"),
+												  res->getString("requester_avatar"),
+												  res->getString("target_avatar"),
+												  res->getString("status"))));
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+		return results;
+	}
+	return results;
+}
+
+FriendRequest* CloudChatDatabase::GetFriendRequestById(int id) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM friend_requests WHERE id = ?"
+		);
+		pstmt->setInt(1, id);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		if (res->next()) {
+			FriendRequest* friend_request = new FriendRequest(res->getInt("id"),
+															  res->getInt("requester_id"),
+															  res->getInt("target_id"),
+															  res->getString("requester_username"),
+															  res->getString("target_username"),
+															  res->getString("requester_avatar"),
+															  res->getString("target_avatar"),
+															  res->getString("status"));
+			delete res;
+			delete pstmt;
+			return friend_request;
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+	}
+	return nullptr;
+}
+
+bool CloudChatDatabase::UpdateFriendRequest(FriendRequest* friend_request) {
+	if (friend_request == nullptr) {
+		std::cerr << "update-failed: friend_request is null" << std::endl;
+		return false;
+	}
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"UPDATE friend_requests SET status = ? where id = ?"
+		);
+		pstmt->setString(1, friend_request->get_status());
+		pstmt->setInt(2, friend_request->get_id());
+
+		int rowsAffected = pstmt->executeUpdate();
+		delete pstmt;
+		return rowsAffected;
+	} catch(sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+	}
+	return false;
+}
+
+FriendRequest* CloudChatDatabase::GetFriendRequestByTwoIds(int requester_id, int target_id) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM friend_requests WHERE requester_id = ? and target_id = ?"
+		);
+		pstmt->setInt(1, requester_id);
+		pstmt->setInt(2, target_id);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		if (res->next()) {
+			FriendRequest* friend_request = new FriendRequest(res->getInt("id"),
+															  res->getInt("requester_id"),
+															  res->getInt("target_id"),
+															  res->getString("requester_username"),
+															  res->getString("target_username"),
+															  res->getString("requester_avatar"),
+															  res->getString("target_avatar"),
+															  res->getString("status"));
+			delete res;
+			delete pstmt;
+			return friend_request;
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+	}
+	return nullptr;
+}
+
+bool CloudChatDatabase::AddFriend(int user_id1, int user_id2) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"INSERT INTO friends(user_id1, user_id2)"
+			"VALUES(?,?)"
+		);
+		
+		pstmt->setInt(1, user_id1);
+		pstmt->setInt(2, user_id2);
+
+		return pstmt->executeUpdate() > 0;
+
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cerr << "add-failed:" << e.what() << std::endl;
+		std::cerr << "wrong-code:" << e.getErrorCode() << std::endl;
+		return false;
+	}
+}
+
+std::vector<CloudChatUser> CloudChatDatabase::get_contacts(int user_id) {
+	std::vector<CloudChatUser> results;
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM friends WHERE user_id1 = ? or user_id2 = ?"
+		);
+		pstmt->setInt(1, user_id);
+		pstmt->setInt(2, user_id);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		while (res->next()) {
+			int user_id1 = res->getInt("user_id1");
+			int user_id2 = res->getInt("user_id2");
+			if (user_id1 == user_id) results.push_back(*(GetUserById(user_id2)));
+			else results.push_back(*(GetUserById(user_id1)));
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+		return results;
+	}
+	return results;
+}
+
+bool CloudChatDatabase::is_friend(int user_id1, int user_id2) {
+	bool result = false;
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM friends WHERE user_id1 = ? and user_id2 = ?"
+		);
+		pstmt->setInt(1, user_id1);
+		pstmt->setInt(2, user_id2);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		if (res->next()) result = true;
+		else {
+			pstmt = connection_->prepareStatement(
+				"SELECT * FROM friends WHERE user_id1 = ? and user_id2 = ?"
+				);
+			pstmt->setInt(1, user_id2);
+			pstmt->setInt(2, user_id1);
+
+			res = pstmt->executeQuery();
+			if (res->next()) result = true;
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+	}
+	return result;
 }

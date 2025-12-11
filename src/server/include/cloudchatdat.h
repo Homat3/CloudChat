@@ -27,12 +27,23 @@ public:
 	static CloudChatDatabase* GetInstance(); // 获取单例模式实例
 	// TODO: 编写数据库操作接口
 
+	// users
 	bool AddUser(CloudChatUser& user);//addUser
 	CloudChatUser* GetUserById(int id);//
-	bool UpdateUser(CloudChatUser* user);//
+	bool           UpdateUser(CloudChatUser* user);//
 	CloudChatUser* GetUserByName(std::string name);
-	bool DeleteUser(int id);
+	bool           DeleteUser(int id);
 	std::vector<CloudChatUser> SearchUsersByName(std::string username);
+	// friend_requests
+	bool AddFriendRequest(FriendRequest friend_request);
+	std::vector<FriendRequest> GetFriendRequestsByUserId(int user_id);
+	FriendRequest*             GetFriendRequestById(int id);
+	bool                       UpdateFriendRequest(FriendRequest* friend_request);
+	FriendRequest*             GetFriendRequestByTwoIds(int requester_id, int target_id);
+	// friends
+	bool AddFriend(int user_id1, int user_id2);
+	std::vector<CloudChatUser> get_contacts(int user_id);
+	bool is_friend(int user_id1, int user_id2);
 };
 
 #endif // CLOUDCHATDAT_H

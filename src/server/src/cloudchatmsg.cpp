@@ -1,4 +1,5 @@
 #include "cloudchatmsg.h"
+#include "cloudchatuser.h"
 
 ProtocalMsg::ProtocalMsg(std::string type) {
 	type_ = type;
@@ -473,6 +474,8 @@ ClientMsg* parse_protocal_msg(std::string JSON) {
 		return RefuseFriendRequestClientMsg::parse_from_JSON(JSON, payload_pos);
 	} else if (type == ACCEPT_FRIEND_REQUEST) {
 		return AcceptFriendRequestClientMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == LOAD_FRIEND_REQUEST) {
+		return LoadFriendRequestMsg::parse_from_JSON(JSON, payload_pos);
 	}
 	return new ClientMsg(ILLEGAL_MSG);
 }
@@ -644,6 +647,9 @@ int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, Se
 		}
 	} catch (websocketpp::exception e) {
 		std::cout << "发送失败：" << e.code() << ": " << e.what() << std::endl;
+		return SEND_FAILED;
+	} catch (...) {
+		std::cout << "发送失败：未知错误" << std::endl;
 		return SEND_FAILED;
 	}
 	return SEND_SUCCESSFUL;
@@ -854,14 +860,14 @@ int LogoutMsg::get_user_id() {
 	return user_id_;
 }
 
-LoadFriendRequestMsg::LoadFriendRequestMsg(int userId) : ClientMsg(LOAD_FRIEND_REQUEST) {
-	userId_ = userId;
+LoadFriendRequestMsg::LoadFriendRequestMsg(int user_id) : ClientMsg(LOAD_FRIEND_REQUEST) {
+	user_id_ = user_id;
 }
 
 LoadFriendRequestMsg* LoadFriendRequestMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	int userId = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""),
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""),
 									 JSON.length() - 1);
-	return new LoadFriendRequestMsg(userId);
+	return new LoadFriendRequestMsg(user_id);
 }
 
 AddFriendRequestClientMsg::AddFriendRequestClientMsg(FriendRequest friend_request) : ClientMsg(
@@ -928,6 +934,10 @@ RefuseFriendRequestClientMsg* RefuseFriendRequestClientMsg::parse_from_JSON(std:
 	int end = JSON.length() - 1;
 	int id = parse_int_from_json(JSON, find_field_pos(JSON, "\"id\""), end);
 	return new RefuseFriendRequestClientMsg(id);
+}
+
+int RefuseFriendRequestClientMsg::get_id() {
+	return id_;
 }
 
 RefuseFriendRequestServerMsg::RefuseFriendRequestServerMsg(int id) : ServerMsg(
@@ -1106,4 +1116,28 @@ std::string FriendRequestLoadedFailedMsg::to_JSON() {
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
+}
+
+std::string FriendRequestAcceptedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"id\":%d}}", to_JSON_string(type_).c_str(), id_);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FriendRequest AddFriendRequestClientMsg::get_friend_request() {
+	return friend_request_;
+}
+
+int LoadFriendRequestMsg::get_user_id() {
+	return user_id_;
+}
+
+int AcceptFriendRequestClientMsg::get_id() {
+	return id_;
+}
+
+int LoadContactsMsg::get_user_id() {
+	return user_id_;
 }

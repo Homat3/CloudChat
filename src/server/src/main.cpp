@@ -1,5 +1,6 @@
 #include "cloudchatdat.h"
 #include "cloudchatservice.h"
+#include <boost/system/system_error.hpp>
 #include <websocketpp/common/connection_hdl.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
@@ -18,6 +19,7 @@ void OnClose(websocketpp::connection_hdl hdl);
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg);
 
 int main() {
+	srand(time(0));
 	// 初始化服务器
 	printf("CloudChat 服务器正在初始化...\n");
 	if (InitServer() != SERVER_INITIALIZED) {
@@ -99,22 +101,32 @@ void OnOpen(websocketpp::connection_hdl hdl) { // 客户端连接建立时服务
 void OnClose(websocketpp::connection_hdl hdl) {	// 客户端断开连接时服务端的提示信息
 	// 通过连接句柄获取连接指针
     server_t::connection_ptr con = g_cloudchat_srv.get_con_from_hdl(hdl);
+
+	if (!con) {
+		std::cerr << "无法获取连接对象" << std::endl;
+		return;
+	}
+
+	try {
+		// 获取底层socket，然后获取远程端点
+		boost::asio::ip::tcp::socket &sock = con->get_raw_socket();
+		boost::asio::ip::tcp::endpoint remote_ep = sock.remote_endpoint();
     
-    // 获取底层socket，然后获取远程端点
-    boost::asio::ip::tcp::socket &sock = con->get_raw_socket();
-    boost::asio::ip::tcp::endpoint remote_ep = sock.remote_endpoint();
-    
-    // 获取IP地址（字符串形式）
-    std::string remote_ip = remote_ep.address().to_string();
-    std::cout << "客户端已断开连接，IP地址: " << remote_ip << std::endl;
+		// 获取IP地址（字符串形式）
+		std::string remote_ip = remote_ep.address().to_string();
+		std::cout << "客户端已断开连接，IP地址: " << remote_ip << std::endl;
+	} catch (const boost::system::system_error& e) {
+		std::cerr << "获取远程端点失败：" << e.what() << std::endl;
+	}
 
 	// 更新用户在线状态
-	int user_id = g_online_users_id[hdl];
-	g_online_users_id.erase(hdl);
-	g_online_users_hdl.erase(user_id);
+	auto it = g_online_users.find(hdl);
+	if (it == g_online_users.end()) return;
+	int user_id = it->second;
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserById(user_id);
 	user->SetOnline(false);
 	CloudChatDatabase::GetInstance()->UpdateUser(user);
+	g_online_users.erase(it);
 }
 
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
