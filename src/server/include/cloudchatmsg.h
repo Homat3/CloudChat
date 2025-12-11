@@ -188,6 +188,7 @@ private:
 public:
 	LoadContactsMsg(int user_id);
 	static LoadContactsMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
 };
 
 class SearchForUserByIdMsg : public ClientMsg { // 根据 id 搜索用户
@@ -472,11 +473,12 @@ public:
 
 class LoadFriendRequestMsg : public ClientMsg { // 加载好友请求列表
 private:
-	int userId_;				// 请求加载好友请求列表的用户 id
+	int user_id_;				// 请求加载好友请求列表的用户 id
 
 public:
-	LoadFriendRequestMsg(int userId);
+	LoadFriendRequestMsg(int user_id);
 	static LoadFriendRequestMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
 };
 
 class AddFriendRequestClientMsg : public ClientMsg { // 添加好友请求
@@ -486,6 +488,7 @@ private:
 public:
 	AddFriendRequestClientMsg(FriendRequest friend_request);
 	static AddFriendRequestClientMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	FriendRequest get_friend_request();
 };
 
 class AddFriendRequestServerMsg : public ServerMsg { // 添加好友请求
@@ -504,6 +507,7 @@ private:
 public:
 	RefuseFriendRequestClientMsg(int id);
 	static RefuseFriendRequestClientMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_id();
 };
 
 class RefuseFriendRequestServerMsg : public ServerMsg { // 拒绝好友请求
@@ -522,6 +526,7 @@ private:
 public:
 	AcceptFriendRequestClientMsg(int id);
 	static AcceptFriendRequestClientMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_id();
 };
 
 class AcceptFriendRequestServerMsg : public ServerMsg { // 通过好友请求

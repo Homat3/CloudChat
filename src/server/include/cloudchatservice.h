@@ -7,8 +7,8 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 
-extern std::map<int, websocketpp::connection_hdl> g_online_users_hdl;
-extern std::map<websocketpp::connection_hdl, int> g_online_users_id;
+extern std::map<websocketpp::connection_hdl, int,
+				std::owner_less<websocketpp::connection_hdl>> g_online_users;
 
 void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* login_msg);
 void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,

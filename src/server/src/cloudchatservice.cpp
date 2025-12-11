@@ -1,8 +1,10 @@
 #include "cloudchatservice.h"
 #include "cloudchatdat.h"
+#include "cloudchatmsg.h"
+#include "cloudchatuser.h"
 
-std::map<int, websocketpp::connection_hdl> g_online_users_hdl;
-std::map<websocketpp::connection_hdl, int> g_online_users_id;
+std::map<websocketpp::connection_hdl, int,
+	std::owner_less<websocketpp::connection_hdl>> g_online_users;
 // 账密登录业务
 void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* login_msg) {
 	std::string username = login_msg->get_username(), password = login_msg->get_password();
@@ -29,8 +31,7 @@ void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* l
 	user->SetOnline(true);
 	CloudChatDatabase::GetInstance()->UpdateUser(user); // 更新令牌
 	// 将用户加入在线列表
-	g_online_users_hdl[user_id] = hdl;
-	g_online_users_id[hdl] = user_id;
+	g_online_users[hdl] = user_id;
 	// 回复消息
 	SendMsgToClient(cloudchat_srv, hdl, new LoginSuccessMsg(user_id, username, email, avatar,
 															token));
@@ -62,8 +63,7 @@ void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	user->SetToken(token);
 	user->SetOnline(true);
 	CloudChatDatabase::GetInstance()->UpdateUser(user); // 更新令牌
-	g_online_users_hdl[user_id] = hdl;
-	g_online_users_id[hdl] = user_id;
+	g_online_users[hdl] = user_id;
 	SendMsgToClient(cloudchat_srv, hdl, new LoginSuccessMsg(user_id, username, email, avatar,
 															token));
 }
@@ -87,8 +87,7 @@ void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, Register
 							 true);
 	CloudChatDatabase::GetInstance()->AddUser(*user);
 	user = CloudChatDatabase::GetInstance()->GetUserByName(username);
-	g_online_users_hdl[user->get_id()] = hdl;
-	g_online_users_id[hdl] = user->get_id();
+	g_online_users[hdl] = user->get_id();
 	SendMsgToClient(cloudchat_srv, hdl, new RegisterSuccessMsg(user->get_id(), username,
 															   email, user->get_avatar(),
 															   user->get_token()));
@@ -99,8 +98,7 @@ void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LogoutMsg*
 	std::cout << "用户下线：" << std::endl;
 	std::cout << "userId: " << user_id << std::endl;
 
-	g_online_users_hdl.erase(user_id);
-	g_online_users_id.erase(hdl);
+	if (g_online_users.find(hdl) != g_online_users.end()) g_online_users.erase(hdl);
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserById(user_id);
 	user->SetOnline(false);
 	CloudChatDatabase::GetInstance()->UpdateUser(user);
@@ -112,8 +110,14 @@ void UpdateProfile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 }
 
 void LoadContacts(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				  LoadContactsMsg* load_contacts_msg) {
-	// TODO: 加载联系人列表业务
+				  LoadContactsMsg* load_contacts_msg) { // 加载联系人列表业务
+	int user_id = load_contacts_msg->get_user_id();
+
+	std::cout << "加载联系人列表：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
+
+	SendMsgToClient(cloudchat_srv, hdl, new ContactsLoadedMsg(CloudChatDatabase::GetInstance()->
+															  get_contacts(user_id)));
 }
 
 void AddContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
@@ -159,8 +163,10 @@ void ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 void SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,				   
 					   SearchForUserByIdMsg* search_for_user_by_id_msg) { // 根据 id 搜索用户
 	int id = search_for_user_by_id_msg->get_user_id();
+	
 	std::cout << "搜索指定用户：" << std::endl;
 	std::cout << "userId: " << id << std::endl;
+	
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserById(id);
 	std::vector<CloudChatUser> users;
 	if (user) users.push_back(*user); // 找到了指定用户
@@ -179,20 +185,149 @@ void SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 
 void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					  AddFriendRequestClientMsg* add_friend_request_client_msg) {
+	FriendRequest friend_request = add_friend_request_client_msg->get_friend_request();
 	
+	std::cout << "添加好友请求：" << std::endl;
+	std::cout << "requesterId: " << friend_request.get_requester_id() << std::endl;
+	std::cout << "requesterUsername: " << friend_request.get_requester_username() << std::endl;
+	std::cout << "targetId: " << std::endl;
+	std::cout << "targetUsername: " << friend_request.get_target_username() << std::endl;
+
+	// 检查是否已经是好友
+	if (CloudChatDatabase::GetInstance()->is_friend(friend_request.get_requester_id(),
+													friend_request.get_target_id())) {
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedFailedMsg("你和 TA 已经是好友了"));
+		return;
+	}
+
+	FriendRequest* res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
+		friend_request.get_requester_id(), friend_request.get_target_id()
+		);
+	if (res != nullptr) {		// 已经发送过请求
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedFailedMsg("已向 TA 发送过好友请求"));
+		return;
+	}
+	res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
+		friend_request.get_target_id(),
+		friend_request.get_requester_id()
+		);
+	if (res != nullptr) {		// 已经收到过请求
+		SendMsgToClient(cloudchat_srv, hdl,
+						new FriendRequestAddedFailedMsg("已收到过 TA 发来的好友请求"));
+		return;
+	}
+	
+	if (CloudChatDatabase::GetInstance()->AddFriendRequest(friend_request)) {
+		res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
+			friend_request.get_requester_id(), friend_request.get_target_id());
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedMsg(*res));
+		CloudChatUser* target_user = CloudChatDatabase::GetInstance()->GetUserById(
+			friend_request.get_target_id());
+		if (target_user->is_online()) {
+			for (auto& p : g_online_users) {
+				if (p.second == target_user->get_id()) {
+					SendMsgToClient(cloudchat_srv, p.first,
+									new AddFriendRequestServerMsg(friend_request));
+					break;
+				}
+			}
+		}
+	} else SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedFailedMsg("数据库操作失败"));
 }
 
 void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 RefuseFriendRequestClientMsg* refuse_friend_request_client_msg) {
-	
+	int id = refuse_friend_request_client_msg->get_id();
+
+	std::cout << "拒绝好友请求：" << std::endl;
+	std::cout << "id: " << id << std::endl;
+
+	FriendRequest* friend_request = CloudChatDatabase::GetInstance()->GetFriendRequestById(id);
+	if (friend_request == nullptr) {
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedFailedMsg("该条好友请求不存在"));
+		return;
+	}
+
+	friend_request->SetStatus(FRIEND_REQUEST_STATUS_REFUSED);
+	if (!CloudChatDatabase::GetInstance()->UpdateFriendRequest(friend_request)) {
+		// friend_requests 数据表更新失败
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedFailedMsg("好友请求列表更新失败"));
+		return;
+	}
+	// 回复消息
+	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedMsg(id));
+	CloudChatUser* requester = CloudChatDatabase::GetInstance()->GetUserById(
+		friend_request->get_requester_id());
+	if (requester->is_online()) {
+		for (auto& p : g_online_users) {
+			if (p.second == requester->get_id()) {
+				SendMsgToClient(cloudchat_srv, p.first, new RefuseFriendRequestServerMsg(id));
+				break;
+			}
+		}
+	}
 }
 
 void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 AcceptFriendRequestClientMsg* accept_friend_request_client_msg) {
-	
+	int id = accept_friend_request_client_msg->get_id();
+
+	std::cout << "接受好友请求：" << std::endl;
+	std::cout << "id: " << id << std::endl;
+
+	FriendRequest* friend_request = CloudChatDatabase::GetInstance()->GetFriendRequestById(id);
+	if (friend_request == nullptr) {
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedFailedMsg("该条好友请求不存在"));
+		return;
+	}
+
+	friend_request->SetStatus(FRIEND_REQUEST_STATUS_ACCEPTED);
+	if (!CloudChatDatabase::GetInstance()->UpdateFriendRequest(friend_request)) {
+		// friend_requests 数据表更新失败
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAcceptedFailedMsg("好友请求列表更新失败"));
+		return;
+	}
+	if (!CloudChatDatabase::GetInstance()->AddFriend(friend_request->get_requester_id(),
+													 friend_request->get_target_id())) {
+		// friends 数据表更新失败
+		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAcceptedFailedMsg("联系人列表更新失败"));
+		friend_request->SetStatus(FRIEND_REQUEST_STATUS_PENDING);
+		CloudChatDatabase::GetInstance()->UpdateFriendRequest(friend_request);
+		return;
+	}
+	// 回复消息
+	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAcceptedMsg(id));
+	CloudChatUser* requester = CloudChatDatabase::GetInstance()->GetUserById(
+		friend_request->get_requester_id());
+	CloudChatUser* target = CloudChatDatabase::GetInstance()->GetUserById(
+		friend_request->get_target_id());
+	SendMsgToClient(cloudchat_srv, hdl, new ContactAddedMsg(requester->get_id(),
+															requester->get_username(),
+															requester->get_avatar(),
+															requester->is_online()));
+	if (requester->is_online()) {
+		for (auto& p : g_online_users) {
+			if (p.second == requester->get_id()) {
+				SendMsgToClient(cloudchat_srv, p.first, new AcceptFriendRequestServerMsg(id));
+				SendMsgToClient(cloudchat_srv, p.first, new ContactAddedMsg(target->get_id(),
+																			target->get_username(),
+																			target->get_avatar(),
+																			target->is_online()));
+				break;
+			}
+		}
+	}
 }
 
 void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					   LoadFriendRequestMsg* load_friend_request_msg) {
-	
+	int user_id = load_friend_request_msg->get_user_id();
+
+	std::cout << "加载好友请求列表：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
+
+	std::vector<FriendRequest> friend_requests =
+		CloudChatDatabase::GetInstance()->GetFriendRequestsByUserId(user_id);
+
+	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestLoadedMsg(friend_requests));
 }
