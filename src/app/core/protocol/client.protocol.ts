@@ -22,6 +22,7 @@ export enum ClientMessageType {
   SEND_IMAGE = 'SEND_IMAGE',
   MARK_READ = 'MARK_READ',
   CLEAR_MESSAGES = 'CLEAR_MESSAGES',
+  UPLOAD_FILE = 'UPLOAD_FILE'
 }
 
 type ClientPayload =
@@ -42,7 +43,8 @@ type ClientPayload =
   | SendFilePayload
   | SendImagePayload
   | MarkReadPayload
-  | ClearMessagesPayload;
+  | ClearMessagesPayload
+  | UploadFilePayload;
 
 export interface LoginPayload {
   username: string;
@@ -143,4 +145,9 @@ export interface MarkReadPayload {
 export interface ClearMessagesPayload {
   requesterUserId: number;
   targetUserId: number;
+}
+
+export interface UploadFilePayload {
+  filePath: string;
+  dataStream: String;
 }

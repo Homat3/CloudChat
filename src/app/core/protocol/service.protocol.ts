@@ -28,7 +28,9 @@ export enum ServiceMessageType {
   MESSAGES_LOADED = 'MESSAGES_LOADED',
   MESSAGE_RECEIVED_SELF = 'MESSAGE_RECEIVED_SELF',
   MESSAGE_RECEIVED_OTHER = 'MESSAGE_RECEIVED_OTHER',
-  MESSAGES_CLEARED = 'MESSAGES_CLEARED'
+  MESSAGES_CLEARED = 'MESSAGES_CLEARED',
+  FILE_UPLOADED = 'FILE_UPLOADED',
+  FILE_UPLOADED_FAILED = 'FILE_UPLOADED_FAILED'
 }
 
 export type ServicePayload =
@@ -56,7 +58,9 @@ export type ServicePayload =
   MessagesLoadedPayload |
   SelfMessageReceivedPayload |
   ToSelfMessageReceivedPayload |
-  MessagesClearedPayload;
+  MessagesClearedPayload|
+  FileUploadedPayload|
+  FileUploadedFailedPayload;
 
 export interface LoginSuccessPayload {
   userId: number;
@@ -219,4 +223,13 @@ export interface MessagesLoadedPayload {
 export interface MessagesClearedPayload {
   userId: number;
   targetUserId: number;
+}
+
+export interface FileUploadedPayload {
+  filePath: string;
+}
+
+export interface FileUploadedFailedPayload {
+  filePath: string;
+  error: string;
 }

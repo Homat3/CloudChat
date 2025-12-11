@@ -19,7 +19,7 @@ import {
   SendFilePayload,
   SendImagePayload,
   SendMessagePayload,
-  UpdateProfilePayload
+  UpdateProfilePayload, UploadFilePayload
 } from '../protocol/client.protocol';
 import {filter, take} from 'rxjs/operators';
 import {LoginSuccessPayload} from '../protocol/service.protocol';
@@ -209,6 +209,16 @@ export class RequestService {
         this.socketService.sendMessage({ type: ClientMessageType.CLEAR_MESSAGES, payload });
         if (onSuccess) {
             this.responseService.messagesCleared$.pipe(take(1)).subscribe(() => onSuccess());
+        }
+    }
+
+    uploadFile(payload: UploadFilePayload, onSuccess?: (filePath: string) => void, onError?: (err: string) => void) {
+        this.socketService.sendMessage({ type: ClientMessageType.UPLOAD_FILE, payload });
+        if (onSuccess) {
+            this.responseService.fileUploaded$.pipe(take(1)).subscribe((result) => onSuccess(result.filePath));
+        }
+        if (onError) {
+            this.responseService.fileUploadedFailed$.pipe(take(1)).subscribe(err => onError(err.error));
         }
     }
 }

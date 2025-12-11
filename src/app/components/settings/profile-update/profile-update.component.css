@@ -1,0 +1,321 @@
+.profile-update-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    background-color: #f5f7fb;
+    font-family: 'Inter', sans-serif;
+    overflow-y: auto; /* 添加垂直滚动条 */
+}
+
+.profile-update-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    margin-right: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.back-btn:hover {
+    color: #333;
+    background-color: #edf2f7;
+}
+
+.back-btn i {
+    margin-right: 8px;
+}
+
+.profile-update-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.profile-update-content {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.profile-update-section {
+    margin-bottom: 30px;
+}
+
+.profile-update-section h2 {
+    margin: 0 0 20px;
+    font-size: 1.1rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.profile-update-section h3 {
+    margin: 0 0 15px;
+    font-size: 1rem;
+    color: #555;
+    text-align: center;
+}
+
+.custom-avatar-upload {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.current-avatar {
+    margin-bottom: 30px;
+}
+
+.avatar-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.preview-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4a6cf7;
+    box-shadow: 0 4px 6px rgba(74, 108, 247, 0.2);
+    transition: all 0.3s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.05);
+}
+
+.preload-avatars {
+    margin-top: 20px;
+}
+
+.avatars-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.avatars-title h3 {
+    margin: 0 15px;
+    font-size: 1rem;
+}
+
+.avatars-title::before,
+.avatars-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+}
+
+.avatars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.avatar-option {
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px;
+    transition: all 0.3s ease;
+    position: relative;
+    background: #f8fafc;
+}
+
+.avatar-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px rgba(74, 108, 247, 0.2);
+    background: white;
+    z-index: 2;
+}
+
+.avatar-option.selected {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px #4a6cf7, 0 4px 6px rgba(74, 108, 247, 0.3);
+    background: white;
+    z-index: 3;
+}
+
+.avatar-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #4ade80;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-thumbnail {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+}
+
+.form-control:hover:not(:focus) {
+    border-color: #cbd5e0;
+}
+
+.error-message {
+    color: #e53e3e;
+    background-color: #fef2f2;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border: 1px solid #fed7d7;
+    font-size: 0.9rem;
+}
+
+.error-message::before {
+    content: '⚠';
+    margin-right: 8px;
+}
+
+.success-message {
+    color: #38a169;
+    background-color: #f0fff4;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border: 1px solid #c6f6d5;
+    font-size: 0.9rem;
+}
+
+.success-message::before {
+    content: '✓';
+    margin-right: 8px;
+}
+
+.profile-update-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #edf2f7;
+}
+
+.save-btn {
+    padding: 12px 40px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    box-shadow: 0 2px 4px rgba(74, 108, 247, 0.3);
+}
+
+.save-btn:hover:not(:disabled) {
+    background-color: #3a56c0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(74, 108, 247, 0.4);
+}
+
+.save-btn:disabled {
+    background-color: #a0cfff;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .profile-update-container {
+        padding: 15px;
+    }
+    
+    .profile-update-content {
+        padding: 15px;
+    }
+    
+    .avatars-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+    
+    .avatar-thumbnail {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .preview-image {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-update-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .back-btn {
+        margin-bottom: 15px;
+    }
+    
+    .avatars-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .avatar-option.selected {
+        transform: scale(1.05);
+    }
+}

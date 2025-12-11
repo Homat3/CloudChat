@@ -1,7 +1,7 @@
-@import '../../shared/styles/variables.css';
-@import '../../shared/styles/components.css';
-@import '../../shared/styles/buttons.css';
-@import '../../shared/styles/inputs.css';
+@import '../../../shared/styles/variables.css';
+@import '../../../shared/styles/components.css';
+@import '../../../shared/styles/buttons.css';
+@import '../../../shared/styles/inputs.css';
 
 .add-contact-overlay {
   position: fixed;

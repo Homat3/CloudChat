@@ -1,0 +1,98 @@
+<div class="profile-update-container">
+    <div class="profile-update-header">
+        <a (click)="onBack()" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+        <h1>修改个人信息</h1>
+    </div>
+
+    <div class="profile-update-content">
+        <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+            <div class="profile-update-section">
+                <h2>头像</h2>
+                <div class="custom-avatar-upload">
+                  @if (avatarToUploadUrl){
+                    <div class="w-48 h-48 rounded-full bg-gradient-to-br items-center justify-center text-white text-3xl font-bold">
+                      <img src="{{avatarToUploadUrl}}" alt="{{ username.charAt(0) || '+' }}" style="border-radius: 50%; width: 20%; height: 20%">
+                    </div>
+                  } @else if (avatar){
+                    <div class="w-48 h-48 rounded-full bg-gradient-to-br items-center justify-center text-white text-3xl font-bold">
+                      <img src="{{avatar}}" alt="{{ username.charAt(0) || '?' }}" style="border-radius: 50%; width: 20%; height: 20%">
+                    </div>
+                  } @else {
+                    <label>{{ username.charAt(0) || '+' }}</label>
+                  }
+                  <div class="upload-controls">
+                      <label for="avatar-upload" class="upload-button">
+                          选择图片
+                      </label>
+                      <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          (change)="onFileSelected($event)"
+                          style="display: none;">
+
+                      <div class="upload-description">
+                          上传自定义图片作为您的新头像
+                      </div>
+
+                    @if (uploadProgress){
+                      <div class="upload-progress">
+                        <div class="progress-bar">
+                          <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+                        </div>
+                        <div class="progress-text">{{ uploadProgress }}%</div>
+                      </div>
+                    }
+                  </div>
+                </div>
+            </div>
+
+            <div class="profile-update-section">
+                <h2>基本信息</h2>
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        [(ngModel)]="username"
+                        class="form-control"
+                        placeholder="请输入用户名"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        [(ngModel)]="email"
+                        class="form-control"
+                        placeholder="请输入邮箱"
+                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                        required>
+                </div>
+
+              @if (errorMessage){
+                <div class="error-message">
+                    {{ errorMessage }}
+                </div>
+              }
+              @if (successMessage){
+                <div class="success-message">
+                    {{ successMessage }}
+                </div>
+              }
+            </div>
+
+            <div class="profile-update-actions">
+                <button type="submit" class="save-btn" [disabled]="isLoading">
+                  <span>{{isLoading ? "保存中..." : "保存"}}</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,10 +1,10 @@
 import {AfterContentInit, Component, EventEmitter, OnDestroy, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {RequestService} from '../../core/services/request.service';
-import {FriendRequest, FriendRequestInfo, User} from '../../core/models';
-import {AuthService} from '../../core/services/auth.service';
-import {FriendRequestService} from '../../core/services/friend_request.service';
+import {RequestService} from '../../../core/services/request.service';
+import {FriendRequest, FriendRequestInfo, User} from '../../../core/models';
+import {AuthService} from '../../../core/services/auth.service';
+import {FriendRequestService} from '../../../core/services/friend_request.service';
 import {Subscription} from 'rxjs';
 
 @Component({
@@ -23,6 +23,7 @@ export class AddContactComponent implements AfterContentInit, OnDestroy {
   searchResult: Array<{ contactId: number; username: string; avatar: string; }> | null = null;
   searchError: string = '';
   selectedContact: { contactId: number; username: string; avatar: string; } | null = null;
+  friendRequestError: string = '';
 
   private subscriptions: Subscription[] = [];
 
@@ -113,10 +114,9 @@ export class AddContactComponent implements AfterContentInit, OnDestroy {
     const currentUser = this.authService.currentUserValue;
     if (currentUser) {
       this.requestService.addFriendRequest(this.createFriendRequest(currentUser, this.selectedContact!), (payload) => {
-        window.alert('已发送好友请求给' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + ')');
         console.log('请求添加联系人: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + ')');
       }, (error) => {
-        window.alert('发送好友请求失败: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + '):' + error);
+        this.friendRequestError = '发送好友请求失败: ' + this.selectedContact?.username + '(' + this.selectedContact!.contactId + '):' + error;
         console.error('添加联系人失败:', error);
       });
     }
