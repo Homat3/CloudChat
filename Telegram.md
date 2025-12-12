@@ -398,7 +398,7 @@
 {
   "type": "SEND_MESSAGE",
   "payload": {
-    "messageId": "int",
+    "tempId": "string",
     "senderId": "int",
     "receiverId": "int",
     "content": "string"
@@ -410,13 +410,11 @@
 {
   "type": "SEND_FILE",
   "payload": {
-    "messageId": "int",
+    "tempId": "string",
     "senderId": "int",
     "receiverId": "int",
     "fileName": "string",
-    "fileContent": [
-      "","","","","..."
-    ]
+    "fileContent": "string"
   }
 }
 ```
@@ -425,13 +423,11 @@
 {
   "type": "SEND_IMAGE",
   "payload": {
-    "messageId": "int",
+    "tempId": "string",
     "senderId": "int",
     "receiverId": "int",
     "imageName": "string",
-    "imageContent": [
-      "","","","","..."
-    ]
+    "imageContent": "string"
   }
 }
 ```
@@ -450,17 +446,8 @@
 {
   "type": "MARK_READ",
   "payload": {
-    "messageId": "int"
-  }
-}
-```
-### 请求清除消息记录
-```json
-{
-  "type": "CLEAR_MESSAGES",
-  "payload": {
-    "requesterUserId": "int",
-    "targetUserId": "int"
+    "userId": "int",
+    "targetId": "int"
   }
 }
 ```
@@ -470,7 +457,18 @@
 {
   "type": "MESSAGE_RECEIVED_SELF",
   "payload": {
-    "messageId": "int"
+    "tempId": "string",
+    "id": "int"
+  }
+}
+```
+### 接收当前客户端消息失败
+```json
+{
+  "type": "MESSAGE_SEND_FAILED",
+  "payload": {
+    "tempId": "int",
+    "error": "string"
   }
 }
 ```
@@ -553,16 +551,6 @@
       "type": "string = image"
     }
   ]
-}
-```
-### 消息记录已清除
-```json
-{
-  "type": "MESSAGE_RECEIVED_OTHER",
-  "payload": {
-    "userId": "int",
-    "targetUserId": "int"
-  }
 }
 ```
 # 文件操作模块
