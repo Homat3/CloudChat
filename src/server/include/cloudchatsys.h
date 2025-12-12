@@ -22,6 +22,8 @@
 #include <websocketpp/common/connection_hdl.hpp>
 #include <websocketpp/error.hpp>
 #include <websocketpp/logger/levels.hpp>
+#include <fstream>
+#include <filesystem>
 
 #define SERVER_PORT 14514 // 服务器通信端口号
 // 114.116.245.123
@@ -31,5 +33,7 @@
 #define BUFF_LEN    512			// 字符串缓冲区大小
 
 typedef websocketpp::server<websocketpp::config::asio> server_t; // 服务器对象类型
+
+std::string base64Decode(const std::string& encoded); // Base64解码函数
 
 #endif // CLOUDCHATSYS_H

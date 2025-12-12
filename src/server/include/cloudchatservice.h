@@ -45,5 +45,7 @@ void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 						 AcceptFriendRequestClientMsg* accept_friend_request_client_msg);
 void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					   LoadFriendRequestMsg* load_friend_request_msg);
+void UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+				UploadFileMsg* upload_file_msg);
 
 #endif // CLOUDCHAT_SERVICE

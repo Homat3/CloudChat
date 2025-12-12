@@ -476,6 +476,8 @@ ClientMsg* parse_protocal_msg(std::string JSON) {
 		return AcceptFriendRequestClientMsg::parse_from_JSON(JSON, payload_pos);
 	} else if (type == LOAD_FRIEND_REQUEST) {
 		return LoadFriendRequestMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == UPLOAD_FILE) {
+		return UploadFileMsg::parse_from_JSON(JSON, payload_pos);
 	}
 	return new ClientMsg(ILLEGAL_MSG);
 }
@@ -1140,4 +1142,76 @@ int AcceptFriendRequestClientMsg::get_id() {
 
 int LoadContactsMsg::get_user_id() {
 	return user_id_;
+}
+
+UploadFileMsg::UploadFileMsg(std::string file_path, std::string data_stream) : ClientMsg(
+	UPLOAD_FILE) {
+	file_path_ = file_path;
+	data_stream_ = data_stream;
+}
+
+std::string UploadFileMsg::get_file_path() {
+	return file_path_;
+}
+
+std::string UploadFileMsg::get_data_stream() {
+	return data_stream_;
+}
+
+UploadFileMsg* UploadFileMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int end = JSON.length() - 1;
+	std::string file_path = parse_str_from_json(JSON, find_field_pos(JSON, "\"filePath\""), end);
+	std::string data_stream = parse_str_from_json(JSON, find_field_pos(JSON, "\"dataStream\""),
+												  end);
+	return new UploadFileMsg(file_path, data_stream);
+}
+
+FileUploadedMsg::FileUploadedMsg(std::string file_path) : ServerMsg(FILE_UPLOADED) {
+	file_path_ = file_path;
+}
+
+std::string FileUploadedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"filePath\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(file_path_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+FileUploadedFailedMsg::FileUploadedFailedMsg(std::string file_path, std::string error)
+	: ServerMsg(FILE_UPLOADED_FAILED){
+	file_path_ = file_path;
+	error_     = error;
+}
+
+std::string FileUploadedFailedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"filePath\":\"%s\",\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(),
+			to_JSON_string(file_path_).c_str(),
+			to_JSON_string(error_).c_str());
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+int UpdateProfileMsg::get_user_id() {
+	return user_id_;
+}
+
+std::string UpdateProfileMsg::get_username() {
+	return username_;
+}
+
+std::string UpdateProfileMsg::get_password() {
+	return password_;
+}
+
+std::string UpdateProfileMsg::get_email() {
+	return email_;
+}
+
+std::string UpdateProfileMsg::get_avatar() {
+	return avatar_;
 }

@@ -40,6 +40,7 @@
 #define MARK_READ               "MARK_READ"				  // 标记为已读
 #define CLEAR_MESSAGES          "CLEAR_MESSAGES"		  // 清空聊天记录
 #define LOAD_FRIEND_REQUEST     "LOAD_FRIEND_REQUEST"	  // 加载好友请求列表
+#define UPLOAD_FILE             "UPLOAD_FILE"			  // 上传文件
 // 服务端消息
 #define LOGIN_SUCCESS           "LOGIN_SUCCESS"			  // 登录成功
 #define LOGIN_FAILURE           "LOGIN_FAILURE"			  // 登录失败
@@ -67,6 +68,8 @@
 #define FRIEND_REQUEST_REFUSED_FAILED "FRIEND_REQUEST_REFUSED_FAILED" // 拒绝好友请求失败
 #define FRIEND_REQUEST_ACCEPTED       "FRIEND_REQUEST_ACCEPTED"		  // 已通过好友请求
 #define FRIEND_REQUEST_ACCEPTED_FAILED "FRIEND_REQUEST_ACCEPTED_FAILED" // 通过好友请求失败
+#define FILE_UPLOADED                  "FILE_UPLOADED"					// 文件上传成功
+#define FILE_UPLOADED_FAILED           "FILE_UPLOADED_FAILED"			// 文件上传失败
 
 class CloudChatMessage { // 聊天消息类
 private:
@@ -179,6 +182,11 @@ public:
 	UpdateProfileMsg(int user_id, std::string username, std::string password, std::string email,
 						 std::string avatar);
 	static UpdateProfileMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
+	std::string get_username();
+	std::string get_password();
+	std::string get_email();
+	std::string get_avatar();
 };
 
 class LoadContactsMsg : public ClientMsg { // 加载联系人列表消息
@@ -607,6 +615,37 @@ private:
 
 public:
 	FriendRequestLoadedFailedMsg(std::string error);
+	std::string to_JSON() override;
+};
+
+class UploadFileMsg : public ClientMsg { // 上传文件
+private:
+	std::string file_path_;		// 文件完整路径
+	std::string data_stream_;	// 文件数据字节流
+
+public:
+	UploadFileMsg(std::string file_path, std::string data_stream);
+	std::string get_file_path();
+	std::string get_data_stream();
+	static UploadFileMsg* parse_from_JSON(std::string JSON, int payload_pos);
+};
+
+class FileUploadedMsg : public ServerMsg { // 文件上传成功
+private:
+	std::string file_path_;		// 文件完整路径
+
+public:
+	FileUploadedMsg(std::string file_path);
+	std::string to_JSON() override;
+};
+
+class FileUploadedFailedMsg : public ServerMsg { // 文件上传失败
+private:
+	std::string file_path_;		// 文件完整路径
+	std::string error_;			// 错误信息
+
+public:
+	FileUploadedFailedMsg(std::string file_path, std::string error);
 	std::string to_JSON() override;
 };
 

@@ -2,6 +2,7 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatuser.h"
+#include <websocketpp/base64/base64.hpp>
 
 std::map<websocketpp::connection_hdl, int,
 	std::owner_less<websocketpp::connection_hdl>> g_online_users;
@@ -105,8 +106,30 @@ void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LogoutMsg*
 }
 
 void UpdateProfile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				   UpdateProfileMsg* update_profile_msg) {
-	// TODO: 更新个人信息业务
+				   UpdateProfileMsg* update_profile_msg) { // 更新个人信息业务
+	int user_id = update_profile_msg->get_user_id();
+	std::string username = update_profile_msg->get_username();
+	std::string password = update_profile_msg->get_password();
+	std::string email    = update_profile_msg->get_email();
+	std::string avatar   = update_profile_msg->get_avatar();
+
+	std::cout << "更新个人信息：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
+	std::cout << "username: " << username << std::endl;
+	std::cout << "email: " << email << std::endl;
+	std::cout << "avatar: " << avatar << std::endl;
+
+	CloudChatUser* old_profile = CloudChatDatabase::GetInstance()->GetUserById(user_id);
+	password = old_profile->get_password();
+	CloudChatUser* new_profile = new CloudChatUser(user_id, username, password, avatar,
+												   generate_token(), email, true);
+	if (!CloudChatDatabase::GetInstance()->UpdateUser(new_profile)) {
+		// 更新 users 数据表失败
+		SendMsgToClient(cloudchat_srv, hdl, new ProfileUpdatedFailedMsg("更新 users 数据表失败"));
+		return;
+	}
+	SendMsgToClient(cloudchat_srv, hdl, new ProfileUpdatedSuccessMsg(user_id, username, password,
+																	 email, avatar));
 }
 
 void LoadContacts(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
@@ -330,4 +353,30 @@ void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 		CloudChatDatabase::GetInstance()->GetFriendRequestsByUserId(user_id);
 
 	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestLoadedMsg(friend_requests));
+}
+
+void UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+				UploadFileMsg* upload_file_msg) {
+	std::string file_path = upload_file_msg->get_file_path();
+	std::string data_stream = websocketpp::base64_decode(upload_file_msg->get_data_stream());
+
+	std::cout << "上传文件：" << std::endl;
+	std::cout << "filePath: " << file_path << std::endl;
+
+	std::ofstream fout;
+	fout.open(file_path, std::ios::out | std::ios::binary);
+	if (!fout.is_open()) {
+		SendMsgToClient(cloudchat_srv, hdl, new FileUploadedFailedMsg(file_path,
+																	  "文件保存路径不存在"));
+		return;
+	}
+
+	try {
+		fout.write(data_stream.c_str(), data_stream.size());
+		SendMsgToClient(cloudchat_srv, hdl, new FileUploadedMsg(file_path));
+	} catch (...) {
+		SendMsgToClient(cloudchat_srv, hdl, new FileUploadedFailedMsg(file_path, "未知错误"));
+	}
+
+	fout.close();
 }
