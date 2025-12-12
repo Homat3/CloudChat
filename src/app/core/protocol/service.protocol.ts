@@ -27,8 +27,8 @@ export enum ServiceMessageType {
   ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
   MESSAGES_LOADED = 'MESSAGES_LOADED',
   MESSAGE_RECEIVED_SELF = 'MESSAGE_RECEIVED_SELF',
+  MESSAGE_SEND_FAILED = 'MESSAGE_SEND_FAILED',
   MESSAGE_RECEIVED_OTHER = 'MESSAGE_RECEIVED_OTHER',
-  MESSAGES_CLEARED = 'MESSAGES_CLEARED',
   FILE_UPLOADED = 'FILE_UPLOADED',
   FILE_UPLOADED_FAILED = 'FILE_UPLOADED_FAILED'
 }
@@ -56,9 +56,9 @@ export type ServicePayload =
   AcceptFriendRequestPayload |
   SearchForUserResultPayload |
   MessagesLoadedPayload |
-  SelfMessageReceivedPayload |
-  ToSelfMessageReceivedPayload |
-  MessagesClearedPayload|
+  MessageReceivedSelfPayload |
+  MessageSendFailedPayload |
+  MessageReceivedOtherPayload |
   FileUploadedPayload|
   FileUploadedFailedPayload;
 
@@ -194,11 +194,17 @@ export interface AcceptFriendRequestPayload {
   id: number;
 }
 
-export interface SelfMessageReceivedPayload {
-  messageId: number;
+export interface MessageReceivedSelfPayload {
+  tempId: string;
+  id: number
 }
 
-export interface ToSelfMessageReceivedPayload {
+export interface MessageSendFailedPayload {
+  tempId: number;
+  error: string;
+}
+
+export interface MessageReceivedOtherPayload {
   id: number;
   senderId: number;
   receiverId: number;
@@ -218,11 +224,6 @@ export interface MessagesLoadedPayload {
     status: 'sending' | 'sent' | 'read';
     type: 'text' | 'image' | 'file';
   }>;
-}
-
-export interface MessagesClearedPayload {
-  userId: number;
-  targetUserId: number;
 }
 
 export interface FileUploadedPayload {
