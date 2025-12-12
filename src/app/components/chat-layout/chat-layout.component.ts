@@ -119,6 +119,7 @@ export class ChatLayoutComponent implements AfterContentInit, OnDestroy{
     if (this.isMobile) {
       this.activeView = ActiveView.Chat;
     }
+    this.contactService.setCurrentContact(contact);
   }
 
   onSettingChanged(setting: string) {

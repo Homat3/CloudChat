@@ -11,6 +11,7 @@ export class ContactService {
 
   private contactListSubject: BehaviorSubject<Contact[]> = new BehaviorSubject<Contact[]>([]);
   public contactList$ = this.contactListSubject.asObservable();
+  private currentContact: Contact | null = null;
 
   constructor(private responseService: ResponseService) {
     // 监听联系人相关事件并更新联系人列表
@@ -27,5 +28,13 @@ export class ContactService {
 
   public get contactListValue(): Contact[] {
     return this.contactListSubject.value;
+  }
+
+  public setCurrentContact(contact: Contact | null) {
+    this.currentContact = contact;
+  }
+
+  public getCurrentContact(): Contact | null {
+    return this.currentContact;
   }
 }
