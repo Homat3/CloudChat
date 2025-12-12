@@ -196,11 +196,12 @@ export interface AcceptFriendRequestPayload {
 
 export interface MessageReceivedSelfPayload {
   tempId: string;
-  id: number
+  id: number;
+  timestamp: string;
 }
 
 export interface MessageSendFailedPayload {
-  tempId: number;
+  tempId: string;
   error: string;
 }
 

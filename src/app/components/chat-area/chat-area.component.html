@@ -51,13 +51,11 @@
     <div class="input-container">
       <div class="input-actions">
         <button class="icon-button" (click)="appendEmoji()" [disabled]="!selectedContact">😊</button>
-        <button class="icon-button" (click)="sendFile()" [disabled]="!selectedContact">📎</button>
-        <button class="icon-button" (click)="sendImage()" [disabled]="!selectedContact">🎤</button>
       </div>
       <textarea class="message-input" placeholder="{{selectedContact ? '输入消息...' : '请先选择一个联系人'}}"
-        [(ngModel)]="newMessage" (keydown.enter)="sendMessage($event)" [disabled]="!selectedContact"></textarea>
+        [(ngModel)]="newMessage" (keydown.enter)="sendMessage()" [disabled]="!selectedContact"></textarea>
     </div>
-    <button class="send-button" (click)="sendMessage($event)" [disabled]="!selectedContact || !newMessage.trim()">发送</button>
+    <button class="send-button" (click)="sendMessage()" [disabled]="!selectedContact || !newMessage.trim()">发送</button>
   </div>
   }
 </div>

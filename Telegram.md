@@ -458,7 +458,8 @@
   "type": "MESSAGE_RECEIVED_SELF",
   "payload": {
     "tempId": "string",
-    "id": "int"
+    "id": "int",
+    "timestamp": "string"
   }
 }
 ```

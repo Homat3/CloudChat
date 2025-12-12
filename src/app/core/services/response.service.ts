@@ -16,7 +16,7 @@ import {
   FriendRequestRefusedPayload,
   LoginFailurePayload,
   LoginSuccessPayload,
-  MessagesClearedPayload,
+  MessageSendFailedPayload,
   MessagesLoadedPayload,
   ProfileUpdatedFailedPayload,
   ProfileUpdatedSuccessPayload,
@@ -24,9 +24,9 @@ import {
   RegisterFailurePayload,
   RegisterSuccessPayload,
   SearchForUserResultPayload,
-  SelfMessageReceivedPayload,
+  MessageReceivedSelfPayload,
   ServiceMessageType,
-  ToSelfMessageReceivedPayload
+  MessageReceivedOtherPayload
 } from '../protocol/service.protocol';
 
 @Injectable({
@@ -57,9 +57,9 @@ export class ResponseService {
     public refuseFriendRequest$ = new Subject<RefuseFriendRequestPayload>();
     public acceptFriendRequest$ = new Subject<AcceptFriendRequestPayload>();
     public messagesLoaded$ = new Subject<MessagesLoadedPayload>();
-    public messageReceivedSelf$ = new Subject<SelfMessageReceivedPayload>();
-    public messageReceivedOther$ = new Subject<ToSelfMessageReceivedPayload>();
-    public messagesCleared$ = new Subject<MessagesClearedPayload>();
+    public messageReceivedSelf$ = new Subject<MessageReceivedSelfPayload>();
+    public messageSendFailed$ = new Subject<MessageSendFailedPayload>();
+    public messageReceivedOther$ = new Subject<MessageReceivedOtherPayload>();
     public fileUploaded$ = new Subject<FileUploadedPayload>();
     public fileUploadedFailed$ = new Subject<FileUploadedFailedPayload>();
 
@@ -144,11 +144,11 @@ export class ResponseService {
             case ServiceMessageType.MESSAGE_RECEIVED_SELF:
                 this.messageReceivedSelf$.next(message.payload);
                 break;
+            case ServiceMessageType.MESSAGE_SEND_FAILED:
+                this.messageSendFailed$.next(message.payload);
+                break;
             case ServiceMessageType.MESSAGE_RECEIVED_OTHER:
                 this.messageReceivedOther$.next(message.payload);
-                break;
-            case ServiceMessageType.MESSAGES_CLEARED:
-                this.messagesCleared$.next(message.payload);
                 break;
             case ServiceMessageType.FILE_UPLOADED:
                 this.fileUploaded$.next(message.payload);

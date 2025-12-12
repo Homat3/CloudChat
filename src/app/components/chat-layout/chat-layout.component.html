@@ -22,17 +22,17 @@
   @if (isMobile){
     @if (ActiveView.Contacts === activeView){
       <div class="contacts-panel">
-        <app-contact-list (contactSelected)="onContactSelected($event)"></app-contact-list>
+        <app-contact-list  (contactSelected)="onContactSelected($event)" [currentUser]="currentUser" [contactList]="contactList" [messagesMap]="messageMap"></app-contact-list>
       </div>
     }
     @if (selectedContact) {
       @if (ActiveView.Settings === activeView){
         <div class="sidebar-panel">
-          <app-sidebar style="height: 100%" [selectedContact]="selectedContact"  (settingChanged)="onSettingChanged($event)"></app-sidebar>
+          <app-sidebar style="height: 100%" [selectedContact]="selectedContact" (settingChanged)="onSettingChanged($event)"></app-sidebar>
         </div>
       } @else if (ActiveView.Chat === activeView) {
         <div class="chat-main">
-          <app-chat-area style="height: 100%" [selectedContact]="selectedContact"></app-chat-area>
+          <app-chat-area style="height: 100%" [selectedContact]="selectedContact" [messages]="messagesWithContact(selectedContact, messageMap) || []"></app-chat-area>
         </div>
       }
     }
@@ -40,12 +40,12 @@
   @else {
     <!-- 左侧联系人栏 -->
     <div class="contacts-panel">
-      <app-contact-list (contactSelected)="onContactSelected($event)"></app-contact-list>
+      <app-contact-list (contactSelected)="onContactSelected($event)" [currentUser]="currentUser" [contactList]="contactList" [messagesMap]="messageMap"></app-contact-list>
     </div>
 
     <!-- 中间聊天主区域 -->
     <div class="chat-main">
-      <app-chat-area style="height: 100%" [selectedContact]="selectedContact"></app-chat-area>
+      <app-chat-area style="height: 100%" [selectedContact]="selectedContact" [messages]="messagesWithContact(selectedContact, messageMap) || []"></app-chat-area>
     </div>
 
     <!-- 右侧功能侧边栏 -->

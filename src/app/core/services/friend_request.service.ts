@@ -9,7 +9,7 @@ import {ResponseService} from './response.service';
 export class FriendRequestService {
   public isReady$: Observable<boolean>;
 
-  private friendRequestMapSubject: BehaviorSubject<Map<number, FriendRequestInfo>> = new BehaviorSubject<Map<number, FriendRequestInfo>>(new Map<number, FriendRequest>());
+  private friendRequestMapSubject: BehaviorSubject<Map<number, FriendRequestInfo>> = new BehaviorSubject<Map<number, FriendRequestInfo>>(new Map<number, FriendRequestInfo>());
   public friendRequestMap$ = this.friendRequestMapSubject.asObservable();
 
   constructor(private responseService: ResponseService) {

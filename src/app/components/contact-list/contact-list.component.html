@@ -11,13 +11,13 @@
       </button>
       <a routerLink="/settings" class="icon-button" title="设置">
         @if (currentUser){
-              @if (currentUser.avatar){
-                <div>
-                  <img src="{{currentUser.avatar}}" alt="{{ currentUser.username.charAt(0) || '?' }}" style="border-radius: 50%; width: 100%; height: 100%">
-                </div>
-              } @else {
-                <label>{{ currentUser.username.charAt(0) || '?' }}</label>
-              }
+            @if (currentUser.avatar){
+              <div>
+                <img src="{{currentUser.avatar}}" alt="{{ currentUser.username.charAt(0) || '?' }}" style="border-radius: 50%; width: 100%; height: 100%">
+              </div>
+            } @else {
+              <label>{{ currentUser.username.charAt(0) || '?' }}</label>
+            }
         }
       </a>
     </div>

@@ -19,6 +19,8 @@ export class RegisterComponent implements OnInit {
   email = '';
   isLoading = false;
   errorMessage = '';
+  
+  private registerTimeout: any;
 
   constructor(
     private router: Router,
@@ -56,19 +58,34 @@ export class RegisterComponent implements OnInit {
       () => {
         this.isLoading = false;
         // Navigation is handled in AuthService
+        if (this.registerTimeout) {
+          clearTimeout(this.registerTimeout);
+          this.registerTimeout = null;
+        }
       },
       (error) => {
         this.isLoading = false;
         this.errorMessage = error;
+        if (this.registerTimeout) {
+          clearTimeout(this.registerTimeout);
+          this.registerTimeout = null;
+        }
       }
     );
 
 
-    setTimeout(() => {
+    this.registerTimeout = setTimeout(() => {
       if (!this.authService.currentUserValue && !this.errorMessage) {
         this.isLoading = false;
         this.errorMessage = '注册超时，请重试';
       }
+      this.registerTimeout = null;
     }, 5000);
+  }
+  
+  ngOnDestroy(): void {
+    if (this.registerTimeout) {
+      clearTimeout(this.registerTimeout);
+    }
   }
 }

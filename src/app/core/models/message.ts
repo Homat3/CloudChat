@@ -18,7 +18,7 @@ export class TextMessage implements Message {
   status: 'sending' | 'sent' | 'read';
   readonly type: 'text' | 'image' | 'file' = 'text';
 
-  constructor(
+  public constructor(
     id: number,
     senderId: number,
     receiverId: number,
@@ -44,7 +44,7 @@ export class ImageMessage implements Message {
   status: 'sending' | 'sent' | 'read';
   readonly type: 'text' | 'image' | 'file' = 'image';
 
-  constructor(
+  public constructor(
     id: number,
     senderId: number,
     receiverId: number,
@@ -70,7 +70,7 @@ export class FileMessage implements Message {
   status: 'sending' | 'sent' | 'read';
   readonly type: 'text' | 'image' | 'file' = 'file';
 
-  constructor(
+  public constructor(
     id: number,
     senderId: number,
     receiverId: number,

@@ -34,8 +34,8 @@ export class AuthService {
     private login(payload: LoginPayload, currentUserSubject: BehaviorSubject<User | null>){
       const user = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
       currentUserSubject.next(user);
-      localStorage.setItem('localToken', payload.token)
-      localStorage.setItem('localUsername', payload.username)
+      localStorage.setItem('localToken', payload.token);
+      localStorage.setItem('localUsername', payload.username);
       this.router.navigate(['/']);
     }
 
@@ -45,8 +45,8 @@ export class AuthService {
 
     public logout() {
         this.currentUserSubject.next(null);
-        localStorage.removeItem('localToken')
-        localStorage.removeItem('localUsername')
+        localStorage.removeItem('localToken');
+        localStorage.removeItem('localUsername');
         this.router.navigate(['/login']);
     }
 }

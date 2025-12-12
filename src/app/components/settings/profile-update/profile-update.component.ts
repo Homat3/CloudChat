@@ -20,7 +20,10 @@ export class ProfileUpdateComponent implements OnInit {
     preloadAvatars: string[] = [
       'default.png',
       'avatar/Zombatar_1.jpg',
-      'avatar/Zombatar_2.jpg'
+      'avatar/Zombatar_2.jpg',
+      'avatar/Zombatar_3.jpg',
+      'avatar/Zombatar_4.jpg',
+      'avatar/Zombatar_5.jpg'
     ]; // 预设头像列表
     selectedAvatar: string = ''; // 当前选中的头像
 

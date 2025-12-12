@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {AfterContentInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {Contact, Message, User} from '../../core/models';
@@ -16,35 +16,17 @@ import {ContactService} from '../../core/services/contact.service';
   standalone: true,
   imports: [CommonModule, RouterLink]
 })
-export class ContactListComponent implements OnInit, OnDestroy {
+export class ContactListComponent {
   @Output() contactSelected = new EventEmitter<Contact>();
+  @Input() messagesMap: Map<number, Message[]> | null = null;
+  @Input() contactList: Contact[] = [];
+  @Input() currentUser: User | null = null;
   selectedContactId: number | null = null;
-  contactsList: Contact[] = [];
-  currentUser: User | null = null;
-  private subscriptions: Subscription[] = [];
 
-  constructor(
-    private requestService: RequestService,
-    private authService: AuthService,
-    private messageService: MessageService,
-    private contactService: ContactService
-  ) { }
-
-  ngOnInit() {
-    this.currentUser = this.authService.currentUserValue;
-    if (this.currentUser) {
-      this.requestService.loadContacts({ userId: this.currentUser.userId });
-    }
-
-    this.subscriptions.push(
-      this.contactService.contactList$.subscribe(contacts => {
-        this.contactsList = contacts;
-      }),
-    );
-  }
+  constructor() { }
 
   get contacts(): Contact[] {
-    return this.contactsList;
+    return this.contactList;
   }
 
   selectContact(contact: Contact) {
@@ -53,7 +35,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   getLastMessage(contact: Contact): Message | undefined {
-    let messages = this.messageService.messagesMapValue?.get(contact.contactId)
+    let messages = this.messagesMap?.get(contact.contactId)
     if (messages) {
       return messages[messages.length - 1];
     }
@@ -68,7 +50,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   getUnreadCount(contact: Contact): number {
-    return this.messageService.messagesMapValue?.get(contact.contactId)?.filter(m => m.status === 'sent').length || 0;
+    return this.messagesMap?.get(contact.contactId)?.filter(m => m.senderId == contact.contactId && m.status === 'sent').length || 0;
   }
 
   showAddContact() {
@@ -76,9 +58,5 @@ export class ContactListComponent implements OnInit, OnDestroy {
     // 使用自定义事件方式触发
     const event = new CustomEvent('showAddContactDialog');
     window.dispatchEvent(event);
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

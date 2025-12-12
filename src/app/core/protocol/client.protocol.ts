@@ -18,8 +18,6 @@ export enum ClientMessageType {
   ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
   LOAD_MESSAGES = 'LOAD_MESSAGES',
   SEND_MESSAGE = 'SEND_MESSAGE',
-  SEND_FILE = 'SEND_FILE',
-  SEND_IMAGE = 'SEND_IMAGE',
   MARK_READ = 'MARK_READ',
   UPLOAD_FILE = 'UPLOAD_FILE'
 }
@@ -39,8 +37,6 @@ type ClientPayload =
   | AcceptFriendRequestPayload
   | LoadMessagesPayload
   | SendMessagePayload
-  | SendFilePayload
-  | SendImagePayload
   | MarkReadPayload
   | UploadFilePayload;
 
@@ -112,22 +108,6 @@ export interface SendMessagePayload {
   senderId: number;
   receiverId: number;
   content: string;
-}
-
-export interface SendFilePayload {
-  tempId: string;
-  senderId: number;
-  receiverId: number;
-  fileName: string;
-  fileContent: String;
-}
-
-export interface SendImagePayload {
-  tempId: string;
-  senderId: number;
-  receiverId: number;
-  imageName: string;
-  imageContent: String;
 }
 
 export interface LoadMessagesPayload {

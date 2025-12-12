@@ -31,16 +31,6 @@ export class SidebarComponent {
   handleSetting(setting: string) {
     this.settingChanged.emit(setting);
     switch (setting) {
-      case 'clear':
-        const currentUser = this.authService.currentUserValue;
-        if (currentUser && this.selectedContact) {
-          this.requestService.clearMessages({
-            requesterUserId: currentUser.userId,
-            targetUserId: this.selectedContact.contactId
-          });
-          console.log('清空聊天记录');
-        }
-        break;
       default:
         console.log('未定义的设置:', setting);
     }

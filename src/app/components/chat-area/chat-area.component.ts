@@ -15,6 +15,7 @@ import {RequestService} from '../../core/services/request.service';
 import {AuthService} from '../../core/services/auth.service';
 import {MessageService} from '../../core/services/message.service';
 import {Subscription} from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-chat-area',
@@ -23,11 +24,11 @@ import {Subscription} from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy {
+export class ChatAreaComponent implements OnChanges{
   @Input() selectedContact: Contact | null = null;
   @ViewChild('chatMessagesContainer', { static: false }) private chatMessagesContainer!: ElementRef;
 
-  messages: Message[] = [];
+  @Input() messages: Message[] = [];
   newMessage = '';
   private subscriptions: Subscription[] = [];
 
@@ -35,16 +36,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
     private requestService: RequestService,
     private authService: AuthService,
     private messageService: MessageService
-  ) {
-    this.subscriptions.push(
-      this.messageService.messageMap$.subscribe(messagesMap => {
-        let refreshedMessages = messagesMap.get(<number>this.currentContact?.contactId);
-        if (refreshedMessages){
-          this.messages = refreshedMessages;
-        }
-      })
-    );
-  }
+  ) {}
 
   get currentContact(): Contact | null {
     return this.selectedContact;
@@ -57,11 +49,11 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
       this.loadContactMessages(contactId);
       let toMark = false
       this.messages.forEach((message) => {
-        toMark ||= message.status != 'read'
+        toMark ||= (message.receiverId == this.currentContact?.contactId && message.status != 'read')
         if (toMark) return;
       });
       if (toMark){
-        this.markMessagesAsRead(this.authService.currentUserValue?.userId || 0, contactId);
+        this.markMessagesAsRead(this.authService.currentUserValue?.userId || -1, contactId);
       }
       console.log('切换到联系人:', changes['selectedContact'].currentValue.username);
     }
@@ -72,6 +64,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
   }
 
   private markMessagesAsRead(userId: number, targetId: number): void {
+    if (userId == -1) return;
     this.requestService.markRead({ userId, targetId });
   }
 
@@ -90,40 +83,47 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
     }
   }
 
-  sendMessage(event: Event) {
+  sendMessage() {
     if (!this.newMessage.trim() || !this.selectedContact) return;
 
     const currentUser = this.authService.currentUserValue;
     if (!currentUser) {
-      console.error('User not logged in');
+      window.alert('请先登录');
+      console.error('用户未登录');
       return;
     }
 
-    const tempMessageId = Date.now(); // Temporary ID
+    const tempMessageId = uuidv4(); // Temporary ID
     const content = this.newMessage;
     const receiverId = this.selectedContact.contactId;
 
     const messagePayload = {
-      messageId: tempMessageId,
+      tempId: tempMessageId,
       senderId: currentUser.userId,
       receiverId: receiverId,
-      content: content
+      content: content,
+      type: 'text' as 'text' | 'image' | 'file'
     };
 
-    this.requestService.sendMessage(messagePayload, () => {
-      // Success callback - update local state here
-      const sentMsg = new TextMessage(
-        tempMessageId,
-        currentUser.userId,
-        receiverId,
-        content,
-        new Date().toISOString(), // Use local time as server doesn't return it in ack
-        'sent'
-      );
-      this.messages.push(sentMsg);
+    this.messageService.putWaitingMessage(messagePayload);
+    this.requestService.sendMessage(messagePayload,
+      () => {
       this.newMessage = '';
       this.scrollToBottom();
-    });
+      },
+      (error) => {
+        console.error('发送消息失败:', error);
+        window.alert('发送消息失败: ' + error);
+      }
+      );
+  }
+
+  private formatTimestamp(date: Date){
+    return date.getFullYear().toString() + ' ' +
+      date.getMonth().toString() + ' ' +
+      date.getDate().toString() + ' | ' +
+      date.getHours().toString() + ':' +
+      date.getMinutes().toString()
   }
 
   isNewMessage(message: Message): boolean {
@@ -136,33 +136,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked, OnDestroy
     return !!currentUser && message.senderId !== currentUser.userId;
   }
 
-  sendFile() {
-    // TODO: Implement file selection and sending logic
-    console.log('File sending not implemented yet');
-  }
-
-  sendImage() {
-    // TODO: Implement image selection and sending logic
-    console.log('Image sending not implemented yet');
-  }
-
   appendEmoji() {
     this.newMessage += '😊'; // Simple example
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-  private mapToMessage(data: any): Message {
-    if (data.type === 'text') {
-      return new TextMessage(data.id, data.senderId, data.receiverId, data.content, data.timestamp, data.status);
-    } else if (data.type === 'image') {
-      return new ImageMessage(data.id, data.senderId, data.receiverId, data.content, data.timestamp, data.status);
-    } else if (data.type === 'file') {
-      return new FileMessage(data.id, data.senderId, data.receiverId, data.content, data.timestamp, data.status);
-    }
-    // Default to text if unknown
-    return new TextMessage(data.id, data.senderId, data.receiverId, typeof data.content === 'string' ? data.content : '', data.timestamp, data.status);
   }
 }

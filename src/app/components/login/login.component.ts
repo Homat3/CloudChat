@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit, AfterContentInit, OnDestroy {
     errorMessage = '';
 
     private subscriptions: Subscription[] = [];
+    private loginTimeout: any;
 
     constructor(
         private router: Router,
@@ -29,6 +30,9 @@ export class LoginComponent implements OnInit, AfterContentInit, OnDestroy {
 
     ngOnDestroy(): void {
       this.subscriptions.forEach(sub => sub.unsubscribe());
+      if (this.loginTimeout) {
+        clearTimeout(this.loginTimeout);
+      }
     }
 
     ngAfterContentInit(): void {
@@ -42,7 +46,7 @@ export class LoginComponent implements OnInit, AfterContentInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (this.authService.currentUser$) {
+        if (this.authService.currentUserValue) {
             this.router.navigate(['/']);
         }
     }
@@ -51,17 +55,35 @@ export class LoginComponent implements OnInit, AfterContentInit, OnDestroy {
       let localToken = localStorage.getItem('localToken');
       let localUsername = localStorage.getItem('localUsername');
       if (localToken && localUsername) {
+        this.isLoading = true;
+        this.errorMessage = '';
         this.requestService.loginByToken(
           { token: localToken, username: localUsername },
           () => {
             this.isLoading = false;
+            if (this.loginTimeout) {
+              clearTimeout(this.loginTimeout);
+              this.loginTimeout = null;
+            }
           },
           (error) => {
             this.isLoading = false;
             this.errorMessage = error;
+            if (this.loginTimeout) {
+              clearTimeout(this.loginTimeout);
+              this.loginTimeout = null;
+            }
           }
         );
       }
+
+      this.loginTimeout = setTimeout(() => {
+        if (!this.authService.currentUserValue && !this.errorMessage) {
+          this.isLoading = false;
+          this.errorMessage = '登录超时，请重试';
+        }
+        this.loginTimeout = null;
+      }, 5000);
     }
 
     onLogin(): void {
@@ -77,18 +99,27 @@ export class LoginComponent implements OnInit, AfterContentInit, OnDestroy {
             { username: this.username, password: this.password },
             () => {
                 this.isLoading = false;
+                if (this.loginTimeout) {
+                  clearTimeout(this.loginTimeout);
+                  this.loginTimeout = null;
+                }
             },
             (error) => {
                 this.isLoading = false;
                 this.errorMessage = error;
+                if (this.loginTimeout) {
+                  clearTimeout(this.loginTimeout);
+                  this.loginTimeout = null;
+                }
             }
         );
 
-        setTimeout(() => {
+        this.loginTimeout = setTimeout(() => {
           if (!this.authService.currentUserValue && !this.errorMessage) {
             this.isLoading = false;
             this.errorMessage = '登录超时，请重试';
           }
+          this.loginTimeout = null;
         }, 5000);
     }
 
