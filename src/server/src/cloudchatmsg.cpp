@@ -112,9 +112,9 @@ LoadMessagesMsg::LoadMessagesMsg(int user_id, int target_id) : ClientMsg(LOAD_ME
 	target_id_ = target_id;
 }
 
-SendMessageMsg::SendMessageMsg(int message_id, int sender_id, int receiver_id,
+SendMessageMsg::SendMessageMsg(std::string temp_id, int sender_id, int receiver_id,
 									   std::string content) : ClientMsg(SEND_MESSAGE) {
-	message_id_ = message_id;
+	temp_id_ = temp_id;
 	sender_id_  = sender_id;
 	receiver_id_ = receiver_id;
 	content_     = content;
@@ -172,9 +172,12 @@ ContactDeletedFailedMsg::ContactDeletedFailedMsg(std::string error) : ServerMsg(
 	error_ = error;
 }
 
-SelfMessageReceivedMsg::SelfMessageReceivedMsg(int message_id) : ServerMsg(
+SelfMessageReceivedMsg::SelfMessageReceivedMsg(std::string temp_id, int message_id,
+											   std::string timestamp) : ServerMsg(
 	MESSAGE_RECEIVED_SELF) {
+	temp_id_ = temp_id;
 	message_id_ = message_id;
+	timestamp_  = timestamp;
 }
 
 ToSelfMessageReceivedMsg::ToSelfMessageReceivedMsg(CloudChatMessage message) :
@@ -360,8 +363,9 @@ std::string ContactDeletedFailedMsg::to_JSON() {
 std::string SelfMessageReceivedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
 	sprintf(buff,
-			"{\"type\":\"%s\",\"payload\":{\"messageId\":%d}}",
-			to_JSON_string(type_).c_str(), message_id_);
+			"{\"type\":\"%s\",\"payload\":{\"tempId\":\"%s\",\"id\":%d,\"timestamp\":\"%s\"}}",
+			to_JSON_string(type_).c_str(), to_JSON_string(temp_id_).c_str(), message_id_,
+			to_JSON_string(timestamp_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -371,48 +375,50 @@ std::string ToSelfMessageReceivedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
 	std::time_t created_at = message_.get_created_at();
 	sprintf(buff,
-			"{\"type\":\"%s\",\"payload\":{\"id\":%d,\"senderId\":%d,\"receiverId\":%d,\"content\":\"%s\",\"timestamp\":\"%s\",\"status\":\"%s\",\"type\":\"%s\"}}",
+			"{\"type\":\"%s\",\"payload\":{\"id\":%d,\"senderId\":%d,\"receiverId\":%d,\"content\":\"",
 			to_JSON_string(type_).c_str(),
 			message_.get_id(),
 			message_.get_sender_id(),
-			message_.get_receiver_id(),
-			to_JSON_string(message_.get_content()).c_str(),
+			message_.get_receiver_id()
+	);
+	std::string JSON = buff;
+	JSON += to_JSON_string(message_.get_content());
+	sprintf(buff, "\",\"timestamp\":\"%s\",\"status\":\"%s\",\"type\":\"%s\"}}",
 			c_str_to_JSON_string(ctime(&created_at)).c_str(),
 			message_.get_is_read()? "read" : "sent",
-			to_JSON_string(message_.get_type_str()).c_str()
-	);
-	std::string JSON;
-	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+			to_JSON_string(message_.get_type_str()).c_str());
+	JSON += buff;
 	return JSON;
 }
 
 std::string MessagesLoadedMsg::to_JSON() {
-	char buff[BUFF_LEN] = "";
 	std::string messages_json = "[";
 	for (size_t i = 0; i < messages_.size(); i++) {
 		char message_buff[BUFF_LEN] = "";
 		std::time_t created_at = messages_[i].get_created_at();
 		sprintf(message_buff,
-				"{\"id\":%d,\"senderId\":%d,\"receiverId\":%d,\"content\":\"%s\",\"timestamp\":\"%s\",\"status\":\"%s\",\"type\":\"%s\"}",
+				"{\"id\":%d,\"senderId\":%d,\"receiverId\":%d,\"content\":\"",
 				messages_[i].get_id(),
 				messages_[i].get_sender_id(),
-				messages_[i].get_receiver_id(),
-				to_JSON_string(messages_[i].get_content()).c_str(),
+				messages_[i].get_receiver_id()
+		);
+		messages_json += message_buff;
+		messages_json += to_JSON_string(messages_[i].get_content());
+		sprintf(message_buff, "\",\"timestamp\":\"%s\",\"status\":\"%s\",\"type\":\"%s\"}",
 				c_str_to_JSON_string(ctime(&created_at)).c_str(),
 				messages_[i].get_is_read()? "read" : "sent",
 				to_JSON_string(messages_[i].get_type_str()).c_str()
-		);
+			);
 		messages_json += message_buff;
 		if (i != messages_.size() - 1) {
 			messages_json += ",";
 		}
 	}
 	messages_json += "]";
-	sprintf(buff,
-			"{\"type\":\"%s\",\"payload\":{\"targetId\":%d,\"messages\":%s}}",
-			to_JSON_string(type_).c_str(), target_id_, messages_json.c_str());
-	std::string JSON;
-	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	char buff[BUFF_LEN] = "";
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"targetId\":%d,\"messages\":",
+			to_JSON_string(type_).c_str(), target_id_);
+	std::string JSON = buff + messages_json + "}}";;
 	return JSON;
 }
 
@@ -571,7 +577,7 @@ DeleteContactMsg* DeleteContactMsg::parse_from_JSON(std::string JSON, int payloa
 }
 
 SendMessageMsg* SendMessageMsg::parse_from_JSON(std::string JSON, int payload_pos) {
-	int message_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"messageId\""),
+	std::string temp_id = parse_str_from_json(JSON, find_field_pos(JSON, "\"tempId\""),
 										JSON.length() - 1);
 	int sender_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"senderId\""),
 										JSON.length() - 1);
@@ -579,7 +585,7 @@ SendMessageMsg* SendMessageMsg::parse_from_JSON(std::string JSON, int payload_po
 										JSON.length() - 1);
 	std::string content = parse_str_from_json(JSON, find_field_pos(JSON, "\"content\""),
 											JSON.length() - 1);
-	return new SendMessageMsg(message_id, sender_id, receiver_id, content);
+	return new SendMessageMsg(temp_id, sender_id, receiver_id, content);
 }
 
 int parse_int_from_json(std::string JSON, int begin, int end) {
@@ -642,6 +648,18 @@ std::string to_JSON_string(std::string str) {
 int SendMsgToClient(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, ServerMsg* srv_msg) {
 	try {
 		websocketpp::lib::error_code ec;
+		// 首先检查连接是否仍然有效
+		server_t::connection_ptr con = cloudchat_srv.get_con_from_hdl(hdl, ec);
+		if (ec) {
+			std::cout << "连接无效：" << ec.message() << std::endl;
+			return SEND_FAILED;
+		}
+		
+		// 检查连接状态
+		if (!con || con->get_state() != websocketpp::session::state::open) {
+			std::cout << "连接已关闭或状态异常" << std::endl;
+			return SEND_FAILED;
+		}
 		cloudchat_srv.send(hdl, srv_msg->to_JSON(), websocketpp::frame::opcode::text, ec);
 		if (ec) {
 			std::cout << "发送失败：" << ec.message() << std::endl;
@@ -1214,4 +1232,80 @@ std::string UpdateProfileMsg::get_email() {
 
 std::string UpdateProfileMsg::get_avatar() {
 	return avatar_;
+}
+
+std::string SendMessageMsg::get_temp_id() {
+	return temp_id_;
+}
+
+int SendMessageMsg::get_sender_id() {
+	return sender_id_;
+}
+
+int SendMessageMsg::get_receiver_id() {
+	return receiver_id_;
+}
+
+std::string SendMessageMsg::get_content() {
+	return content_;
+}
+
+int LoadMessagesMsg::get_user_id() {
+	return user_id_;
+}
+
+int LoadMessagesMsg::get_target_id() {
+	return target_id_;
+}
+
+int MarkReadMsg::get_user_id() {
+	return user_id_;
+}
+
+int MarkReadMsg::get_target_id() {
+	return target_id_;
+}
+
+MessageSendFailedMsg::MessageSendFailedMsg(std::string temp_id, std::string error) : ServerMsg(
+	MESSAGE_SEND_FAILED
+	) {
+	temp_id_ = temp_id;
+	error_   = error;
+}
+
+std::string MessageSendFailedMsg::to_JSON() {
+	char buff[BUFF_LEN] = "";
+	sprintf(buff,
+			"{\"type\":\"%s\",\"payload\":{\"tempId\":\"%s\",\"error\":\"%s\"}}",
+			to_JSON_string(type_).c_str(),
+			to_JSON_string(temp_id_).c_str(),
+			to_JSON_string(error_).c_str()
+	);
+	std::string JSON;
+	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
+	return JSON;
+}
+
+CloudChatMessage::CloudChatMessage(int id, bool is_group, int type, int sender_id, int receiver_id,
+								   std::string content, std::string file_name, int file_size,
+								   std::string file_path, bool is_read, time_t created_at) {
+	id_          = id;
+	is_group_    = is_group;
+	type_        = type;
+	sender_id_   = sender_id;
+	receiver_id_ = receiver_id;
+	content_     = content;
+	file_name_   = file_name;
+	file_size_   = file_size;
+	file_path_   = file_path;
+	is_read_     = is_read;
+	created_at_  = created_at;
+}
+
+CloudChatMessage::CloudChatMessage() {
+	
+}
+
+void CloudChatMessage::SetIsRead(bool is_read) {
+	is_read_ = is_read;
 }

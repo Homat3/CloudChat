@@ -5,15 +5,15 @@
 #ifndef CLOUDCHATDAT_H
 #define CLOUDCHATDAT_H
 
+#include "cloudchatmsg.h"
+#include "cloudchatuser.h"
+
 #define DATABASE_USERNAME "cloudchat" // 数据库用户名
 #define DATABASE_PASSWORD "1919810" // 数据库密码
 #define DATABASE_HOST     "tcp://127.0.0.1:3306" // 数据库主机地址
 
 #define DATABASE_INITIALIZED 0                   // 数据库已初始化
 #define DATABASE_INITIALIZATION_FAILED -1        // 数据库初始化失败
-
-#include "cloudchatsys.h"
-#include "cloudchatuser.h"
 
 class CloudChatDatabase { // CloudChat 数据库类
 private:
@@ -26,7 +26,6 @@ private:
 public:
 	static CloudChatDatabase* GetInstance(); // 获取单例模式实例
 	// TODO: 编写数据库操作接口
-
 	// users
 	bool AddUser(CloudChatUser& user);//addUser
 	CloudChatUser* GetUserById(int id);//
@@ -44,6 +43,10 @@ public:
 	bool AddFriend(int user_id1, int user_id2);
 	std::vector<CloudChatUser> get_contacts(int user_id);
 	bool is_friend(int user_id1, int user_id2);
+	// messages
+	bool AddMessage(CloudChatMessage* message);
+	std::vector<CloudChatMessage> GetMessagesByTwoIds(int user_id, int target_id);
+	bool UpdateMessage(CloudChatMessage* message);
 };
 
 #endif // CLOUDCHATDAT_H

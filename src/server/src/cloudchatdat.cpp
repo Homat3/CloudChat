@@ -1,7 +1,9 @@
 #include "cloudchatdat.h"
+#include "cloudchatmsg.h"
 #include "cloudchatuser.h"
 #include <cppconn/exception.h>
 #include <cppconn/prepared_statement.h>
+#include <cppconn/resultset.h>
 
 CloudChatDatabase::CloudChatDatabase() {
 	try {
@@ -48,7 +50,7 @@ CloudChatDatabase::CloudChatDatabase() {
 		std::cout << "数据表 friends 已成功创建。" << std::endl;
 		// 添加消息表
 		statement->execute(R"(
-			create table if not exists private_messages (
+			create table if not exists messages (
 			id int auto_increment primary key,
 			sender_id int not null,
 			receiver_id int not null,
@@ -58,7 +60,7 @@ CloudChatDatabase::CloudChatDatabase() {
 			file_size int,                
 			file_path varchar(500),       
 			is_read boolean default false,
-			created_at timestamp default current_timestamp,
+			created_at int,
 			foreign key (sender_id) references users(id) on delete cascade,
 			foreign key (receiver_id) references users(id) on delete cascade,
 			index idx_conversation (sender_id, receiver_id, created_at) 
@@ -514,4 +516,93 @@ bool CloudChatDatabase::is_friend(int user_id1, int user_id2) {
 		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
 	}
 	return result;
+}
+
+bool CloudChatDatabase::AddMessage(CloudChatMessage* message) {
+	try {
+		sql::PreparedStatement* pstmt = connection_->prepareStatement(
+			"insert into messages(sender_id, receiver_id, message_type, content, file_name, file_size, file_path, is_read, created_at)"
+			"values(?, ?, ?, ?, ?, ?, ?, ?, ?)"
+			);
+		pstmt->setInt(1, message->get_sender_id());
+		pstmt->setInt(2, message->get_receiver_id());
+		pstmt->setString(3, message->get_type_str());
+		pstmt->setString(4, message->get_content());
+		pstmt->setString(5, message->get_file_name());
+		pstmt->setInt(6, message->get_file_size());
+		pstmt->setString(7, message->get_file_path());
+		pstmt->setBoolean(8, message->get_is_read());
+		pstmt->setInt(9, message->get_created_at());
+
+		int res = pstmt->executeUpdate();
+		delete pstmt;
+		return res > 0;
+	} catch (sql::SQLException& e) {
+		std::cout << "更新 messages 数据表失败：" << e.what() << std::endl;
+	}
+	return false;
+}
+
+std::vector<CloudChatMessage> CloudChatDatabase::GetMessagesByTwoIds(int user_id, int target_id) {
+	std::vector<CloudChatMessage> results;
+	try {
+		sql::PreparedStatement* pstmt = connection_->prepareStatement(
+			"select * from messages where (sender_id = ? and receiver_id = ?) or (sender_id = ? and receiver_id = ?)"
+			);
+		pstmt->setInt(1, user_id);
+		pstmt->setInt(2, target_id);
+		pstmt->setInt(3, target_id);
+		pstmt->setInt(4, user_id);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		while (res->next()) {
+		    int id = res->getInt("id");
+			bool is_group = false;
+			std::string type_str = res->getString("message_type");
+			int type = (type_str == "text") * TEXT_MESSAGE + (type_str == "file") * FILE_MESSAGE +
+				(type_str == "image") * IMAGE_MESSAGE;
+			int sender_id = res->getInt("sender_id");
+			int receiver_id = res->getInt("receiver_id");
+			std::string content = res->getString("content");
+			std::string file_name = res->getString("file_name");
+			int file_size = res->getInt("file_size");
+			std::string file_path = res->getString("file_path");
+			bool is_read = res->getBoolean("is_read");
+			time_t created_at = res->getInt("created_at");
+
+			results.push_back(*(new CloudChatMessage(id, is_group, type, sender_id, receiver_id,
+												   content, file_name, file_size, file_path, is_read,
+												   created_at)));
+		}
+		delete res;
+		delete pstmt;
+	} catch (sql::SQLException& e) {
+		std::cout << "筛选 messages 数据表失败：" << e.what() << std::endl;
+	}
+	return results;
+}
+
+bool CloudChatDatabase::UpdateMessage(CloudChatMessage* message) {
+	try {
+		sql::PreparedStatement* pstmt = connection_->prepareStatement(
+			"update messages set message_type = ?, sender_id = ?, receiver_id = ?, content = ?, file_name = ?, file_size = ?, file_path = ?, is_read = ?, created_at = ? where id = ?"
+			);
+		pstmt->setString(1, message->get_type_str());
+		pstmt->setInt(2, message->get_sender_id());
+		pstmt->setInt(3, message->get_receiver_id());
+		pstmt->setString(4, message->get_content());
+		pstmt->setString(5, message->get_file_name());
+		pstmt->setInt(6, message->get_file_size());
+		pstmt->setString(7, message->get_file_path());
+		pstmt->setBoolean(8, message->get_is_read());
+		pstmt->setInt(9, message->get_created_at());
+		pstmt->setInt(10, message->get_id());
+
+		int res = pstmt->executeUpdate();
+		delete pstmt;
+		return res > 0;
+	} catch (sql::SQLException& e) {
+		std::cout << "更新 messages 数据表失败：" << e.what() << std::endl;
+	}
+	return false;
 }

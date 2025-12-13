@@ -60,6 +60,7 @@
 #define MESSAGE_RECEIVED_SELF   "MESSAGE_RECEIVED_SELF"	  // 客户端发送的聊天消息已被服务器接收
 #define MESSAGE_RECEIVED_OTHER  "MESSAGE_RECEIVED_OTHER"  // 有其他用户向客户端发送聊天消息（新消息提醒）
 #define MESSAGES_CLEARD         "MESSAGES_CLEARD"		  // 已清空聊天记录
+#define MESSAGE_SEND_FAILED     "MESSAGE_SEND_FAILED"	  // 消息发送失败
 #define FRIEND_REQUEST_LOADED   "FRIEND_REQUEST_LOADED"	  // 已加载好友请求列表
 #define FRIEND_REQUEST_LOADED_FAILED "FRIEND_REQUEST_LOADED_FAILED"	// 加载好友请求列表失败
 #define FRIEND_REQUEST_ADDED         "FRIEND_REQUEST_ADDED"			// 已添加好友请求
@@ -86,6 +87,10 @@ private:
 	time_t      created_at_; // 发送时间
 
 public:
+	CloudChatMessage();
+	CloudChatMessage(int id, bool is_group, int type, int sender_id, int receiver_id,
+					 std::string content, std::string file_name, int file_size,
+					 std::string file_path, bool is_read, time_t created_at);
 	// getter
 	int get_id();
 	bool get_is_group();
@@ -99,6 +104,8 @@ public:
 	std::string get_file_path();
 	bool        get_is_read();
 	time_t      get_created_at();
+	// setter
+	void SetIsRead(bool is_read);
 };
 
 // 客户端和服务端之间通信的消息类
@@ -239,14 +246,18 @@ public:
 
 class SendMessageMsg : public ClientMsg { // 发送聊天消息消息
 private:
-	int message_id_;		    // 消息 id
+	std::string temp_id_;		// 消息在客户端生成的临时 id
 	int sender_id_;				// 发送者用户 id
 	int receiver_id_;			// 接收者用户 id
 	std::string content_;		// 消息内容
 
 public:
-	SendMessageMsg(int message_id, int sender_id, int receiver_id, std::string content);
+	SendMessageMsg(std::string temp_id, int sender_id, int receiver_id, std::string content);
 	static SendMessageMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	std::string get_temp_id();
+	int get_sender_id();
+	int get_receiver_id();
+	std::string get_content();
 };
 
 class SendFileMsg : public ClientMsg { // 发送文件消息
@@ -285,6 +296,8 @@ private:
 public:
 	LoadMessagesMsg(int user_id, int target_id);
 	static LoadMessagesMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
+	int get_target_id();
 };
 
 class MarkReadMsg : public ClientMsg { // 标记为已读消息
@@ -295,6 +308,8 @@ private:
 public:
 	MarkReadMsg(int user_id, int target_id);
 	static MarkReadMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
+	int get_target_id();
 };
 
 class ClearMessagesMsg : public ClientMsg { // 清空聊天记录
@@ -443,10 +458,12 @@ public:
 
 class SelfMessageReceivedMsg : public ServerMsg { // 聊天消息被接收
 private:
-	int message_id_;
+	std::string temp_id_;		// 客户端生成的临时 id
+	int message_id_;			// 数据库分配的消息 id
+	std::string timestamp_;     // 时间戳
 
 public:
-	SelfMessageReceivedMsg(int message_id);
+	SelfMessageReceivedMsg(std::string temp_id, int message_id, std::string timestamp);
 	std::string to_JSON() override;
 };
 
@@ -646,6 +663,16 @@ private:
 
 public:
 	FileUploadedFailedMsg(std::string file_path, std::string error);
+	std::string to_JSON() override;
+};
+
+class MessageSendFailedMsg : public ServerMsg {		// 聊天消息发送失败
+private:
+	std::string temp_id_;		// 客户端生成的临时消息 id
+	std::string error_;			// 错误信息
+
+public:
+	MessageSendFailedMsg(std::string temp_id, std::string error);
 	std::string to_JSON() override;
 };
 

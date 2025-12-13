@@ -1,6 +1,8 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatservice.h"
+#include <csignal>
+#include <websocketpp/logger/levels.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
@@ -16,9 +18,12 @@ int InitDatabase(); // 初始化数据库
 void OnOpen(websocketpp::connection_hdl hdl);
 void OnClose(websocketpp::connection_hdl hdl);
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg);
+void signal_handler(int signal);
 
 int main() {
 	srand(time(0));
+	std::signal(SIGABRT, signal_handler);
+	std::signal(SIGSEGV, signal_handler);
 	// 初始化服务器
 	printf("CloudChat 服务器正在初始化...\n");
 	if (InitServer() != SERVER_INITIALIZED) {
@@ -63,6 +68,7 @@ int InitNetwork() {
 	try {
 		// 初始化日志输出 --> 关闭日志输出
 		g_cloudchat_srv.set_access_channels(websocketpp::log::alevel::none);
+		g_cloudchat_srv.set_error_channels(websocketpp::log::elevel::none);
 		g_cloudchat_srv.init_asio(); // 初始化ASIO框架
 		// 设置消息处理/连接握手成功/连接关闭回调函数
 		g_cloudchat_srv.set_open_handler(OnOpen);
@@ -134,40 +140,52 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	ClientMsg* client_msg = parse_protocal_msg(JSON_msg);
 	std::string type = client_msg->get_type();
 
-	if (type == LOGIN) Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
-	else if (type == LOGIN_BY_TOKEN)
+	if (type == LOGIN) {
+		Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
+	} else if (type == LOGIN_BY_TOKEN) {
 		LoginByToken(g_cloudchat_srv, hdl, (LoginByTokenMsg*)client_msg);
-    else if (type == REGISTER) Register(g_cloudchat_srv, hdl, (RegisterMsg*)client_msg);
-	else if (type == LOGOUT) Logout(g_cloudchat_srv, hdl, (LogoutMsg*)client_msg);
-	else if (type == UPDATE_PROFILE)
+	} else if (type == REGISTER) {
+		Register(g_cloudchat_srv, hdl, (RegisterMsg*)client_msg);
+	} else if (type == LOGOUT) {
+		Logout(g_cloudchat_srv, hdl, (LogoutMsg*)client_msg);
+	} else if (type == UPDATE_PROFILE) {
 		UpdateProfile(g_cloudchat_srv, hdl, (UpdateProfileMsg*)client_msg);
-	else if (type == LOAD_CONTACTS)
+	} else if (type == LOAD_CONTACTS) {
 		LoadContacts(g_cloudchat_srv, hdl, (LoadContactsMsg*)client_msg);
-	else if (type == ADD_CONTACT)
+	} else if (type == ADD_CONTACT) {
 		AddContact(g_cloudchat_srv, hdl, (AddContactMsg*)client_msg);
-	else if (type == DELETE_CONTACT)
+	} else if (type == DELETE_CONTACT) {
 		DeleteContact(g_cloudchat_srv, hdl, (DeleteContactMsg*)client_msg);
-	else if (type == LOAD_MESSAGES)
+	} else if (type == LOAD_MESSAGES) {
 		LoadMessages(g_cloudchat_srv, hdl, (LoadMessagesMsg*)client_msg);
-	else if (type == SEND_MESSAGE)
+	} else if (type == SEND_MESSAGE) {
 		SendMessage(g_cloudchat_srv, hdl, (SendMessageMsg*)client_msg);
-	else if (type == SEND_FILE) SendFile(g_cloudchat_srv, hdl, (SendFileMsg*)client_msg);
-	else if (type == SEND_IMAGE) SendImage(g_cloudchat_srv, hdl, (SendImageMsg*)client_msg);
-	else if (type == MARK_READ) MarkRead(g_cloudchat_srv, hdl, (MarkReadMsg*)client_msg);
-	else if (type == CLEAR_MESSAGES)
+	} else if (type == SEND_FILE) {
+		SendFile(g_cloudchat_srv, hdl, (SendFileMsg*)client_msg);	
+	} else if (type == SEND_IMAGE) {
+		SendImage(g_cloudchat_srv, hdl, (SendImageMsg*)client_msg);
+	} else if (type == MARK_READ) {
+		MarkRead(g_cloudchat_srv, hdl, (MarkReadMsg*)client_msg);
+	} else if (type == CLEAR_MESSAGES) {
 		ClearMessages(g_cloudchat_srv, hdl, (ClearMessagesMsg*)client_msg);
-	else if (type == SEARCH_FOR_USER_BY_ID)
+	} else if (type == SEARCH_FOR_USER_BY_ID) {
 		SearchForUserById(g_cloudchat_srv, hdl, (SearchForUserByIdMsg*)client_msg);
-	else if (type == SEARCH_FOR_UESR_BY_NAME)
+	} else if (type == SEARCH_FOR_UESR_BY_NAME) {
 		SearchForUserByName(g_cloudchat_srv, hdl, (SearchForUserByNameMsg*)client_msg);
-	else if (type == ADD_FRIEND_REQUEST)
+	} else if (type == ADD_FRIEND_REQUEST) {
 		AddFriendRequest(g_cloudchat_srv, hdl, (AddFriendRequestClientMsg*)client_msg);
-	else if (type == REFUSE_FRIEND_REQUEST)
+	} else if (type == REFUSE_FRIEND_REQUEST) {
 		RefuseFriendRequest(g_cloudchat_srv, hdl, (RefuseFriendRequestClientMsg*)client_msg);
-	else if (type == ACCEPT_FRIEND_REQUEST)
+	} else if (type == ACCEPT_FRIEND_REQUEST) {
 		AcceptFriendRequest(g_cloudchat_srv, hdl, (AcceptFriendRequestClientMsg*)client_msg);
-	else if (type == LOAD_FRIEND_REQUEST)
+	} else if (type == LOAD_FRIEND_REQUEST) {
 		LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
-	else if (type == UPLOAD_FILE)
+	} else if (type == UPLOAD_FILE) {
 		UploadFile(g_cloudchat_srv, hdl, (UploadFileMsg*)client_msg);
+	}
+}
+
+void signal_handler(int signal) {
+	std::cout << "收到信号：" << signal << std::endl;
+	std::exit(signal);
 }
