@@ -154,13 +154,52 @@ void DeleteContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 }
 
 void LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				  LoadMessagesMsg* load_messages_msg) {
-	// TODO: 加载聊天记录业务
+				  LoadMessagesMsg* load_messages_msg) { // 加载聊天记录业务
+	int user_id = load_messages_msg->get_user_id();
+	int target_id = load_messages_msg->get_target_id();
+
+	std::cout << "加载聊天记录：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
+	std::cout << "targetId: " << target_id << std::endl;
+
+	std::vector<CloudChatMessage> messages = CloudChatDatabase::GetInstance()->GetMessagesByTwoIds(
+		user_id, target_id);
+	SendMsgToClient(cloudchat_srv, hdl, new MessagesLoadedMsg(target_id, messages));
 }
 
 void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				 SendMessageMsg* send_message_msg) {
-	// TODO: 发送消息业务
+				 SendMessageMsg* send_message_msg) { // 发送消息业务
+	std::string temp_id = send_message_msg->get_temp_id();
+	int sender_id = send_message_msg->get_sender_id();
+	int receiver_id = send_message_msg->get_receiver_id();
+	std::string content = send_message_msg->get_content();
+	time_t created_at = time(0);
+
+	std::cout << "发送消息：" << std::endl;
+	std::cout << "temp_id: " << temp_id << std::endl;
+	std::cout << "sender_id: " << sender_id << std::endl;
+	std::cout << "receiver_id: " << receiver_id << std::endl;
+	std::cout << "content: " << content << std::endl;
+
+	CloudChatMessage* message = new CloudChatMessage(0, false, TEXT_MESSAGE, sender_id, receiver_id,
+													 content, "", 0, "", false, created_at);
+	if (!CloudChatDatabase::GetInstance()->AddMessage(message)) {
+		SendMsgToClient(cloudchat_srv, hdl, new MessageSendFailedMsg(temp_id,
+																	 "messages 数据表更新失败"));
+		return;
+	}
+
+	SendMsgToClient(cloudchat_srv, hdl, new SelfMessageReceivedMsg(temp_id, 0, ctime(&created_at)));
+	CloudChatUser* target = CloudChatDatabase::GetInstance()->GetUserById(receiver_id);
+	if (target == nullptr) return;
+	if (target->is_online()) {
+		for (auto& p : g_online_users) {
+			if (p.second == receiver_id) {
+				SendMsgToClient(cloudchat_srv, p.first, new ToSelfMessageReceivedMsg(*message));
+				break;
+			}
+		}
+	}
 }
 
 void SendFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
@@ -174,8 +213,20 @@ void SendImage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 }
 
 void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-			  MarkReadMsg* mark_read_msg) {
-	// TODO: 标记已读业务
+			  MarkReadMsg* mark_read_msg) { // 标记已读业务
+	int user_id = mark_read_msg->get_user_id();
+	int target_id = mark_read_msg->get_target_id();
+
+	std::cout << "标记已读：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
+	std::cout << "targetId: " << target_id << std::endl;
+
+	std::vector<CloudChatMessage> messages = CloudChatDatabase::GetInstance()->GetMessagesByTwoIds(
+		user_id, target_id);
+	for (CloudChatMessage message : messages) {
+		if (message.get_receiver_id() == user_id) message.SetIsRead(true);
+		CloudChatDatabase::GetInstance()->UpdateMessage(&message);
+	}
 }
 
 void ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
