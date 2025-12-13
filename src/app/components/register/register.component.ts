@@ -19,7 +19,7 @@ export class RegisterComponent implements OnInit {
   email = '';
   isLoading = false;
   errorMessage = '';
-  
+
   private registerTimeout: any;
 
   constructor(
@@ -45,8 +45,10 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    if (!this.email) {
-      this.errorMessage = '请输入邮箱';
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(this.email)) {
+      this.isLoading = false;
+      this.errorMessage = '请输入有效的邮箱地址';
       return;
     }
 
@@ -82,7 +84,7 @@ export class RegisterComponent implements OnInit {
       this.registerTimeout = null;
     }, 5000);
   }
-  
+
   ngOnDestroy(): void {
     if (this.registerTimeout) {
       clearTimeout(this.registerTimeout);
