@@ -1,0 +1,48 @@
+#ifndef CLOUDCHATDAT_H
+#define CLOUDCHATDAT_H
+
+#define DATABASE_USERNAME "cloudchat" // 数据库用户名
+#define DATABASE_PASSWORD "1919810" // 数据库密码
+#define DATABASE_HOST     "tcp://127.0.0.1:3306" // 数据库主机地址
+
+#define DATABASE_INITIALIZED 1                   // 数据库已初始化
+#define DATABASE_INITIALIZATION_FAILED -1        // 数据库初始化失败
+
+#include "cloudchatsys.h"
+
+class CloudChatDatabase { // CloudChat 数据库类
+private:
+	sql::mysql::MySQL_Driver* driver_; // 驱动对象指针
+	sql::Connection*          connection_; // MySQL 连接对象指针
+
+	CloudChatDatabase() {                 // 构造函数
+		try {
+			driver_ = sql::mysql::get_mysql_driver_instance(); // 获取驱动实例
+			 // 建立连接
+			connection_ = driver_->connect(DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
+			// 创建 Statement 对象
+			sql::Statement *statement = connection_->createStatement();
+			// 执行创建数据库的 SQL 语句
+			statement->execute("create database if not exists cloudchat");
+
+			std::cout << "数据库 cloudchat 已成功创建。" << std::endl;
+
+			// TODO: 创建数据表
+
+			// 清理资源
+			delete statement;
+		} catch (sql::SQLException &e) { // 发生错误
+			std::cerr << "MySQL 错误：" << e.what() << std::endl;
+			std::cerr << "错误代码：" << e.getErrorCode() << std::endl;
+			throw;
+		}
+	}
+
+public:
+	static CloudChatDatabase* GetInstance() { // 获取单例模式实例
+		static CloudChatDatabase instance_;   // 单例模式实例
+		return &instance_;
+	}
+};
+
+#endif // CLOUDCHATDAT_H
