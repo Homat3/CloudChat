@@ -145,6 +145,7 @@ CloudChatDatabase::CloudChatDatabase() {
 		std::cerr << "错误代码：" << e.getErrorCode() << std::endl;
 		throw;
 	}
+	th_pump_ = std::thread(&CloudChatDatabase::Pump, this);
 }
 
 CloudChatDatabase* CloudChatDatabase::GetInstance() {
@@ -605,4 +606,15 @@ bool CloudChatDatabase::UpdateMessage(CloudChatMessage* message) {
 		std::cout << "更新 messages 数据表失败：" << e.what() << std::endl;
 	}
 	return false;
+}
+
+void CloudChatDatabase::Pump() {
+	while (1) {
+		GetUserById(1);
+		sleep(7 * 60 * 60);
+	}
+}
+
+CloudChatDatabase::~CloudChatDatabase() {
+	th_pump_.join();
 }
