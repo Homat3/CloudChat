@@ -19,9 +19,11 @@ class CloudChatDatabase { // CloudChat 数据库类
 private:
 	sql::mysql::MySQL_Driver* driver_; // 驱动对象指针
 	sql::Connection*          connection_; // MySQL 连接对象指针
+	std::thread               th_pump_;    // 心跳线程，定时执行数据库操作，防止断连
 
-	// 构造函数建立与 mysql 的连接，初始化数据库，创建数据表
-	CloudChatDatabase();
+	CloudChatDatabase(); // 构造函数建立与 mysql 的连接，初始化数据库，创建数据表
+	~CloudChatDatabase();
+	void Pump();		 // 心跳函数，在心跳线程中执行
 
 public:
 	static CloudChatDatabase* GetInstance(); // 获取单例模式实例

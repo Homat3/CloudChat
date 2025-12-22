@@ -25,6 +25,7 @@
 #include <fstream>
 #include <filesystem>
 #include <csignal>
+#include <thread>
 
 #define SERVER_PORT 14514 // 服务器通信端口号
 // 114.116.245.123
