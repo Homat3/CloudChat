@@ -1,5 +1,8 @@
 #include "cloudchatsys.h"
 
+int g_server_port = 14514;
+int g_buff_len    = 2048;
+
 // Base64解码函数
 std::string base64Decode(const std::string& encoded) {
     const std::string base64_chars = 

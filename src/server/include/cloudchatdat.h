@@ -8,9 +8,9 @@
 #include "cloudchatmsg.h"
 #include "cloudchatuser.h"
 
-std::string g_database_username = "cloudchat";
-std::string g_database_password = "1919810";
-std::string g_database_host     = "tcp://127.0.0.1:3306";
+extern std::string g_database_username;
+extern std::string g_database_password;
+extern std::string g_database_host;
 
 #define DATABASE_USERNAME g_database_username // 数据库用户名
 #define DATABASE_PASSWORD g_database_password // 数据库密码

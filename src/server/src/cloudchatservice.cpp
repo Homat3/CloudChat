@@ -431,3 +431,47 @@ void UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 
 	fout.close();
 }
+
+std::string HTTPLogin(LoginMsg* login_msg) {
+	return "";
+}
+
+std::string HTTPLoginByToken(LoginByTokenMsg* login_by_token_msg) {
+	return "";
+}
+
+std::string HTTPRegister(RegisterMsg* register_msg) {
+	return "";
+}
+
+std::string HTTPLogout(LogoutMsg* logout_msg) {
+	return "";
+}
+
+std::string HTTPUpdateProfile(UpdateProfileMsg* update_profile_msg) {
+	return "";
+}
+
+std::string HTTPLoadContacts(LoadContactsMsg* load_contacts_msg) {
+	return "";
+}
+
+std::string HTTPLoadMessages(LoadMessagesMsg* load_messages_msg) {
+	return "";
+}
+
+std::string HTTPMarkRead(MarkReadMsg* mark_read_msg) {
+	return "";
+}
+
+std::string HTTPSearchForUserById(SearchForUserByIdMsg* search_for_user_by_id_msg) {
+	return "";
+}
+
+std::string HTTPSearchForUserByName(SearchForUserByNameMsg* search_for_user_by_name_msg) {
+	return "";
+}
+
+std::string HTTPLoadFriendRequest(LoadFriendRequestMsg* load_friend_request_msg) {
+	return "";
+}
