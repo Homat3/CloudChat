@@ -8,9 +8,9 @@
 #include "cloudchatmsg.h"
 #include "cloudchatuser.h"
 
-std::string g_database_username = "cloudchat";
-std::string g_database_password = "1919810";
-std::string g_database_host     = "tcp://127.0.0.1:3306";
+extern std::string g_database_username;
+extern std::string g_database_password;
+extern std::string g_database_host;
 
 #define DATABASE_USERNAME g_database_username // 数据库用户名
 #define DATABASE_PASSWORD g_database_password // 数据库密码
@@ -33,11 +33,11 @@ public:
 	static CloudChatDatabase* GetInstance(); // 获取单例模式实例
 	// TODO: 编写数据库操作接口
 	// users
-	bool AddUser(CloudChatUser& user);//addUser
-	CloudChatUser* GetUserById(int id);//
-	bool           UpdateUser(CloudChatUser* user);//
+	bool AddUser(CloudChatUser& user);//添加用户
+	CloudChatUser* GetUserById(int id);
+	bool UpdateUser(CloudChatUser* user);//更新用户
 	CloudChatUser* GetUserByName(std::string name);
-	bool           DeleteUser(int id);
+	bool DeleteUser(int id);//删除用户
 	std::vector<CloudChatUser> SearchUsersByName(std::string username);
 	// friend_requests
 	bool AddFriendRequest(FriendRequest friend_request);

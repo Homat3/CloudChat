@@ -1,6 +1,9 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatservice.h"
+#include <functional>
+#include <websocketpp/common/connection_hdl.hpp>
+#include <websocketpp/http/constants.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
@@ -17,6 +20,7 @@ void LoadConfig();				// 加载配置文件
 void OnOpen(websocketpp::connection_hdl hdl);
 void OnClose(websocketpp::connection_hdl hdl);
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg);
+void OnHTTP(websocketpp::connection_hdl hdl);
 void signal_handler(int signal);
 
 int main() {
@@ -77,6 +81,8 @@ int InitNetwork() {
 		auto msg_handler = std::bind(OnMessage, std::placeholders::_1,
 									 std::placeholders::_2);
 		g_cloudchat_srv.set_message_handler(msg_handler);
+		auto http_handler = std::bind(OnHTTP, std::placeholders::_1);
+		g_cloudchat_srv.set_http_handler(http_handler);
 		// 启用地址重用
 		g_cloudchat_srv.set_reuse_addr(true);
 		// 设置监听端口
@@ -136,7 +142,6 @@ void OnClose(websocketpp::connection_hdl hdl) {	// 客户端断开连接时服�
 }
 
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
-	// TODO: 收到客户端的消息并解析处理
 	std::string JSON_msg = msg->get_payload();
 	ClientMsg* client_msg = parse_protocal_msg(JSON_msg);
 	std::string type = client_msg->get_type();
@@ -218,4 +223,46 @@ void LoadConfig() {
 	int database_host_pos = find_field_pos(text, "\"database_host\"");
 	std::string database_host = parse_str_from_json(text, database_host_pos, end);
 	if (database_host != "") g_database_host = database_host;
+}
+
+void OnHTTP(websocketpp::connection_hdl hdl) {
+	server_t::connection_ptr con = g_cloudchat_srv.get_con_from_hdl(hdl);
+
+	std::string method = con->get_request().get_method();
+    std::string uri = con->get_request().get_uri();
+    std::string body = con->get_request_body();  // 请求体（支持 POST 等）
+	
+	std::string JSON_msg = body;
+	ClientMsg* client_msg = parse_protocal_msg(JSON_msg);
+	std::string type = client_msg->get_type();
+
+	std::string response_body;
+
+	if (type == LOGIN) {
+		response_body = HTTPLogin((LoginMsg*)client_msg);
+	} else if (type == LOGIN_BY_TOKEN) {
+		response_body = HTTPLoginByToken((LoginByTokenMsg*)client_msg);
+	} else if (type == REGISTER) {
+		response_body = HTTPRegister((RegisterMsg*)client_msg);
+	} else if (type == LOGOUT) {
+		response_body = HTTPLogout((LogoutMsg*)client_msg);
+	} else if (type == UPDATE_PROFILE) {
+		response_body = HTTPUpdateProfile((UpdateProfileMsg*)client_msg);
+	} else if (type == LOAD_CONTACTS) {
+		response_body = HTTPLoadContacts((LoadContactsMsg*)client_msg);
+	} else if (type == LOAD_MESSAGES) {
+		response_body = HTTPLoadMessages((LoadMessagesMsg*)client_msg);
+	} else if (type == MARK_READ) {
+		response_body = HTTPMarkRead((MarkReadMsg*)client_msg);
+	} else if (type == SEARCH_FOR_USER_BY_ID) {
+		response_body = HTTPSearchForUserById((SearchForUserByIdMsg*)client_msg);
+	} else if (type == SEARCH_FOR_UESR_BY_NAME) {
+		response_body = HTTPSearchForUserByName((SearchForUserByNameMsg*)client_msg);
+	} else if (type == LOAD_FRIEND_REQUEST) {
+		response_body = HTTPLoadFriendRequest((LoadFriendRequestMsg*)client_msg);
+	}
+
+	con->set_status(websocketpp::http::status_code::ok);
+	con->set_body(response_body);
+	con->append_header("Content-Type", "application/json");
 }

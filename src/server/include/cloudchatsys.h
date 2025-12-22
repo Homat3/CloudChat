@@ -28,9 +28,10 @@
 #include <thread>
 #include <csignal>
 #include <cstdio>
+#include <cppconn/resultset.h>
 
-int g_server_port = 14514;
-int g_buff_len    = 2048;
+extern int g_server_port;
+extern int g_buff_len;
 
 #define SERVER_PORT g_server_port // 服务器通信端口号
 #define BUFF_LEN    g_buff_len	  // 字符串缓冲区大小

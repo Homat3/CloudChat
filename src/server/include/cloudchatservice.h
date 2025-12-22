@@ -1,7 +1,6 @@
 #ifndef CLOUDCHAT_SERVICE
 #define CLOUDCHAT_SERVICE
 
-#include <websocketpp/common/connection_hdl.hpp>
 #define DEFAULT_AVATAR_URL "default.png"	// 默认用户头像 URL
 
 #include "cloudchatdat.h"
@@ -9,7 +8,7 @@
 
 extern std::map<websocketpp::connection_hdl, int,
 				std::owner_less<websocketpp::connection_hdl>> g_online_users;
-
+// Websocket 请求服务
 void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* login_msg);
 void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				  LoginByTokenMsg* login_by_token_msg);
@@ -47,5 +46,17 @@ void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					   LoadFriendRequestMsg* load_friend_request_msg);
 void UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				UploadFileMsg* upload_file_msg);
+// HTTP 请求服务
+std::string HTTPLogin(LoginMsg* login_msg);
+std::string HTTPLoginByToken(LoginByTokenMsg* login_by_token_msg);
+std::string HTTPRegister(RegisterMsg* register_msg);
+std::string HTTPLogout(LogoutMsg* logout_msg);
+std::string HTTPUpdateProfile(UpdateProfileMsg* update_profile_msg);
+std::string HTTPLoadContacts(LoadContactsMsg* load_contacts_msg);
+std::string HTTPLoadMessages(LoadMessagesMsg* load_messages_msg);
+std::string HTTPMarkRead(MarkReadMsg* mark_read_msg);
+std::string HTTPSearchForUserById(SearchForUserByIdMsg* search_for_user_by_id_msg);
+std::string HTTPSearchForUserByName(SearchForUserByNameMsg* search_for_user_by_name_msg);
+std::string HTTPLoadFriendRequest(LoadFriendRequestMsg* load_friend_request_msg);
 
 #endif // CLOUDCHAT_SERVICE

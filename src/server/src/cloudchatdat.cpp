@@ -1,9 +1,10 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatuser.h"
-#include <cppconn/exception.h>
-#include <cppconn/prepared_statement.h>
-#include <cppconn/resultset.h>
+
+std::string g_database_username = "cloudchat";
+std::string g_database_password = "1919810";
+std::string g_database_host     = "tcp://127.0.0.1:3306";
 
 CloudChatDatabase::CloudChatDatabase() {
 	try {
