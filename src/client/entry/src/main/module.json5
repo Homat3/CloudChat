@@ -29,6 +29,10 @@
               "ohos.want.action.home"
             ]
           }
+        ],
+        "permissions": [
+          "ohos.permission.INTERNET",
+          "ohos.permission.GET_NETWORK_INFO"
         ]
       }
     ],
