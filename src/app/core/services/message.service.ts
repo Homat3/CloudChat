@@ -4,6 +4,8 @@ import {ResponseService} from './response.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AuthService} from './auth.service';
 import {SendMessagePayload} from '../protocol/client.protocol';
+import {ContactService} from './contact.service';
+import {RequestService} from './request.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +25,10 @@ export class MessageService {
   }> = new Map();
 
   constructor(
+    private reqestService: RequestService,
     private responseService: ResponseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private contactService: ContactService
   ) {
     this.responseService.messagesLoaded$.subscribe(payload => {
       if (this.authService.currentUserValue){
@@ -103,6 +107,13 @@ export class MessageService {
           newMessageMap.set(newMessage.senderId, [newMessage]);
         }
         this.messageMapSubject.next(newMessageMap);
+
+        const currentContact = this.contactService.getCurrentContact();
+        if (currentContact) {
+          if (currentContact.contactId === newMessage.senderId) {
+            this.markRead(newMessage.senderId);
+          }
+        }
       } else {
         console.error("消息列表解析失败")
       }
@@ -127,5 +138,17 @@ export class MessageService {
     setTimeout(() => {
       this.messagesWaitingForEmit.delete(message.tempId)
     }, 5000);
+  }
+
+  public markRead(targetId: number) {
+    if (this.messagesMapValue && this.authService.currentUserValue){
+      this.reqestService.markRead({userId: this.authService.currentUserValue.userId, targetId: targetId});
+      this.messagesMapValue.get(targetId)?.forEach(message => {
+        if (message.status != 'read' && message.senderId == targetId) {
+          message.status = 'read';
+        }
+      })
+      this.messageMapSubject.next(this.messagesMapValue);
+    }
   }
 }

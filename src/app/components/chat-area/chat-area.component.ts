@@ -30,7 +30,6 @@ export class ChatAreaComponent implements OnChanges{
 
   @Input() messages: Message[] = [];
   newMessage = '';
-  private subscriptions: Subscription[] = [];
 
   constructor(
     private requestService: RequestService,
@@ -53,7 +52,7 @@ export class ChatAreaComponent implements OnChanges{
         if (toMark) return;
       });
       if (toMark){
-        this.markMessagesAsRead(this.authService.currentUserValue?.userId || -1, contactId);
+        this.markMessagesAsRead(contactId);
       }
       console.log('切换到联系人:', changes['selectedContact'].currentValue.username);
     }
@@ -63,9 +62,8 @@ export class ChatAreaComponent implements OnChanges{
     this.messages = this.messageService.messagesMapValue?.get(targetId) || [];
   }
 
-  private markMessagesAsRead(userId: number, targetId: number): void {
-    if (userId == -1) return;
-    this.requestService.markRead({ userId, targetId });
+  private markMessagesAsRead(targetId: number): void {
+    this.messageService.markRead(targetId);
   }
 
   ngAfterViewChecked() {
@@ -116,14 +114,6 @@ export class ChatAreaComponent implements OnChanges{
         window.alert('发送消息失败: ' + error);
       }
       );
-  }
-
-  private formatTimestamp(date: Date){
-    return date.getFullYear().toString() + ' ' +
-      date.getMonth().toString() + ' ' +
-      date.getDate().toString() + ' | ' +
-      date.getHours().toString() + ':' +
-      date.getMinutes().toString()
   }
 
   isNewMessage(message: Message): boolean {
