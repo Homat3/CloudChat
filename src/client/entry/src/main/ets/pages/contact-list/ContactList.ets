@@ -1,12 +1,12 @@
 @Entry
 @Component
-struct Index {
+struct ContactList {
   @State message: string = 'Hello World';
 
   build() {
     RelativeContainer() {
       Text(this.message)
-        .id('HelloWorld')
+        .id('PageHelloWorld')
         .fontSize($r('app.float.page_text_font_size'))
         .fontWeight(FontWeight.Bold)
         .alignRules({
@@ -14,7 +14,7 @@ struct Index {
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
         .onClick(() => {
-          this.message = 'Welcome Test';
+          this.message = 'Welcome';
         })
     }
     .height('100%')

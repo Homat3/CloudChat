@@ -1,9 +1,9 @@
 {
   "name": "entry",
   "version": "1.0.0",
-  "description": "Please describe the basic information.",
+  "description": "CloudChat. A chat app.",
   "main": "",
-  "author": "",
+  "author": "Infinomat",
   "license": "",
   "dependencies": {}
 }
