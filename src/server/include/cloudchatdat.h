@@ -8,9 +8,13 @@
 #include "cloudchatmsg.h"
 #include "cloudchatuser.h"
 
-#define DATABASE_USERNAME "cloudchat" // 数据库用户名
-#define DATABASE_PASSWORD "1919810" // 数据库密码
-#define DATABASE_HOST     "tcp://127.0.0.1:3306" // 数据库主机地址
+std::string g_database_username = "cloudchat";
+std::string g_database_password = "1919810";
+std::string g_database_host     = "tcp://127.0.0.1:3306";
+
+#define DATABASE_USERNAME g_database_username // 数据库用户名
+#define DATABASE_PASSWORD g_database_password // 数据库密码
+#define DATABASE_HOST     g_database_host	  // 数据库主机地址
 
 #define DATABASE_INITIALIZED 0                   // 数据库已初始化
 #define DATABASE_INITIALIZATION_FAILED -1        // 数据库初始化失败
