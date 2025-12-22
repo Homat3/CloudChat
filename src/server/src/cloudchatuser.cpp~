@@ -1,0 +1,5 @@
+#include "cloudchatuser.h"
+
+int CloudChatUser::GetId() {
+	return id_;
+}
