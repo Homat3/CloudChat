@@ -10,6 +10,18 @@
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:Permission_REASON_INTERNET",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse",
+        }
+      }
+    ],
     "abilities": [
       {
         "name": "EntryAbility",
@@ -29,10 +41,6 @@
               "ohos.want.action.home"
             ]
           }
-        ],
-        "permissions": [
-          "ohos.permission.INTERNET",
-          "ohos.permission.GET_NETWORK_INFO"
         ]
       }
     ],
