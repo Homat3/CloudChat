@@ -1,40 +1,23 @@
-// CommonInput.ets
 @Component
 export struct CommonInput {
-  // 输入框提示文本
+//默认内容
   @Prop placeholder: string = '请输入内容'
-
-  // 输入框当前值
   @Prop text: string = ''
 
-  // 背景颜色
+  //默认样式
   @Prop inputBgColor: string = '#FFFFFF'
-
-  // 字体颜色
   @Prop inputFontColor: Color = Color.Black
-
-  // 边框颜色（重命名避免冲突）
   @Prop inputBorderColor: string = '#E5E5E5'
-
-  // 边框圆角（重命名避免冲突）
   @Prop inputBorderRadius: number = 8
 
-  // 输入框类型
+  // 该变量
   @Prop inputType: InputType = InputType.Normal
-
-  // 是否禁用（重命名避免冲突）
   @Prop isEnabled: boolean = true
-
-  // 最大输入长度
   @Prop maxLength: number = 50
 
-  // 输入变化回调
+  // 回调函数
   @Prop onTextChange: (text: string) => void = () => {}
-
-  // 获取焦点回调（重命名避免冲突）
   @Prop onInputFocus: () => void = () => {}
-
-  // 失去焦点回调（重命名避免冲突）
   @Prop onInputBlur: () => void = () => {}
 
   build() {
@@ -55,22 +38,22 @@ export struct CommonInput {
         .fontColor(this.inputFontColor)
         .fontSize(16)
         .type(this.inputType)
-        .enabled(this.isEnabled)  // 使用重命名后的属性
+        .enabled(this.isEnabled)
         .maxLength(this.maxLength)
         .border({
-          color: this.inputBorderColor,  // 使用重命名后的属性
+          color: this.inputBorderColor,
           width: 1,
-          radius: this.inputBorderRadius  // 使用重命名后的属性
+          radius: this.inputBorderRadius
         })
         .padding({ left: 12, right: 12 })
         .onChange((value: string) => {
           this.onTextChange(value)
         })
         .onFocus(() => {
-          this.onInputFocus()  // 使用重命名后的回调
+          this.onInputFocus()
         })
         .onBlur(() => {
-          this.onInputBlur()  // 使用重命名后的回调
+          this.onInputBlur()
         })
     }
     .width('100%')
