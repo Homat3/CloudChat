@@ -1,4 +1,4 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';  //日志模块
+import { hilog } from '@kit.PerformanceAnalysisKit'; //日志模块
 import { BackupExtensionAbility, BundleVersion } from '@kit.CoreFileKit';
 
 const DOMAIN = 0x0000;  //日志域

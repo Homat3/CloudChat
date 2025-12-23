@@ -1,4 +1,4 @@
-import { NetworkServiceError } from "../error/NetWorkServiceError";
+import { NetworkServiceError } from '../error/NetWorkServiceError';
 
 //在错误消息前添加前缀
 export class HttpServiceError extends NetworkServiceError{

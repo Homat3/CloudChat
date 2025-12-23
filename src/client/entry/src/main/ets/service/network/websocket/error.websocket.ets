@@ -1,4 +1,4 @@
-import { NetworkServiceError } from "../error/NetWorkServiceError";
+import { NetworkServiceError } from '../error/NetWorkServiceError';
 
 export class WebsocketServiceError extends NetworkServiceError{
   constructor(message: string) {

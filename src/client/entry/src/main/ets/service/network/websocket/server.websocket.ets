@@ -1,12 +1,22 @@
-import { webSocket } from '@kit.NetworkKit'
-import { ConnectFailedError, ServiceCloseError, ServiceOpenError, ServiceReceiveError,
-  WebsocketServiceError, SendError } from './error.websocket';
+import { webSocket } from '@kit.NetworkKit';
+import {
+  ConnectFailedError,
+  SendError,
+  ServiceCloseError,
+  ServiceOpenError,
+  ServiceReceiveError,
+  WebsocketServiceError
+} from './error.websocket';
 
 export class WebsocketService {
   private websocketBase = webSocket.createWebSocket();
   private serverUrl: string;
+  private port: string | null;
   private _newMessage: string = "";
   private newMessageObservers: Array<(newMessage: string) => void> = [];
+
+  private retryCount = 0;
+  private maxRetryCount = 5;
 
   set newMessage(value: string){
     if (!(this._newMessage === value)){
@@ -25,18 +35,34 @@ export class WebsocketService {
   }
 
   public constructor(serverUrl: string, port: string | null) {
-    this.serverUrl = serverUrl + (port ? ":" + port : "");
+    this.port = port;
+    this.serverUrl = serverUrl;
+  }
 
-    this.websocketBase.connect('ws://' + this.serverUrl, (err: BusinessError) => {
+  public connect() {
+    let errorOccurs = this.retryCount > this.maxRetryCount;
+    this.retryCount++;
+    // 定义WebSocket连接的URL前缀
+    const prefix = 'ws://';
+    // 根据端口是否存在，决定是否添加端口号
+    const endfix = this.port ? ":" + this.port : "";
+    // 拼接完整的WebSocket连接地址
+    let n = prefix + this.serverUrl + endfix;
+    // 调用WebSocket连接方法，进行实际连接
+    this.websocketBase.connect(prefix + this.serverUrl + endfix, (err: BusinessError) => {
       if (!err) {
+        // 连接成功，输出日志并订阅消息
         console.info("Connected successfully");
         this.subscribe();
-      }
-      else {
-        throw new ConnectFailedError(err.message, err.code);
+      } else {
+        // 连接失败，抛出连接失败错误
+        console.error(`连接失败，3秒后重试 Code:${err.code}`);
+        setTimeout((): void => this.connect(), 3000);
+        if (errorOccurs) throw new ConnectFailedError(err.message, err.code);
       }
     });
   }
+
 
   private subscribe(){// 连接成功事件
     this.websocketBase.on('open', (err: BusinessError, value: Object) => {

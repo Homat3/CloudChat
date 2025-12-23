@@ -1,4 +1,4 @@
-import { http } from '@kit.NetworkKit'  // 导入ArkTS的网络模块
+import { http } from '@kit.NetworkKit'; // 导入ArkTS的网络模块
 
 export function createDefaultRequestOptions(): http.HttpRequestOptions{
   return new RequestOptionsBuilder().build();

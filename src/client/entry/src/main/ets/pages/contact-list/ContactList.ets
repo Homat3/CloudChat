@@ -1,7 +1,10 @@
+import { common } from '@kit.AbilityKit';
+
 @Entry
 @Component
 struct ContactList {
-  @State message: string = 'Hello CloudChat';
+  @StorageProp("message") message: string = 'Hello CloudChat';
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
     RelativeContainer() {
@@ -16,7 +19,7 @@ struct ContactList {
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
         .onClick(() => {
-          this.message = 'Welcome'; //点击后更新触发UI重绘
+          this.context.eventHub.emit("test");
         })
     }
     //容器高与宽占满
