@@ -24,8 +24,8 @@ export class WebsocketService {
     this.newMessageObservers.forEach(it => it(newValue));
   }
 
-  public constructor(serverUrl: string, port: string) {
-    this.serverUrl = serverUrl + ':' + port;
+  public constructor(serverUrl: string, port: string | null) {
+    this.serverUrl = serverUrl + (port ? ":" + port : "");
 
     this.websocketBase.connect('ws://' + this.serverUrl, (err: BusinessError) => {
       if (!err) {

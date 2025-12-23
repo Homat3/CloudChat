@@ -6,28 +6,31 @@ import { RequestOptionsBuilder } from './config.http';
 export class HttpService {
   private httpBase = http.createHttp();
   private baseUrl: string;
+  private port: string | null = null
   private SSL_Available: boolean;
 
   /**
    * @param baseUrl 目标域名/ip
    * @example const exampleService = new HttpService('example.com');
    */
-  public constructor(baseUrl: string, SSL_Available: boolean = true) {
+  public constructor(baseUrl: string, port: string | null = null, SSL_Available: boolean = true) {
     this.baseUrl = baseUrl;
+    this.port = port;
     this.SSL_Available = SSL_Available;
   }
 
   private async request(uri: string, requestOptions: http.HttpRequestOptions, callback: AsyncCallback<http.HttpResponse>) {
     try {
       const prefix = this.SSL_Available ? "https://" : "http://";
-      this.httpBase.request(prefix + this.baseUrl + uri, requestOptions, callback);
+      const endfix = this.port ? ":" + this.port : "";
+      this.httpBase.request(prefix + this.baseUrl + endfix + uri, requestOptions, callback);
     } catch (error) {
       throw new Error(`Error code: ${error.code}`);
     }
   }
 
-  async post(uri: string, callback: AsyncCallback<http.HttpResponse>){
-    const requestOptions = new RequestOptionsBuilder().method('POST').build();
+  async post(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+    const requestOptions = new RequestOptionsBuilder().method('POST').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
     } catch (error){
@@ -35,8 +38,8 @@ export class HttpService {
     }
   }
 
-  async get(uri: string, callback: AsyncCallback<http.HttpResponse>){
-    const requestOptions = new RequestOptionsBuilder().method('GET').build();
+  async get(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+    const requestOptions = new RequestOptionsBuilder().method('GET').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
     } catch (error){
@@ -44,8 +47,8 @@ export class HttpService {
     }
   }
 
-  async put(uri: string, callback: AsyncCallback<http.HttpResponse>){
-    const requestOptions = new RequestOptionsBuilder().method('PUT').build();
+  async put(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+    const requestOptions = new RequestOptionsBuilder().method('PUT').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
     } catch (error){
@@ -53,8 +56,8 @@ export class HttpService {
     }
   }
 
-  async delete(uri: string, callback: AsyncCallback<http.HttpResponse>){
-    const requestOptions = new RequestOptionsBuilder().method('DELETE').build();
+  async delete(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+    const requestOptions = new RequestOptionsBuilder().method('DELETE').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
     } catch (error){

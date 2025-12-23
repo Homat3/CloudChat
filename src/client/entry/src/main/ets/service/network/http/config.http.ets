@@ -9,6 +9,7 @@ interface HttpHeaderInterface {
 }
 interface HttpConfigInterface {
   header: HttpHeaderInterface,
+  expectDataType: http.HttpDataType,
   readTimeout: number,
   connectTimeout: number // 5s
 }
@@ -27,6 +28,7 @@ export class HttpConfig implements HttpConfigInterface{
 
 
   public header: HttpHeaderInterface;
+  public expectDataType: http.HttpDataType = http.HttpDataType.OBJECT;
 
   private _readTimeout: number = 5000
   public get readTimeout(){
@@ -67,6 +69,8 @@ export class RequestOptionsBuilder{
   private requestOptions: http.HttpRequestOptions = {
     method: http.RequestMethod.GET,
     header: this.config.header,
+    extraData: "",
+    expectDataType: this.config.expectDataType,
     readTimeout: this.config.readTimeout,
     connectTimeout: this.config.connectTimeout
   };
@@ -89,6 +93,11 @@ export class RequestOptionsBuilder{
           console.error("Not Implement")
           break;
     }
+    return this;
+  }
+
+  public body(body: object): RequestOptionsBuilder {
+    this.requestOptions.extraData = JSON.stringify(body);
     return this;
   }
 
