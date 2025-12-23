@@ -158,10 +158,6 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 		UpdateProfile(g_cloudchat_srv, hdl, (UpdateProfileMsg*)client_msg);
 	} else if (type == LOAD_CONTACTS) {
 		LoadContacts(g_cloudchat_srv, hdl, (LoadContactsMsg*)client_msg);
-	} else if (type == ADD_CONTACT) {
-		AddContact(g_cloudchat_srv, hdl, (AddContactMsg*)client_msg);
-	} else if (type == DELETE_CONTACT) {
-		DeleteContact(g_cloudchat_srv, hdl, (DeleteContactMsg*)client_msg);
 	} else if (type == LOAD_MESSAGES) {
 		LoadMessages(g_cloudchat_srv, hdl, (LoadMessagesMsg*)client_msg);
 	} else if (type == SEND_MESSAGE) {
@@ -186,8 +182,8 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 		AcceptFriendRequest(g_cloudchat_srv, hdl, (AcceptFriendRequestClientMsg*)client_msg);
 	} else if (type == LOAD_FRIEND_REQUEST) {
 		LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
-	} else if (type == UPLOAD_FILE) {
-		UploadFile(g_cloudchat_srv, hdl, (UploadFileMsg*)client_msg);
+	} else if (type == HDL_INFO) {
+		GetHdlInfo(g_cloudchat_srv, hdl, (HdlInfoMsg*)client_msg);
 	}
 }
 
@@ -207,10 +203,6 @@ void LoadConfig() {
 	int server_port_pos = find_field_pos(text, "\"server_port\"");
 	int server_port = parse_int_from_json(text, server_port_pos, end);
 	if (server_port > 0) g_server_port = server_port;
-	
-	int buff_len_pos = find_field_pos(text, "\"buff_len\"");
-	int buff_len = parse_int_from_json(text, buff_len_pos, end);
-	if (buff_len > 0) g_buff_len = buff_len;
 
 	int database_username_pos = find_field_pos(text, "\"database_username\"");
 	std::string database_username = parse_str_from_json(text, database_username_pos, end);
@@ -239,27 +231,27 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 	std::string response_body;
 
 	if (type == LOGIN) {
-		response_body = HTTPLogin((LoginMsg*)client_msg);
+		response_body = Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
 	} else if (type == LOGIN_BY_TOKEN) {
-		response_body = HTTPLoginByToken((LoginByTokenMsg*)client_msg);
+		response_body = LoginByToken(g_cloudchat_srv, hdl, (LoginByTokenMsg*)client_msg);
 	} else if (type == REGISTER) {
-		response_body = HTTPRegister((RegisterMsg*)client_msg);
+		response_body = Register(g_cloudchat_srv, hdl, (RegisterMsg*)client_msg);
 	} else if (type == LOGOUT) {
-		response_body = HTTPLogout((LogoutMsg*)client_msg);
+		response_body = Logout(g_cloudchat_srv, hdl, (LogoutMsg*)client_msg);
 	} else if (type == UPDATE_PROFILE) {
-		response_body = HTTPUpdateProfile((UpdateProfileMsg*)client_msg);
+		response_body = UpdateProfile(g_cloudchat_srv, hdl, (UpdateProfileMsg*)client_msg);
 	} else if (type == LOAD_CONTACTS) {
-		response_body = HTTPLoadContacts((LoadContactsMsg*)client_msg);
+		response_body = LoadContacts(g_cloudchat_srv, hdl, (LoadContactsMsg*)client_msg);
 	} else if (type == LOAD_MESSAGES) {
-		response_body = HTTPLoadMessages((LoadMessagesMsg*)client_msg);
+		response_body = LoadMessages(g_cloudchat_srv, hdl, (LoadMessagesMsg*)client_msg);
 	} else if (type == MARK_READ) {
-		response_body = HTTPMarkRead((MarkReadMsg*)client_msg);
+		response_body = MarkRead(g_cloudchat_srv, hdl, (MarkReadMsg*)client_msg);
 	} else if (type == SEARCH_FOR_USER_BY_ID) {
-		response_body = HTTPSearchForUserById((SearchForUserByIdMsg*)client_msg);
+		response_body = SearchForUserById(g_cloudchat_srv, hdl, (SearchForUserByIdMsg*)client_msg);
 	} else if (type == SEARCH_FOR_UESR_BY_NAME) {
-		response_body = HTTPSearchForUserByName((SearchForUserByNameMsg*)client_msg);
+		response_body = SearchForUserByName(g_cloudchat_srv, hdl, (SearchForUserByNameMsg*)client_msg);
 	} else if (type == LOAD_FRIEND_REQUEST) {
-		response_body = HTTPLoadFriendRequest((LoadFriendRequestMsg*)client_msg);
+		response_body = LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
 	}
 
 	con->set_status(websocketpp::http::status_code::ok);

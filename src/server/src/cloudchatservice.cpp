@@ -1,13 +1,17 @@
 #include "cloudchatservice.h"
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
+#include "cloudchatsys.h"
 #include "cloudchatuser.h"
 #include <websocketpp/base64/base64.hpp>
+#include <websocketpp/connection.hpp>
 
 std::map<websocketpp::connection_hdl, int,
 	std::owner_less<websocketpp::connection_hdl>> g_online_users;
 // 账密登录业务
-void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* login_msg) {
+std::string Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* login_msg) {
+    bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	std::string username = login_msg->get_username(), password = login_msg->get_password();
 	std::cout << "用户登录消息：" << std::endl;
 	std::cout << "username: " << username << std::endl;
@@ -15,13 +19,15 @@ void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* l
 	// 检查用户名是否存在
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserByName(username);
 	if (user == nullptr) { // 用户不存在
-		SendMsgToClient(cloudchat_srv, hdl, new LoginFailureMsg("用户不存在"));
-		return;
+		LoginFailureMsg* login_failure_msg = new LoginFailureMsg("用户不存在");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, login_failure_msg);
+		return login_failure_msg->to_JSON();
 	}
 	// 检查密码是否正确
 	if (user->get_password() != password) {
-		SendMsgToClient(cloudchat_srv, hdl, new LoginFailureMsg("密码错误"));
-		return;
+		LoginFailureMsg* login_failure_msg = new LoginFailureMsg("密码错误");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, login_failure_msg);
+		return login_failure_msg->to_JSON();
 	}
 	// 登录成功
 	int user_id = user->get_id();
@@ -32,14 +38,18 @@ void Login(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LoginMsg* l
 	user->SetOnline(true);
 	CloudChatDatabase::GetInstance()->UpdateUser(user); // 更新令牌
 	// 将用户加入在线列表
-	g_online_users[hdl] = user_id;
+	if (websocket_open) g_online_users[hdl] = user_id;
 	// 回复消息
-	SendMsgToClient(cloudchat_srv, hdl, new LoginSuccessMsg(user_id, username, email, avatar,
-															token));
+	LoginSuccessMsg* login_success_msg = new LoginSuccessMsg(user_id, username, email, avatar,
+															 token);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, login_success_msg);
+	return login_success_msg->to_JSON();
 }
 
-void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				  LoginByTokenMsg* login_by_token_msg) { // 令牌登录业务
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	std::string username = login_by_token_msg->get_username();
 	std::string token = login_by_token_msg->get_token();
 	std::cout << "令牌登录消息：" << std::endl;
@@ -48,13 +58,15 @@ void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	// 检查用户名是否存在
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserByName(username);
 	if (user == nullptr) { // 用户不存在
-		SendMsgToClient(cloudchat_srv, hdl, new LoginFailureMsg("用户不存在"));
-		return;
+		LoginFailureMsg* login_failure_msg = new LoginFailureMsg("用户不存在");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, login_failure_msg);
+		return login_failure_msg->to_JSON();
 	}
 	// 检查令牌
 	if (user->get_token() != token) {
-		SendMsgToClient(cloudchat_srv, hdl, new LoginFailureMsg("令牌已失效，请重新登录"));
-		return;
+		LoginFailureMsg* login_failure_msg = new LoginFailureMsg("令牌已失效，请重新登录");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, login_failure_msg);
+		return login_failure_msg->to_JSON();
 	}
 	// 登录成功
 	int user_id = user->get_id();
@@ -64,12 +76,16 @@ void LoginByToken(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	user->SetToken(token);
 	user->SetOnline(true);
 	CloudChatDatabase::GetInstance()->UpdateUser(user); // 更新令牌
-	g_online_users[hdl] = user_id;
-	SendMsgToClient(cloudchat_srv, hdl, new LoginSuccessMsg(user_id, username, email, avatar,
-															token));
+	if (websocket_open) g_online_users[hdl] = user_id;
+	LoginSuccessMsg* login_success_msg = new LoginSuccessMsg(user_id, username, email, avatar,
+															 token);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, login_success_msg);
+	return login_success_msg->to_JSON();
 }
 // 注册业务
-void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, RegisterMsg* register_msg) { 
+std::string Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, RegisterMsg* register_msg) {
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	std::string username = register_msg->get_username();
 	std::string password = register_msg->get_password();
 	std::string email = register_msg->get_email();
@@ -80,21 +96,24 @@ void Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, Register
 	// 检查用户名是否存在
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserByName(username);
 	if (user != nullptr) { // 用户名已存在
-		SendMsgToClient(cloudchat_srv, hdl, new RegisterFailureMsg("用户名已存在"));
-		return;
+		RegisterFailureMsg* register_failure_msg = new RegisterFailureMsg("用户名已存在");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, register_failure_msg);
+		return register_failure_msg->to_JSON();
 	}
 	// 用户不存在，注册成功
 	user = new CloudChatUser(0, username, password, DEFAULT_AVATAR_URL, generate_token(), email,
 							 true);
 	CloudChatDatabase::GetInstance()->AddUser(*user);
 	user = CloudChatDatabase::GetInstance()->GetUserByName(username);
-	g_online_users[hdl] = user->get_id();
-	SendMsgToClient(cloudchat_srv, hdl, new RegisterSuccessMsg(user->get_id(), username,
-															   email, user->get_avatar(),
-															   user->get_token()));
+	if (websocket_open) g_online_users[hdl] = user->get_id();
+	RegisterSuccessMsg* register_success_msg = new RegisterSuccessMsg(user->get_id(), username,
+																	  email, user->get_avatar(),
+																	  user->get_token());
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, register_success_msg);
+	return register_success_msg->to_JSON();
 }
 // 退出登录业务
-void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LogoutMsg* logout_msg) {
+std::string Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LogoutMsg* logout_msg) {
 	int user_id = logout_msg->get_user_id();
 	std::cout << "用户下线：" << std::endl;
 	std::cout << "userId: " << user_id << std::endl;
@@ -103,10 +122,14 @@ void Logout(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, LogoutMsg*
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserById(user_id);
 	user->SetOnline(false);
 	CloudChatDatabase::GetInstance()->UpdateUser(user);
+
+	return "";
 }
 
-void UpdateProfile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string UpdateProfile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				   UpdateProfileMsg* update_profile_msg) { // 更新个人信息业务
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int user_id = update_profile_msg->get_user_id();
 	std::string username = update_profile_msg->get_username();
 	std::string password = update_profile_msg->get_password();
@@ -123,38 +146,41 @@ void UpdateProfile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	password = old_profile->get_password();
 	CloudChatUser* new_profile = new CloudChatUser(user_id, username, password, avatar,
 												   generate_token(), email, true);
-	if (!CloudChatDatabase::GetInstance()->UpdateUser(new_profile)) {
-		// 更新 users 数据表失败
-		SendMsgToClient(cloudchat_srv, hdl, new ProfileUpdatedFailedMsg("更新 users 数据表失败"));
-		return;
+	if (!CloudChatDatabase::GetInstance()->UpdateUser(new_profile)) { // 更新 users 数据表失败
+		ProfileUpdatedFailedMsg* profile_updated_failure_msg =
+			new ProfileUpdatedFailedMsg("更新 users 数据表失败");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, profile_updated_failure_msg);
+		return profile_updated_failure_msg->to_JSON();
 	}
-	SendMsgToClient(cloudchat_srv, hdl, new ProfileUpdatedSuccessMsg(user_id, username, password,
-																	 email, avatar));
+
+	ProfileUpdatedSuccessMsg* profile_updated_success_msg = new ProfileUpdatedSuccessMsg(user_id,
+																						 username,
+																						 password,
+																						 email,
+																						 avatar);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, profile_updated_success_msg);
+	return profile_updated_success_msg->to_JSON();
 }
 
-void LoadContacts(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string LoadContacts(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				  LoadContactsMsg* load_contacts_msg) { // 加载联系人列表业务
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int user_id = load_contacts_msg->get_user_id();
 
 	std::cout << "加载联系人列表：" << std::endl;
 	std::cout << "userId: " << user_id << std::endl;
 
-	SendMsgToClient(cloudchat_srv, hdl, new ContactsLoadedMsg(CloudChatDatabase::GetInstance()->
-															  get_contacts(user_id)));
+	ContactsLoadedMsg* contacts_loaded_msg = new ContactsLoadedMsg(CloudChatDatabase::GetInstance()->
+																   get_contacts(user_id));
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, contacts_loaded_msg);
+	return contacts_loaded_msg->to_JSON();
 }
 
-void AddContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				AddContactMsg* add_contact_msg) {
-	// TODO: 添加联系人业务
-}
-
-void DeleteContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
-				   DeleteContactMsg* delete_contact_msg) {
-	// TODO: 删除联系人业务
-}
-
-void LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				  LoadMessagesMsg* load_messages_msg) { // 加载聊天记录业务
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int user_id = load_messages_msg->get_user_id();
 	int target_id = load_messages_msg->get_target_id();
 
@@ -164,7 +190,9 @@ void LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 
 	std::vector<CloudChatMessage> messages = CloudChatDatabase::GetInstance()->GetMessagesByTwoIds(
 		user_id, target_id);
-	SendMsgToClient(cloudchat_srv, hdl, new MessagesLoadedMsg(target_id, messages));
+	MessagesLoadedMsg* messages_loaded_msg = new MessagesLoadedMsg(target_id, messages);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, messages_loaded_msg);
+	return messages_loaded_msg->to_JSON();
 }
 
 void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
@@ -212,7 +240,7 @@ void SendImage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	// TODO: 发送图片业务
 }
 
-void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 			  MarkReadMsg* mark_read_msg) { // 标记已读业务
 	int user_id = mark_read_msg->get_user_id();
 	int target_id = mark_read_msg->get_target_id();
@@ -227,15 +255,19 @@ void MarkRead(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 		if (message.get_receiver_id() == user_id) message.SetIsRead(true);
 		CloudChatDatabase::GetInstance()->UpdateMessage(&message);
 	}
+	return "";
 }
 
-void ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string ClearMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				   ClearMessagesMsg* clear_messages_msg) {
 	// TODO: 清空聊天记录业务
+	return "";
 }
 
-void SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,				   
+std::string SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,				   
 					   SearchForUserByIdMsg* search_for_user_by_id_msg) { // 根据 id 搜索用户
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int id = search_for_user_by_id_msg->get_user_id();
 	
 	std::cout << "搜索指定用户：" << std::endl;
@@ -244,17 +276,24 @@ void SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	CloudChatUser* user = CloudChatDatabase::GetInstance()->GetUserById(id);
 	std::vector<CloudChatUser> users;
 	if (user) users.push_back(*user); // 找到了指定用户
-	SendMsgToClient(cloudchat_srv, hdl, new SearchForUserResultMsg(users));
+	SearchForUserResultMsg* search_for_user_result_msg = new SearchForUserResultMsg(users);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, search_for_user_result_msg);
+	return search_for_user_result_msg->to_JSON();
 }
 
-void SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 SearchForUserByNameMsg* search_for_user_by_name_msg) { // 根据用户名搜索用户
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	std::string username = search_for_user_by_name_msg->get_username();
 	std::cout << "搜索指定用户：" << std::endl;
 	std::cout << "username: " << username << std::endl;
+	
 	std::vector<CloudChatUser> users = CloudChatDatabase::GetInstance()->SearchUsersByName(
 		username);
-	SendMsgToClient(cloudchat_srv, hdl, new SearchForUserResultMsg(users));
+	SearchForUserResultMsg* search_for_user_result_msg = new SearchForUserResultMsg(users);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, search_for_user_result_msg);
+	return search_for_user_result_msg->to_JSON();
 }
 
 void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
@@ -393,8 +432,10 @@ void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 	}
 }
 
-void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					   LoadFriendRequestMsg* load_friend_request_msg) {
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int user_id = load_friend_request_msg->get_user_id();
 
 	std::cout << "加载好友请求列表：" << std::endl;
@@ -403,10 +444,12 @@ void LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	std::vector<FriendRequest> friend_requests =
 		CloudChatDatabase::GetInstance()->GetFriendRequestsByUserId(user_id);
 
-	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestLoadedMsg(friend_requests));
+	FriendRequestLoadedMsg* friend_requests_loaded_msg = new FriendRequestLoadedMsg(friend_requests);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_requests_loaded_msg);
+	return friend_requests_loaded_msg->to_JSON();
 }
-
-void UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+/*
+std::string UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				UploadFileMsg* upload_file_msg) {
 	std::string file_path = upload_file_msg->get_file_path();
 	std::string data_stream = websocketpp::base64_decode(upload_file_msg->get_data_stream());
@@ -431,47 +474,12 @@ void UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 
 	fout.close();
 }
+*/
+void GetHdlInfo(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, HdlInfoMsg* hdl_info_msg) {
+	int user_id = hdl_info_msg->get_user_id();
 
-std::string HTTPLogin(LoginMsg* login_msg) {
-	return "";
-}
+	std::cout << "获得 hdl 信息：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
 
-std::string HTTPLoginByToken(LoginByTokenMsg* login_by_token_msg) {
-	return "";
-}
-
-std::string HTTPRegister(RegisterMsg* register_msg) {
-	return "";
-}
-
-std::string HTTPLogout(LogoutMsg* logout_msg) {
-	return "";
-}
-
-std::string HTTPUpdateProfile(UpdateProfileMsg* update_profile_msg) {
-	return "";
-}
-
-std::string HTTPLoadContacts(LoadContactsMsg* load_contacts_msg) {
-	return "";
-}
-
-std::string HTTPLoadMessages(LoadMessagesMsg* load_messages_msg) {
-	return "";
-}
-
-std::string HTTPMarkRead(MarkReadMsg* mark_read_msg) {
-	return "";
-}
-
-std::string HTTPSearchForUserById(SearchForUserByIdMsg* search_for_user_by_id_msg) {
-	return "";
-}
-
-std::string HTTPSearchForUserByName(SearchForUserByNameMsg* search_for_user_by_name_msg) {
-	return "";
-}
-
-std::string HTTPLoadFriendRequest(LoadFriendRequestMsg* load_friend_request_msg) {
-	return "";
+	g_online_users[hdl] = user_id; // 保存 hdl 信息
 }

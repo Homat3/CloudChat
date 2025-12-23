@@ -41,6 +41,7 @@
 #define CLEAR_MESSAGES          "CLEAR_MESSAGES"		  // 清空聊天记录
 #define LOAD_FRIEND_REQUEST     "LOAD_FRIEND_REQUEST"	  // 加载好友请求列表
 #define UPLOAD_FILE             "UPLOAD_FILE"			  // 上传文件
+#define HDL_INFO                "HDL_INFO"				  // 告知 Websocket 长连接 hdl
 // 服务端消息
 #define LOGIN_SUCCESS           "LOGIN_SUCCESS"			  // 登录成功
 #define LOGIN_FAILURE           "LOGIN_FAILURE"			  // 登录失败
@@ -674,6 +675,16 @@ private:
 public:
 	MessageSendFailedMsg(std::string temp_id, std::string error);
 	std::string to_JSON() override;
+};
+
+class HdlInfoMsg : public ClientMsg { // 告知 Websocket 长连接 hdl
+private:
+	int user_id_;				// 用户 id
+
+public:
+	HdlInfoMsg(int user_id);
+	static HdlInfoMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
 };
 
 ClientMsg* parse_protocal_msg(std::string JSON); // 将 JSON 字符串解析为 ClientMsg 对象
