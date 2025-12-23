@@ -16,11 +16,11 @@ export class HttpService {
     this.baseUrl = baseUrl;
     this.SSL_Available = SSL_Available;
   }
-
+  //发起HTTP请求
   private async request(uri: string, requestOptions: http.HttpRequestOptions, callback: AsyncCallback<http.HttpResponse>) {
     try {
       const prefix = this.SSL_Available ? "https://" : "http://";
-      this.httpBase.request(prefix + this.baseUrl + uri, requestOptions, callback);
+      this.httpBase.request(prefix + this.baseUrl + uri, requestOptions, callback); //URL创建
     } catch (error) {
       throw new Error(`Error code: ${error.code}`);
     }
