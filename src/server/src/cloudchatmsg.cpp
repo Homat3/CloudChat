@@ -1309,3 +1309,17 @@ CloudChatMessage::CloudChatMessage() {
 void CloudChatMessage::SetIsRead(bool is_read) {
 	is_read_ = is_read;
 }
+
+HdlInfoMsg::HdlInfoMsg(int user_id) : ClientMsg(HDL_INFO) {
+	user_id_ = user_id;
+}
+
+HdlInfoMsg* HdlInfoMsg::parse_from_JSON(std::string JSON, int payload_pos) {
+	int user_id = parse_int_from_json(JSON, find_field_pos(JSON, "\"userId\""),
+									 JSON.length() - 1);
+	return new HdlInfoMsg(user_id);
+}
+
+int HdlInfoMsg::get_user_id() {
+	return user_id_;
+}

@@ -31,13 +31,12 @@
 #include <cppconn/resultset.h>
 
 extern int g_server_port;
-extern int g_buff_len;
 
 #define SERVER_PORT g_server_port // 服务器通信端口号
-#define BUFF_LEN    g_buff_len	  // 字符串缓冲区大小
+#define BUFF_LEN    2048		  // 字符串缓冲区大小
 
 typedef websocketpp::server<websocketpp::config::asio> server_t; // 服务器对象类型
-
-std::string base64Decode(const std::string& encoded); // Base64解码函数
+// 检查 websocket 长连接是否建立
+bool check_websocket_open(server_t& cloudchat_srv, websocketpp::connection_hdl hdl);
 
 #endif // CLOUDCHATSYS_H
