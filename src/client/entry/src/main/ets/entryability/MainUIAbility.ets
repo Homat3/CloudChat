@@ -73,6 +73,48 @@ export default class MainUIAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
 
+  //登录逻辑
+  private handleLogin(data: {username: string, password: string }): void {
+    interface LoginPayload {  //负载
+      username: string,
+      password: string
+    }
+    interface LoginInfo {
+      type: string,
+      payload: LoginPayload
+    }
+
+    const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
+    try {
+      ws.connect();
+      ws.addNewMessageObserver((msg) => {
+        //控制台响应
+        console.log(JSON.stringify(msg));
+        //处理登录相应
+        if( msg.type === 'LOGIN_SUCCESS') {
+          window.getLastWindow(this.context).then((win) => {
+            win.loadContent('pages/contact-list/ContactList');
+          });
+        } else if(msg.type === 'LOGIN_FAILED') {
+          //更新UI显示错误信息
+          this.context.eventHub.emit("loginError", msg.reason);
+        }
+      });
+
+      const loginInfo = {
+        type: "LOGIN",
+        payload: {
+          username: data.username,
+          password: data.password
+        }
+      }
+      ws.send(loginInfo);
+    } catch(e) {
+      console.error(e);
+      this.context.eventHub.emit("loginError", "连接服务器失败");
+    }
+  }
+
   // websocket test
   testWebsocket(): void{
     interface PasswordPayload{
