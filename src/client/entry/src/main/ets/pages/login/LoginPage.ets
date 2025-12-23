@@ -1,9 +1,12 @@
+import { common } from '@kit.AbilityKit';
+
 @Entry
 @Component
 struct LoginPage {
   @State username: string = '';
   @State password: string = '';
   @State errorMessage: string = '';
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
     RelativeContainer() {
@@ -72,7 +75,7 @@ struct LoginPage {
       return;
     }
 
-    const context = getContext(this) as common.UIAbilityContext;
+    const context = this.context as common.UIAbilityContext;
     context.eventHub.emit("login", {
       username: this.username,
       password: this.password
