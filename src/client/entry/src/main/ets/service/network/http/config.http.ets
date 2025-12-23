@@ -1,4 +1,4 @@
-import { http } from '@kit.NetworkKit'
+import { http } from '@kit.NetworkKit'  // 导入ArkTS的网络模块
 
 export function createDefaultRequestOptions(): http.HttpRequestOptions{
   return new RequestOptionsBuilder().build();
@@ -14,16 +14,17 @@ interface HttpConfigInterface {
   connectTimeout: number // 5s
 }
 export class HttpConfig implements HttpConfigInterface{
+  //单例模式
   private static instance = new HttpConfig();
   public static getInstance(): HttpConfig{
     return HttpConfig.instance;
   }
   private constructor() {
-    this.header = {
+    this.header = { //默认请求头
       'Content-Type': 'application/json'
     };
-    this.readTimeout = 5000;
-    this.connectTimeout = 5000;
+    this.readTimeout = 5000;  //管理连接超时
+    this.connectTimeout = 5000; //管理读取超时
   }
 
 
@@ -64,9 +65,9 @@ export class HttpConfig implements HttpConfigInterface{
   }
 };
 
-export class RequestOptionsBuilder{
+export class RequestOptionsBuilder{ //建造者模式
   private config: HttpConfigInterface = HttpConfig.getInstance();
-  private requestOptions: http.HttpRequestOptions = {
+  private requestOptions: http.HttpRequestOptions = { //配置HTTP方法
     method: http.RequestMethod.GET,
     header: this.config.header,
     extraData: "",
@@ -102,6 +103,7 @@ export class RequestOptionsBuilder{
   }
 
   public build(): http.HttpRequestOptions{
+    //使用默认配置
     return this.requestOptions;
   }
 }

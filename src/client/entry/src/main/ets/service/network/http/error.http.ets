@@ -1,5 +1,6 @@
 import { NetworkServiceError } from "../error/NetWorkServiceError";
 
+//在错误消息前添加前缀
 export class HttpServiceError extends NetworkServiceError{
   constructor(message: string) {
     super("Http Service Error: " + message);
