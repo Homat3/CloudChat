@@ -27,7 +27,9 @@ export default class MainUIAbility extends UIAbility {
     // 权限注册
     this.permissionManager = new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
     this.permissionManager.putPermissionGroup("COMMON", ['ohos.permission.INTERNET']);  // 基本权限集
-    this.permissionManager.requestAllPermissions();   // 权限集申请
+    this.permissionManager.requestAllPermissions().catch((error: Error) => {
+      console.error(error.name + ": " + error.message);
+    });   // 权限集申请
 
     // 消息响应注册
     this.callBackManager = new CallBackManager(this.context.eventHub);
@@ -56,7 +58,11 @@ export default class MainUIAbility extends UIAbility {
     this.windowStageManager = new WindowStageManager(windowStage);
 
     // 初始化加载联系人列表
-    this.windowStageManager.switchPage(Page.CONTACT_LIST_PAGE);
+    try {
+      this.windowStageManager.switchPage(Page.CONTACT_LIST_PAGE);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   onWindowStageDestroy(): void {
@@ -109,7 +115,11 @@ export default class MainUIAbility extends UIAbility {
   // 登录错误逻辑
   private handleLoginFailed(errorMessage: string){
     console.error(errorMessage);
-    this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
+    try {
+      this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
+    } catch (error) {
+      console.error(error);
+    }
     console.log("Return to LoginPage");
   }
 }
