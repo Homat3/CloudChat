@@ -13,14 +13,17 @@ import { JSON } from '@kit.ArkTS';
 import { ClientMessage, ClientMessageType, LoginPayload } from '../core/protocol/websocket/client.protocol';
 import { LoginFailurePayload, ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
+import { CallBackManager } from './manager/call-back-manager/CallBackManager';
 
 const DOMAIN = 0x0000;  //日志域标识
 
 //应用入口
 export default class MainUIAbility extends UIAbility {
   private windowStageManager: WindowStageManager | null = null;   // window stage 管理器
+  private callBackManager: CallBackManager | null = null;   // call back 管理器
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // 权限申请
     let permissions: Array<Permissions> = ['ohos.permission.INTERNET'];
 
     abilityAccessCtrl.createAtManager().requestPermissionsFromUser(this.context, permissions)
@@ -30,6 +33,9 @@ export default class MainUIAbility extends UIAbility {
       .catch((err: Error) => {
         console.error("权限申请失败：" + JSON.stringify(err));
       });
+
+    // 消息响应注册
+    this.callBackManager = new CallBackManager(this.context.eventHub);
 
     try {
       //颜色跟随系统
