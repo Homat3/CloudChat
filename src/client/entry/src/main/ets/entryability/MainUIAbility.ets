@@ -2,7 +2,6 @@ import {
   abilityAccessCtrl,
   AbilityConstant,
   ConfigurationConstant,
-  Permissions,
   UIAbility,
   Want
 } from '@kit.AbilityKit';
@@ -33,6 +32,7 @@ export default class MainUIAbility extends UIAbility {
     // 消息响应注册
     this.callBackManager = new CallBackManager(this.context.eventHub);
     this.callBackManager.put(Event.LOGIN, this.handleLogin);
+    this.callBackManager.put(Event.LOGIN_FAILED, this.handleLoginFailed);
 
     try {
       //颜色跟随系统
@@ -74,7 +74,7 @@ export default class MainUIAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
 
-  //登录逻辑
+  // 登录逻辑
   private handleLogin(data: LoginPayload): void {
     const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
     try {
@@ -88,7 +88,7 @@ export default class MainUIAbility extends UIAbility {
           this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
         } else if(receivedObject.type === ServiceMessageType.LOGIN_FAILURE) {
           //更新UI显示错误信息
-          this.context.eventHub.emit("loginError", (receivedObject.payload as LoginFailurePayload).error);
+          this.context.eventHub.emit(Event.LOGIN_FAILED, (receivedObject.payload as LoginFailurePayload).error);
         }
       });
 
@@ -102,7 +102,14 @@ export default class MainUIAbility extends UIAbility {
       ws.send(loginInfo);
     } catch(e) {
       console.error(e);
-      this.context.eventHub.emit("loginError", "连接服务器失败");
+      this.context.eventHub.emit(Event.LOGIN_FAILED, "连接服务器失败");
     }
+  }
+
+  // 登录错误逻辑
+  private handleLoginFailed(errorMessage: string){
+    console.error(errorMessage);
+    this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
+    console.log("Return to LoginPage");
   }
 }

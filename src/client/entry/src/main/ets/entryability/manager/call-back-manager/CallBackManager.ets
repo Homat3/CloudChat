@@ -36,5 +36,6 @@ export class CallBackManager{
 }
 
 export enum Event{
-  LOGIN = "LOGIN"
+  LOGIN = "LOGIN",
+  LOGIN_FAILED = "LOGIN_FAILED"
 }
