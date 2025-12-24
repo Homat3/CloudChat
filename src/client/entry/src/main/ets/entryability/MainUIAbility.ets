@@ -13,7 +13,7 @@ import { JSON } from '@kit.ArkTS';
 import { ClientMessage, ClientMessageType, LoginPayload } from '../core/protocol/websocket/client.protocol';
 import { LoginFailurePayload, ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
-import { CallBackManager } from './manager/call-back-manager/CallBackManager';
+import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -36,6 +36,7 @@ export default class MainUIAbility extends UIAbility {
 
     // 消息响应注册
     this.callBackManager = new CallBackManager(this.context.eventHub);
+    this.callBackManager.put(Event.LOGIN, this.handleLogin);
 
     try {
       //颜色跟随系统
