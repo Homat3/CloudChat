@@ -14,6 +14,7 @@ import { ClientMessage, ClientMessageType, LoginPayload } from '../core/protocol
 import { LoginFailurePayload, ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
 import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
+import { PermissionManager } from './manager/permission-manager/PermissionManager';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -21,18 +22,13 @@ const DOMAIN = 0x0000;  //日志域标识
 export default class MainUIAbility extends UIAbility {
   private windowStageManager: WindowStageManager | null = null;   // window stage 管理器
   private callBackManager: CallBackManager | null = null;   // call back 管理器
+  private permissionManager: PermissionManager | null = null; // permission 管理器
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    // 权限申请
-    let permissions: Array<Permissions> = ['ohos.permission.INTERNET'];
-
-    abilityAccessCtrl.createAtManager().requestPermissionsFromUser(this.context, permissions)
-      .then((data) => {
-        console.info("Internet权限申请结果：" + JSON.stringify(data));
-      })
-      .catch((err: Error) => {
-        console.error("权限申请失败：" + JSON.stringify(err));
-      });
+    // 权限注册
+    this.permissionManager = new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
+    this.permissionManager.putPermissionGroup("COMMON", ['ohos.permission.INTERNET']);  // 基本权限集
+    this.permissionManager.requestAllPermissions();   // 权限集申请
 
     // 消息响应注册
     this.callBackManager = new CallBackManager(this.context.eventHub);
