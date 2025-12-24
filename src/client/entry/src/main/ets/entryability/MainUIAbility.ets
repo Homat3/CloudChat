@@ -8,26 +8,28 @@ import {
 } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { WebsocketService } from '../service/network/websocket/server.websocket';
+import { WebsocketService } from '../core/service/network/websocket/server.websocket';
 import { JSON } from '@kit.ArkTS';
+import { ClientMessage, ClientMessageType, LoginPayload } from '../core/protocol/websocket/client.protocol';
+import { LoginFailurePayload, ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
+import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
 
 const DOMAIN = 0x0000;  //日志域标识
 
 //应用入口
 export default class MainUIAbility extends UIAbility {
+  private windowStageManager: WindowStageManager | null = null;   // window stage 管理器
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    let context = this.context;
     let permissions: Array<Permissions> = ['ohos.permission.INTERNET'];
 
-    abilityAccessCtrl.createAtManager().requestPermissionsFromUser(context, permissions)
+    abilityAccessCtrl.createAtManager().requestPermissionsFromUser(this.context, permissions)
       .then((data) => {
         console.info("Internet权限申请结果：" + JSON.stringify(data));
       })
       .catch((err: Error) => {
         console.error("权限申请失败：" + JSON.stringify(err));
       });
-
-    this.context.eventHub.on("test", this.testWebsocket);
 
     try {
       //颜色跟随系统
@@ -48,14 +50,10 @@ export default class MainUIAbility extends UIAbility {
     //窗口阶段对象，管理UI显示
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    windowStage.loadContent('pages/contact-list/ContactList', (err) => {
-      //加载第一个页面
-      if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
-        return;
-      }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
-    });
+    this.windowStageManager = new WindowStageManager(windowStage);
+
+    // 初始化加载联系人列表
+    this.windowStageManager.switchPage(Page.CONTACT_LIST_PAGE);
   }
 
   onWindowStageDestroy(): void {
@@ -74,35 +72,25 @@ export default class MainUIAbility extends UIAbility {
   }
 
   //登录逻辑
-  private handleLogin(data: {username: string, password: string }): void {
-    interface LoginPayload {  //负载
-      username: string,
-      password: string
-    }
-    interface LoginInfo {
-      type: string,
-      payload: LoginPayload
-    }
-
+  private handleLogin(data: LoginPayload): void {
     const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
     try {
       ws.connect();
       ws.addNewMessageObserver((msg) => {
         //控制台响应
-        console.log(JSON.stringify(msg));
+        console.log("Received: " + msg);
+        let receivedObject = JSON.parse(msg) as ServiceMessage;
         //处理登录相应
-        if( msg.type === 'LOGIN_SUCCESS') {
-          window.getLastWindow(this.context).then((win) => {
-            win.loadContent('pages/contact-list/ContactList');
-          });
-        } else if(msg.type === 'LOGIN_FAILED') {
+        if( receivedObject.type === ServiceMessageType.LOGIN_SUCCESS) {
+          this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
+        } else if(receivedObject.type === ServiceMessageType.LOGIN_FAILURE) {
           //更新UI显示错误信息
-          this.context.eventHub.emit("loginError", msg.reason);
+          this.context.eventHub.emit("loginError", (receivedObject.payload as LoginFailurePayload).error);
         }
       });
 
-      const loginInfo = {
-        type: "LOGIN",
+      const loginInfo: ClientMessage = {
+        type: ClientMessageType.LOGIN,
         payload: {
           username: data.username,
           password: data.password
@@ -112,35 +100,6 @@ export default class MainUIAbility extends UIAbility {
     } catch(e) {
       console.error(e);
       this.context.eventHub.emit("loginError", "连接服务器失败");
-    }
-  }
-
-  // websocket test
-  testWebsocket(): void{
-    interface PasswordPayload{
-      username: string,
-      password: string
-    }
-    interface TestInfo{
-      type: string,
-      payload: PasswordPayload
-    }
-    const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
-    try {
-      ws.connect();
-      ws.addNewMessageObserver((msg)=>{
-        console.log(JSON.stringify(msg));
-      })
-      const testInfo: TestInfo = {
-        type: "LOGIN",
-        payload: {
-          username: "test",
-          password: "test",
-        }
-      }
-      ws.send(testInfo)
-    } catch (e) {
-      console.error(e);
     }
   }
 }

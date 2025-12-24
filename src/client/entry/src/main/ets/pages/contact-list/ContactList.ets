@@ -4,7 +4,6 @@ import { common } from '@kit.AbilityKit';
 @Component
 struct ContactList {
   @StorageProp("message") message: string = 'Hello CloudChat';
-  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
     RelativeContainer() {
@@ -19,7 +18,6 @@ struct ContactList {
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
         .onClick(() => {
-          this.context.eventHub.emit("test");
         })
     }
     //容器高与宽占满

@@ -1,9 +1,9 @@
 import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from '@ohos/hypium';
-import { HttpService } from '../main/ets/service/network/http/server.http'
+import { HttpService } from '../main/ets/core/service/network/http/server.http'
 import { AsyncCallback } from '@kit.BasicServicesKit';
 import { http } from '@kit.NetworkKit';
-import { WebsocketService } from '../main/ets/service/network/websocket/server.websocket';
-import { ConnectFailedError } from '../main/ets/service/network/websocket/error.websocket';
+import { WebsocketService } from '../main/ets/core/service/network/websocket/server.websocket';
+import { ConnectFailedError } from '../main/ets/core/service/network/websocket/error.websocket';
 
 export function localUnitTest() {
   describe('LocalUnitTest', () => {
