@@ -59,7 +59,7 @@ export default class MainUIAbility extends UIAbility {
     this.windowStageManager = new WindowStageManager(windowStage);
 
     // 初始化加载联系人列表
-    this.windowStageManager.switchPage(Page.CONTACT_LIST_PAGE);
+    this.windowStageManager.switchPage(Page.LOGIN_PAGE);
   }
 
   onWindowStageDestroy(): void {
@@ -88,7 +88,7 @@ export default class MainUIAbility extends UIAbility {
         let receivedObject = JSON.parse(msg) as ServiceMessage;
         //处理登录相应
         if( receivedObject.type === ServiceMessageType.LOGIN_SUCCESS) {
-          this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
+          this.windowStageManager?.switchPage(Page.MAIN_PAGE);
         } else if(receivedObject.type === ServiceMessageType.LOGIN_FAILURE) {
           //更新UI显示错误信息
           this.context.eventHub.emit("loginError", (receivedObject.payload as LoginFailurePayload).error);
