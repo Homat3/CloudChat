@@ -10,8 +10,17 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { WebsocketService } from '../service/network/websocket/server.websocket';
 import { JSON } from '@kit.ArkTS';
-
 const DOMAIN = 0x0000;  //日志域标识
+
+interface LoginData {
+  username: string,
+  password: string
+}
+
+interface WebSocketMessage {
+  type: string,
+  reason?: string
+}
 
 //应用入口
 export default class MainUIAbility extends UIAbility {
@@ -48,7 +57,7 @@ export default class MainUIAbility extends UIAbility {
     //窗口阶段对象，管理UI显示
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    windowStage.loadContent('pages/contact-list/ContactList', (err) => {
+    windowStage.loadContent('pages/login/LoginPage', (err) => {
       //加载第一个页面
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
@@ -72,9 +81,8 @@ export default class MainUIAbility extends UIAbility {
     //回到应用后台
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
-
   //登录逻辑
-  private handleLogin(data: {username: string, password: string }): void {
+  private handleLogin(data: LoginData): void {
     interface LoginPayload {  //负载
       username: string,
       password: string
@@ -87,21 +95,26 @@ export default class MainUIAbility extends UIAbility {
     const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
     try {
       ws.connect();
-      ws.addNewMessageObserver((msg) => {
+      ws.addNewMessageObserver((msgString: string) => {
         //控制台响应
-        console.log(JSON.stringify(msg));
+        console.log(msgString);
         //处理登录相应
-        if( msg.type === 'LOGIN_SUCCESS') {
-          window.getLastWindow(this.context).then((win) => {
-            win.loadContent('pages/contact-list/ContactList');
-          });
-        } else if(msg.type === 'LOGIN_FAILED') {
-          //更新UI显示错误信息
-          this.context.eventHub.emit("loginError", msg.reason);
+        try {
+          const parsedMsg = JSON.parse(msgString);
+          const msg = parsedMsg as WebSocketMessage;
+          if( msg.type === 'LOGIN_SUCCESS') {
+            window.getLastWindow(this.context).then((win) => {
+              win.loadContent('pages/contact-list/ContactList');
+            });
+          } else if(msg.type === 'LOGIN_FAILED') {
+            //更新UI显示错误信息
+            this.context.eventHub.emit("loginError", msg.reason || "登录失败");
+          }
+        } catch (e) {
+          console.error("JSON解析错误:", e);
         }
       });
-
-      const loginInfo = {
+      const loginInfo: LoginInfo = {
         type: "LOGIN",
         payload: {
           username: data.username,
@@ -128,8 +141,8 @@ export default class MainUIAbility extends UIAbility {
     const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
     try {
       ws.connect();
-      ws.addNewMessageObserver((msg)=>{
-        console.log(JSON.stringify(msg));
+      ws.addNewMessageObserver((msgString: string)=>{
+        console.log(msgString);
       })
       const testInfo: TestInfo = {
         type: "LOGIN",
