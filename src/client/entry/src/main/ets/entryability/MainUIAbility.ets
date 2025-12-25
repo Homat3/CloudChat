@@ -10,10 +10,14 @@ import { window } from '@kit.ArkUI';
 import { WebsocketService } from '../core/service/network/websocket/server.websocket';
 import { JSON } from '@kit.ArkTS';
 import { ClientMessage, ClientMessageType, LoginPayload } from '../core/protocol/websocket/client.protocol';
-import { LoginFailurePayload, ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
+import { LoginFailurePayload,
+  LoginSuccessPayload,
+  ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
 import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
 import { PermissionManager } from './manager/permission-manager/PermissionManager';
+import { CloudChat } from '../CloudChat';
+import { User } from '../core/models/models';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -24,7 +28,7 @@ export default class MainUIAbility extends UIAbility {
   private permissionManager: PermissionManager | null = null; // permission 管理器
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    // 权限注册
+      // 权限注册
     this.permissionManager = new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
     this.permissionManager.putPermissionGroup("COMMON", ['ohos.permission.INTERNET']);  // 基本权限集
     this.permissionManager.requestAllPermissions().catch((error: Error) => {
@@ -33,8 +37,13 @@ export default class MainUIAbility extends UIAbility {
 
     // 消息响应注册
     this.callBackManager = new CallBackManager(this.context.eventHub);
-    this.callBackManager.put(Event.LOGIN, this.handleLogin);
-    this.callBackManager.put(Event.LOGIN_FAILED, this.handleLoginFailed);
+    try {
+      this.callBackManager.addEventSubscription(Event.LOGIN, this.handleLogin);
+      this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, this.handleLoginFailed);
+      this.callBackManager.addEventSubscription(Event.LOGIN_SUCCESS, this.handleLoginSuccess);
+    } catch (error) {
+      console.error("Unknown error");
+    }
 
     try {
       //颜色跟随系统
@@ -47,8 +56,16 @@ export default class MainUIAbility extends UIAbility {
   }
 
   onDestroy(): void {
-    //Ability销毁时调用，释放资源
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    if (this.callBackManager){
+      // 移除事件监听
+      try {
+        this.callBackManager.removeEventSubscription(Event.LOGIN);
+        this.callBackManager.removeEventSubscription(Event.LOGIN_FAILED);
+        this.callBackManager.removeEventSubscription(Event.LOGIN_SUCCESS);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -91,9 +108,8 @@ export default class MainUIAbility extends UIAbility {
         let receivedObject = JSON.parse(msg) as ServiceMessage;
         //处理登录相应
         if( receivedObject.type === ServiceMessageType.LOGIN_SUCCESS) {
-          this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
+          this.context.eventHub.emit(Event.LOGIN_SUCCESS, (receivedObject.payload as LoginSuccessPayload));
         } else if(receivedObject.type === ServiceMessageType.LOGIN_FAILURE) {
-          //更新UI显示错误信息
           this.context.eventHub.emit(Event.LOGIN_FAILED, (receivedObject.payload as LoginFailurePayload).error);
         }
       });
@@ -121,5 +137,15 @@ export default class MainUIAbility extends UIAbility {
       console.error(error);
     }
     console.log("Return to LoginPage");
+  }
+
+  // 登录成功逻辑
+  private handleLoginSuccess(successInfo: LoginSuccessPayload){
+    try {
+      this.windowStageManager?.switchPage(Page.CONTACT_LIST_PAGE);
+      CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

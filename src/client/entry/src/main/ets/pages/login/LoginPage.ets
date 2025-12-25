@@ -1,10 +1,11 @@
 import { common } from '@kit.AbilityKit';
-import { promptAction, router } from '@kit.ArkUI';
+import { CallBackManager, Event } from '../../entryability/manager/call-back-manager/CallBackManager';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
 
 @Entry
 @Component
 struct LoginPage {
+  // 状态
   @State username: string = '';
   @State password: string = '';
   @State errorMessage: string = '';
@@ -13,28 +14,36 @@ struct LoginPage {
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+  // 管理器
+  private callBackManager: CallBackManager = new CallBackManager(this.uiAbilityContext.eventHub);   // call back 管理器
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
-    this.uiAbilityContext = getContext(this) as common.UIAbilityContext;
-    // 监听登录成功事件
-    this.uiAbilityContext?.eventHub.on('loginSuccess', () => {
-      this.uiContext.getRouter().replaceUrl({ url: 'pages/Home' }).catch((e: Error) => {
-        console.error(e.message);
+    try {
+      // 监听登录成功事件
+      this.callBackManager.addEventSubscription(Event.LOGIN_SUCCESS, () => {
+        this.uiContext.getRouter().replaceUrl({ url: 'pages/Home' }).catch((e: Error) => {
+          console.error(e.message);
+        });
       });
-    });
-
-    // 监听登录失败事件
-    this.uiAbilityContext?.eventHub.on('loginFailed', (err: Error) => {
-      this.isLoading = false;
-      this.errorMessage = err.message || '登录失败';
-    });
+      // 监听登录失败事件
+      this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, (err: Error) => {
+        this.isLoading = false;
+        this.errorMessage = err.message || '登录失败';
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   aboutToDisappear(): void {
     // 移除事件监听
-    this.uiAbilityContext?.eventHub.off('loginSuccess');
-    this.uiAbilityContext?.eventHub.off('loginFailed');
+    try {
+      this.callBackManager.removeEventSubscription(Event.LOGIN_SUCCESS);
+      this.callBackManager.removeEventSubscription(Event.LOGIN_FAILED);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   build() {
@@ -192,9 +201,7 @@ struct LoginPage {
             .margin({ top: 10 })
             .padding(8)
         }
-
       }
-
     }
   }
 

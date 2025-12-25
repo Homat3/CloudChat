@@ -2,7 +2,7 @@ import { NoSuchEventSubscribedError, EventAlreadySubscribedError } from './CallB
 import { common } from '@kit.AbilityKit';
 
 /**
- * @description call back 管理器 负责处理页面切换
+ * @description call back 管理器 负责处理特定组件的消息响应
  * @author Infinomat
  */
 export class CallBackManager{
@@ -33,7 +33,7 @@ export class CallBackManager{
    * manager.put(MY_EVENT, callBack);
    * ...
    */
-  public put(event: Event, callBack: Function){
+  public addEventSubscription(event: Event, callBack: Function){
     this.eventHub.on(event, callBack);
     if (!this.callBackMap.has(event)){
       this.callBackMap.set(event, callBack);
@@ -86,5 +86,6 @@ export class CallBackManager{
  */
 export enum Event{
   LOGIN = "LOGIN",
+  LOGIN_SUCCESS = "LOGIN_SUCCESS",
   LOGIN_FAILED = "LOGIN_FAILED"
 }

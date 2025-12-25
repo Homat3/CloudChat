@@ -22,7 +22,7 @@ struct ContactList {
 
   // 添加页面生命周期
   aboutToAppear() {
-    console.log('[DEBUG] ContactList 页面加载了');
+    console.log('ContactList 页面加载了');
     try {
       this.uiContext.getPromptAction().showToast({
         message: 'ContactList 页面加载成功',

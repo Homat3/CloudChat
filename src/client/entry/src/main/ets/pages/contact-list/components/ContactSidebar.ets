@@ -1,56 +1,48 @@
 import { ContactItem } from "./ContactItem";
 import { common } from "@kit.AbilityKit";
+import { Contact } from "../../../core/models/models";
 
 @Component
-  /**
-   * 左侧联系人栏
-   */
+/**
+ * 左侧联系人栏
+ */
 export struct ContactSidebar{
   // 状态变量
-
+  @State contacts: Array<Contact> = []
+  @State selectedIds: string[] = []
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  build() {
+  //初始化联系人数据
+  aboutToAppear() {
+    // 加载真实数据
+  }
+
+  build(){
     Column() {
-      // 搜索框
-      Search({ placeholder: '搜索联系人', controller: this.searchController })
+      //搜索框
+      Search({ placeholder: '搜索联系人' })
+        .width('90%')
+        .margin(10)
         .onChange((value: string) => {
-          this.searchKeyword = value;
+          //处理搜索逻辑
         })
-        .margin(8)
 
-      // 联系人列表
+      //联系人列表
       List() {
-        ForEach(this.contacts, (contact: Contact) => {
-          ListItem() {
-            ContactItem({
-              contact: contact,
-              selected: this.selectedContactId === contact.id,
-              onSelect: (id: number) => {
-                this.selectedContactId = id;
-              }
-            })
-          }
-        }, (contact: Contact) => contact.id.toString())
+        // ForEach(this.contacts, (contact: Contact) => {
+        //   ListItem() {
+        //     ContactItem({ contact: contact })
+        //       .selected(this.selectedIds.includes(contact.id))
+        //       .onClick(() => {
+        //         //处理选中逻辑
+        //         this.toggleSelection(contact.id)
+        //       })
+        //   }
+        // }, (contact: Contact) => contact.id)  //指定唯一key
       }
-      .layoutWeight(1)
-      .divider({ strokeWidth: 1, color: '#EEE' })
-
-      // 添加联系人按钮
-      Button('添加联系人', { type: ButtonType.Normal })
-        .width('80%')
-        .margin(12)
-        .onClick(() => {
-          router.pushUrl({
-            url: 'pages/contact-list/add-contact/AddContact'
-          });
-        })
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor(Color.White)
   }
 
 }
