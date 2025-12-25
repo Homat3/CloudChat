@@ -5,8 +5,8 @@
  * 加上此组件就是把页面设计成： 联系人|消息页面|详情组件
  * 也可以不要这个组件，就是左右布局的两个组件
  */
-export struct DetailPanel{
-  build(){
+export struct DetailPanel {
+  build() {
 
   }
 }

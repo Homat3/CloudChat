@@ -4,9 +4,9 @@ import { ContactItem } from "./ContactItem";
 /**
  * 左侧联系人栏
  */
-export struct ContactSidebar{
+export struct ContactSidebar {
 
-  build(){
+  build() {
 
   }
 
