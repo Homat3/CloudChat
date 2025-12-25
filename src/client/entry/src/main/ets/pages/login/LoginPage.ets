@@ -74,7 +74,7 @@ struct LoginPage {
             color: '#DCDFE6'
           })
           .alignRules({
-            top: { anchor: 'welcomeTitle', align: VerticalAlign.Bottom },
+            top: { anchor: 'usernameInput', align: VerticalAlign.Bottom },
             middle: { anchor: '__container__', align: HorizontalAlign.Center }
           })
           .margin({ top: 30 })
@@ -98,7 +98,7 @@ struct LoginPage {
             color: '#DCDFE6'
           })
           .alignRules({
-            top: { anchor: 'usernameInput', align: VerticalAlign.Bottom },
+            top: { anchor: 'passwordInput', align: VerticalAlign.Bottom },
             middle: { anchor: '__container__', align: HorizontalAlign.Center }
           })
           .onChange((value: string) => {
