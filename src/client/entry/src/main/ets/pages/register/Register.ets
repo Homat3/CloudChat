@@ -2,10 +2,12 @@ import { User } from '../../core/models/models'
 import { promptAction, router } from '@kit.ArkUI';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { common } from '@kit.AbilityKit';
 
 @Entry
 @Component
 struct Register {
+  // 状态变量
   @State Title: string = '注册界面'
   @State userName: string = ''
   @State email: string = ''
@@ -19,6 +21,10 @@ struct Register {
   @State emailError: string = ''
   @State passwordError: string = ''
   @State confirmPasswordError: string = ''
+
+  // 上下文
+  private uiContext: UIContext = this.getUIContext();
+  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   build() {
     Column({ space: 8 }) {
