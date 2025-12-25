@@ -19,6 +19,9 @@
     {
       "name": "error_login_AccountOrPasswordRequireNotNull",
       "value": "账号或密码不能为空"
+    },
+    {
+      "name": ""
     }
   ]
 }

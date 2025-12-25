@@ -35,6 +35,18 @@
     {
       "name": "login_button_login_border",
       "value": "#409EFF"
+    },
+    {
+      "name": "contact_list_contact_background",
+      "value": "#f5f5f5"
+    },
+    {
+      "name": "contact_list_chat_background",
+      "value": "#DCDFE6"
+    },
+    {
+      "name": "contact_list_whole_background",
+      "value": "#FFFFFF"
     }
   ]
 }
