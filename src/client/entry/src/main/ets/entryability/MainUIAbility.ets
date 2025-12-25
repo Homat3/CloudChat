@@ -59,7 +59,7 @@ export default class MainUIAbility extends UIAbility {
 
     // 初始化加载联系人列表
     try {
-      this.windowStageManager.switchPage(Page.CONTACT_LIST_PAGE);
+      this.windowStageManager.switchPage(Page.LOGIN_PAGE);
     } catch (error) {
       console.error(error);
     }

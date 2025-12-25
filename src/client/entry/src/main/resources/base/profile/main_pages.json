@@ -2,6 +2,7 @@
   "src": [
     "pages/contact-list/ContactList",
     "pages/profile-setting/ProfileSetting",
-    "pages/login/LoginPage"
+    "pages/login/LoginPage",
+    "pages/login/Register"
   ]
 }
