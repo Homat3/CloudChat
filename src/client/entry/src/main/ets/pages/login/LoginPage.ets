@@ -1,5 +1,7 @@
+
 import { common } from '@kit.AbilityKit';
 import { promptAction, router } from '@kit.ArkUI';
+import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
 
 @Entry
 @Component
@@ -110,7 +112,7 @@ struct LoginPage {
           }
           .margin({left:20})
           .onClick(() => {
-
+            //TODO:记住我
           })
 
           Blank()
@@ -164,9 +166,13 @@ struct LoginPage {
           .margin({ top: 10 })
           .onClick(() => {
             router.pushUrl({
-              url: 'pages/login/Register'
-            }).catch(() => {
-              // TODO: Implement error handling.
+              url: Page.REGISTER_PAGE
+            }).catch((error: Error) => {
+              console.error('Route failed:', error);
+              promptAction.showToast({
+                message: '无法打开注册页面',
+                duration: 2000
+              });
             })
           })
         //错误提示
@@ -191,19 +197,40 @@ struct LoginPage {
 
 
   private handleLogin() {
-    if(!this.username || !this.password) {
-      this.errorMessage = '用户名和密码不能为空';
+    if (!this.canLogin()) {
+      this.errorMessage = '用户名需5位以上字母数字，密码需8位以上';
       return;
     }
 
-    const context = this.context as common.UIAbilityContext;
-    context.eventHub.emit("login", {
-      username: this.username,
-      password: this.password
-    });
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    // const context = this.context as common.UIAbilityContext;
+    // try {
+    //   context.eventHub.emit(Event.LOGIN, {
+    //     username: this.username,
+    //     password: this.password
+    //   });
+    // } catch (error) {
+    //   this.isLoading = false;
+    //   this.errorMessage = '连接服务器失败，请稍后重试';
+    //   console.error('Login error:', error);
+    // }
   }
-  private canLogin():boolean{//优先检验输入的格式合不合理
-    //TODO:检验登录
+  private canLogin(): boolean {
+    const usernameValid = /^[a-zA-Z0-9_]{5,20}$/.test(this.username);
+    const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.password);
+
+    if (!usernameValid) {
+      this.errorMessage = '用户名需5-20位字母数字或下划线';
+      return false;
+    }
+
+    if (!passwordValid) {
+      this.errorMessage = '密码需至少8位，包含字母和数字';
+      return false;
+    }
+
     return true;
   }
 }
