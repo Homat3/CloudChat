@@ -16,6 +16,8 @@ import { LoginFailurePayload,
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
 import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
 import { PermissionManager } from './manager/permission-manager/PermissionManager';
+import { CloudChat } from '../CloudChat';
+import { User } from '../core/models/models';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -26,7 +28,7 @@ export default class MainUIAbility extends UIAbility {
   private permissionManager: PermissionManager | null = null; // permission 管理器
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    // 权限注册
+      // 权限注册
     this.permissionManager = new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
     this.permissionManager.putPermissionGroup("COMMON", ['ohos.permission.INTERNET']);  // 基本权限集
     this.permissionManager.requestAllPermissions().catch((error: Error) => {
@@ -141,6 +143,7 @@ export default class MainUIAbility extends UIAbility {
   private handleLoginSuccess(successInfo: LoginSuccessPayload){
     try {
       this.windowStageManager?.switchPage(Page.CONTACT_LIST_PAGE);
+      CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
     } catch (error) {
       console.error(error)
     }
