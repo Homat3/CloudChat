@@ -17,10 +17,10 @@ struct ProfileSetting {
         .height(80)
         .borderRadius(40)
         .alignRules({
-          top: { anchor: '__container__', align: VerticalAlign.Top, offset: 40 },
+          top: { anchor: '__container__', align: VerticalAlign.Top },
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
-
+        .margin({ top: 40 })
       // 邮箱信息
       Row() {
         Text('邮箱:')
@@ -32,9 +32,10 @@ struct ProfileSetting {
       }
       .id('emailRow')
       .alignRules({
-        top: { anchor: 'avatar', align: VerticalAlign.Bottom, offset: 40 },
-        left: { anchor: '__container__', align: HorizontalAlign.Start, offset: 20 }
+        top: { anchor: 'avatar', align: VerticalAlign.Bottom },
+        left: { anchor: '__container__', align: HorizontalAlign.Start }
       })
+      .margin({ top: 40, left: 20 })
 
       // // 手机信息
       // Row() {
@@ -50,7 +51,6 @@ struct ProfileSetting {
       //   top: { anchor: 'emailRow', align: VerticalAlign.Bottom, offset: 20 },
       //   left: { anchor: '__container__', align: HorizontalAlign.Start, offset: 20 }
       // })
-
       // 消息通知开关
       Row() {
         Text('消息通知')
@@ -63,9 +63,10 @@ struct ProfileSetting {
       }
       .id('notifyRow')
       .alignRules({
-        top: { anchor: 'phoneRow', align: VerticalAlign.Bottom, offset: 40 },
-        left: { anchor: '__container__', align: HorizontalAlign.Start, offset: 20 }
+        top: { anchor: 'emailRow', align: VerticalAlign.Bottom },
+        left: { anchor: '__container__', align: HorizontalAlign.Start }
       })
+      .margin({ top: 40, left: 20 })
 
       // 深色模式开关
       Row() {
@@ -79,9 +80,10 @@ struct ProfileSetting {
       }
       .id('darkModeRow')
       .alignRules({
-        top: { anchor: 'notifyRow', align: VerticalAlign.Bottom, offset: 20 },
-        left: { anchor: '__container__', align: HorizontalAlign.Start, offset: 20 }
+        top: { anchor: 'notifyRow', align: VerticalAlign.Bottom },
+        left: { anchor: '__container__', align: HorizontalAlign.Start }
       })
+      .margin({ top: 20, left: 20 })
 
     }
     .height('100%')
