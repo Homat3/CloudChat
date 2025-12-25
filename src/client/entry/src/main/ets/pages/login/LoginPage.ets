@@ -123,7 +123,7 @@ struct LoginPage {
           }
           .margin({left:20})
           .onClick(() => {
-            //TODO:记住我
+            this.rememberMe = !this.rememberMe;
           })
 
           Blank()
