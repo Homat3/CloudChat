@@ -22,7 +22,7 @@ struct LoginPage {
     });
 
     // 监听登录失败事件
-    this.context?.eventHub.on('loginFailed', (err) => {
+    this.context?.eventHub.on('loginFailed', (err: Error) => {
       this.isLoading = false;
       this.errorMessage = err.message || '登录失败';
     });
