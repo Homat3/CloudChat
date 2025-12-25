@@ -16,11 +16,22 @@ struct LoginPage {
   //尝试读取保存的用户名
   aboutToAppear(): void {
       this.context = getContext(this) as common.UIAbilityContext;
-      //TODO：绑上监听器
+    // 监听登录成功事件
+    this.context?.eventHub.on('loginSuccess', () => {
+      router.replaceUrl({ url: 'pages/Home' });
+    });
+
+    // 监听登录失败事件
+    this.context?.eventHub.on('loginFailed', (err) => {
+      this.isLoading = false;
+      this.errorMessage = err.message || '登录失败';
+    });
   }
 
   aboutToDisappear(): void {
-
+    // 移除事件监听
+    this.context?.eventHub.off('loginSuccess');
+    this.context?.eventHub.off('loginFailed');
   }
 
   build() {
