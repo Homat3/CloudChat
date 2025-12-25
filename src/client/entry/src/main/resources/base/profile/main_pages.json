@@ -3,6 +3,6 @@
     "pages/contact-list/ContactList",
     "pages/profile-setting/ProfileSetting",
     "pages/login/LoginPage",
-    "pages/login/Register"
+    "pages/register/Register"
   ]
 }

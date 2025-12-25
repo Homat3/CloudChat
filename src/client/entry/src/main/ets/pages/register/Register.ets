@@ -63,7 +63,7 @@ struct Register {
             this.updateErrorMessage();
           })
 
-        // 用户名错误提示（实时）
+        // 用户名错误提示
         if (this.userNameError) {
           Text(this.userNameError)
             .fontColor(Color.Red)
@@ -164,7 +164,8 @@ struct Register {
             .padding({ left: 4 })
         }
 
-        // 注册按钮 - 简化版本，直接跳转
+        // 注册按钮
+        //TODO:发送注册信息
         Button(this.isLoading ? '注册中...' : '注册')
           .width('100%')
           .height(48)
@@ -200,7 +201,7 @@ struct Register {
             });
           })
 
-        // 系统错误提示（非字段验证错误）
+        // 系统错误提示
         if (this.errorMessage) {
           Row({ space: 8 }) {
             Text(this.errorMessage)
@@ -230,43 +231,38 @@ struct Register {
     .alignItems(HorizontalAlign.Center)
   }
 
-  // 直接跳转版本，去掉所有延时
+  //内部实现
+
+  // 直接跳转版本
   private handleRegister() {
     console.log('开始注册处理');
-
     // 1. 验证表单
     if (!this.validateAll()) {
       console.log('表单验证失败');
       return;
     }
-
     // 2. 设置加载状态
     this.isLoading = true;
     this.errorMessage = '';
-
     console.log('表单验证通过，准备直接跳转');
 
-    // 3. 直接跳转，不需要模拟API调用
     // 这里假设注册总是成功，直接跳转到联系人页面
     console.log('跳转到:', Page.CONTACT_LIST_PAGE);
-
-    // 先显示成功提示（可选）
+    // 先显示成功提示
     promptAction.showToast({
       message: '注册成功',
       duration: 1500
     });
-
-    // 直接跳转，不需要延迟
+    // 直接跳转
     router.pushUrl({
       url: Page.CONTACT_LIST_PAGE
     }).then(() => {
       console.log('跳转成功');
-      this.isLoading = false; // 理论上跳转成功后这个页面就销毁了，但这里保留状态重置
+      this.isLoading = false; // 理论上跳转成功后这个页面就销毁了
     }).catch((err: Error) => {
       console.error('跳转失败:', err);
       this.isLoading = false;
       this.errorMessage = `跳转失败: ${err.message || '页面不存在'}`;
-
       // 显示更详细的错误
       promptAction.showToast({
         message: `跳转失败: ${err.message || '未知错误'}`,
@@ -300,8 +296,7 @@ struct Register {
     return !hasError;
   }
 
-  // 检查是否可以注册（用于按钮状态）
-  // 注意：这里只检查是否有输入，不检查验证错误，因为有实时错误提示
+  // 检查是否可以注册
   private canRegister(): boolean {
     // 只有所有字段都有值，且没有正在加载时才能注册
     const canRegister = this.userName.trim().length > 0 &&
@@ -326,6 +321,8 @@ struct Register {
     return '';
   }
 
+
+  //实时表单元素检验
   private validateEmail(email: string): string {
     if (!email.trim()) {
       return '邮箱不能为空';
