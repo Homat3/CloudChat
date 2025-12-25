@@ -10,6 +10,7 @@ struct LoginPage {
   @State errorMessage: string = '';
   @State isLoading: boolean = false;
   @State rememberMe: boolean = false;
+  // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 

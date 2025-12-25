@@ -3,21 +3,31 @@ import { ContactSidebar } from './components/ContactSidebar';
 import { ChatArea } from './components/ChatArea';
 import { DetailPanel } from './components/DetailPanel';
 import { promptAction, router } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 @Entry
 @Component
 struct ContactList {
+  // 状态变量
   @State selectedContactId: number = 0;
   @State selectedMessageId: number = 0;
   @State searchKeyword: string = '';
 
+  // 上下文
+  private uiContext: UIContext = this.getUIContext();
+  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+
   // 添加页面生命周期
   aboutToAppear() {
     console.log('[DEBUG] ContactList 页面加载了');
-    promptAction.showToast({
-      message: 'ContactList 页面加载成功',
-      duration: 2000
-    });
+    try {
+      this.uiContext.getPromptAction().showToast({
+        message: 'ContactList 页面加载成功',
+        duration: 2000
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   build() {
