@@ -3,6 +3,38 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "login_title_font",
+      "value": "#409EFF"
+    },
+    {
+      "name": "login_textInput_all_border",
+      "value": "#DCDFE6"
+    },
+    {
+      "name": "login_text_rememberMe_font",
+      "value": "#606266"
+    },
+    {
+      "name": "login_text_forgetPassword_font",
+      "value": "#409EFF"
+    },
+    {
+      "name": "login_button_login_background_enabled",
+      "value": "#409EFF"
+    },
+    {
+      "name": "login_button_login_background_disabled",
+      "value": "#c0c4cc"
+    },
+    {
+      "name": "login_button_login_font",
+      "value": "#ffffff"
+    },
+    {
+      "name": "login_button_login_border",
+      "value": "#409EFF"
     }
   ]
 }

@@ -1,4 +1,3 @@
-
 import { common } from '@kit.AbilityKit';
 import { promptAction, router } from '@kit.ArkUI';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
@@ -9,20 +8,23 @@ struct LoginPage {
   @State username: string = '';
   @State password: string = '';
   @State errorMessage: string = '';
-  @State isLoading:boolean = false;
-  @State rememberMe:boolean=false;
-  private context:common.UIAbilityContext | null = null;
+  @State isLoading: boolean = false;
+  @State rememberMe: boolean = false;
+  private uiContext: UIContext = this.getUIContext();
+  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
-      this.context = getContext(this) as common.UIAbilityContext;
+    this.uiAbilityContext = getContext(this) as common.UIAbilityContext;
     // 监听登录成功事件
-    this.context?.eventHub.on('loginSuccess', () => {
-      router.replaceUrl({ url: 'pages/Home' });
+    this.uiAbilityContext?.eventHub.on('loginSuccess', () => {
+      this.uiContext.getRouter().replaceUrl({ url: 'pages/Home' }).catch((e: Error) => {
+        console.error(e.message);
+      });
     });
 
     // 监听登录失败事件
-    this.context?.eventHub.on('loginFailed', (err: Error) => {
+    this.uiAbilityContext?.eventHub.on('loginFailed', (err: Error) => {
       this.isLoading = false;
       this.errorMessage = err.message || '登录失败';
     });
@@ -30,27 +32,18 @@ struct LoginPage {
 
   aboutToDisappear(): void {
     // 移除事件监听
-    this.context?.eventHub.off('loginSuccess');
-    this.context?.eventHub.off('loginFailed');
+    this.uiAbilityContext?.eventHub.off('loginSuccess');
+    this.uiAbilityContext?.eventHub.off('loginFailed');
   }
 
   build() {
-    Column({space : 8}) {
+    Column({ space: 8 }) {
       Column() {
         //Logo
-        Text('💬')
-          .fontSize(64)
-          .margin({ bottom: 8 })
+        Text('💬').fontSize(64).margin({ bottom: 8 })
         Column() {
-          Text('CloudChat')
-            .fontSize(28)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#409EFF')
-
-          Text('智能聊天')
-            .fontSize(14)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#409EFF')
+          Text('CloudChat').fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
+          Text('智能聊天').fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
         }
       }
       .margin({ top: 40, bottom: 30 })
@@ -68,13 +61,13 @@ struct LoginPage {
           .height(50)
           .width('80%')
           .padding(12)
-          .backgroundColor('Color.Transparent')
+          .backgroundColor(Color.Transparent)
           .border({
             width: 1,
-            color: '#DCDFE6'
+            color: $r("app.color.login_textInput_all_border")
           })
           .alignRules({
-            top: { anchor: 'usernameInput', align: VerticalAlign.Bottom },
+            top: { anchor: 'welcomeTitle', align: VerticalAlign.Bottom },
             middle: { anchor: '__container__', align: HorizontalAlign.Center }
           })
           .margin({ top: 30 })
@@ -95,7 +88,7 @@ struct LoginPage {
           .backgroundColor('')
           .border({
             width: 1,
-            color: '#DCDFE6'
+            color: $r("app.color.login_textInput_all_border")
           })
           .alignRules({
             top: { anchor: 'passwordInput', align: VerticalAlign.Bottom },
@@ -109,19 +102,13 @@ struct LoginPage {
         Row() {
           //记住我
           Row({ space: 0 }) {
-            Checkbox()
-              .select(this.rememberMe)
-              .onChange((checked: boolean) => {
-                this.rememberMe = checked;
-              })
-              .size({ width: 18, height: 18 })
+            Checkbox().select(this.rememberMe).onChange((checked: boolean) => {
+              this.rememberMe = checked;
+            }).size({ width: 18, height: 18 })
 
-            Text('记住我')
-              .fontSize(14)
-              .fontColor('#606266')
-              .margin({ left: 4 })
+            Text('记住我').margin({ left: 4 }).fontSize(14).fontColor($r("app.color.login_text_rememberMe_font"))
           }
-          .margin({left:20})
+          .margin({ left: 20 })
           .onClick(() => {
             this.rememberMe = !this.rememberMe;
           })
@@ -129,19 +116,18 @@ struct LoginPage {
           Blank()
 
           //忘记密码
-          Text('忘记密码？')
-            .fontSize(14)
-            .fontColor('#409EFF')
-            .margin({right:4})
+          Text('忘记密码？').margin({ right: 4 }).fontSize(14).fontColor($r("app.color.login_text_forgetPassword_font"))
             .onClick(() => {
-              promptAction.showToast({
-                message: '功能开发中...',
-                duration: 2000
-              });
+              try {
+                this.uiContext.getPromptAction().showToast({
+                  message: '功能开发中...',
+                  duration: 2000
+                })
+              } catch (error) {
+                console.error(error);
+              }
             })
-        }
-        .width('100%')
-        .padding({ left: 4, right: 4 })
+        }.width('100%').padding({ left: 4, right: 4 })
 
 
         //登录按钮
@@ -149,14 +135,16 @@ struct LoginPage {
           .id('loginButton')
           .width('80%')
           .height(50)
-          .backgroundColor(this.canLogin() && !this.isLoading ? '#409EFF' : '#c0c4cc')
+          .backgroundColor($r(this.canLogin() && !this.isLoading ?
+            "app.color.login_button_login_background_enabled" : "app.color.login_button_login_background_disabled")
+          )
           .alignRules({
             top: { anchor: 'passwordInput', align: VerticalAlign.Bottom },
             middle: { anchor: '__container__', align: HorizontalAlign.Center }
           })
           .margin({ top: 20 })
-          .fontColor('#ffffff')
-          .enabled(this.canLogin() && !this.isLoading)//登录时禁用
+          .fontColor($r("app.color.login_button_login_font"))
+          .enabled(this.canLogin() && !this.isLoading)  //登录时禁用
           .onClick(() => {
             this.handleLogin();
           })
@@ -168,22 +156,26 @@ struct LoginPage {
           .height(50)
           .fontSize(16)
           .backgroundColor(Color.Transparent)
-          .fontColor('#409EFF')
+          .fontColor($r("app.color.login_button_login_background_enabled"))
           .borderRadius(8)
           .border({
             width: 1,
-            color: '#409EFF'
+            color: $r("app.color.login_button_login_border")
           })
           .margin({ top: 10 })
           .onClick(() => {
-            router.pushUrl({
+            this.uiContext.getRouter().pushUrl({
               url: Page.REGISTER_PAGE
             }).catch((error: Error) => {
               console.error('Route failed:', error);
-              promptAction.showToast({
-                message: '无法打开注册页面',
-                duration: 2000
-              });
+              try {
+                this.uiContext.getPromptAction().showToast({
+                  message: '无法打开注册页面',
+                  duration: 2000
+                });
+              } catch (error) {
+                console.error("Unknown error")
+              }
             })
           })
         //错误提示
@@ -204,8 +196,6 @@ struct LoginPage {
 
     }
   }
-
-
 
   private handleLogin() {
     if (!this.canLogin()) {
@@ -228,6 +218,7 @@ struct LoginPage {
     //   console.error('Login error:', error);
     // }
   }
+
   private canLogin(): boolean {
     const usernameValid = /^[a-zA-Z0-9_]{5,20}$/.test(this.username);
     const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.password);

@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Main UI module"
+      "value": "主 UI 模块"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "Main UI Ability"
+      "value": "主 UI Ability"
     },
     {
       "name": "EntryAbility_label",
@@ -14,11 +14,11 @@
     },
     {
       "name": "permission_reason_INTERNET",
-      "value": "For network"
+      "value": "用于网络通讯"
     },
     {
       "name": "error_login_AccountOrPasswordRequireNotNull",
-      "value": "Account or password require not empty"
+      "value": "账号或密码不能为空"
     }
   ]
 }
