@@ -1,6 +1,17 @@
 import { common } from '@kit.AbilityKit';
+import { HttpService } from '../../core/service/network/http/server.http';
 import { CallBackManager, Event } from '../../entryability/manager/call-back-manager/CallBackManager';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
+import { http } from '@kit.NetworkKit';
+import { HttpClientMessage, HttpClientMessageType } from '../../core/protocol/http/client.http.protocol';
+import { LoginPayload } from '../../core/protocol/websocket/client.websocket.protocol';
+import { beforeAll, expect } from '@ohos/hypium';
+import { AsyncCallback } from '@kit.BasicServicesKit';
+
+interface LoginInfo{
+  type : HttpClientMessageType
+  payload :LoginPayload
+}
 
 @Entry
 @Component
@@ -160,7 +171,7 @@ struct LoginPage {
           })
 
         //注册按钮
-        Button('注册账号')
+        Button($r('app.string.Register_label'))
           .id('registerButton')
           .width('80%')
           .height(50)
@@ -205,28 +216,71 @@ struct LoginPage {
     }
   }
 
-  private handleLogin() {
-    if (!this.canLogin()) {
-      this.errorMessage = '用户名需5位以上字母数字，密码需8位以上';
-      return;
+  //检测登录验证
+  private async handleLogin() {
+      if(!this.canLogin()){
+        return;
+      }
+
+      this.isLoading = true;
+      this.errorMessage = '';
+
+      //初始化Http服务
+      const httpService = new HttpService("cloudchat.infinomat.com","14514",false);
+      const uri = '/test';
+     // let response : string | null = null;
+      // const callback : AsyncCallback<http.HttpResponse> = (err,res)=>{
+      //   if(err){
+      //     console.error(JSON.stringify(err));
+      //   }else{
+      //     console.info("Re:"+JSON.stringify(res));
+      //     response = JSON.stringify(res);
+      //   }
+      // }
+      const loginInfo : LoginInfo = {
+        type : HttpClientMessageType.LOGIN,
+        payload : {
+          username : this.username,
+          password : this.password
+        }
+      };
+      console.log("Request:",loginInfo)
+    //发送POST请求
+    httpService.post(uri,loginInfo,(err,res)=>{
+        console.log("Http Response:",err,res);
+        this.isLoading = false;
+
+        if(err){
+          this.errorMessage = 'HTTP Failed';
+          //TODO:此处错误处理
+          this.callBackManager.emit(Event.LOGIN_FAILED,new Error(this.errorMessage));
+          return ;
+        }
+
+    try{
+          const result = JSON.stringify(res);
+          console.info("Received:",result);
+
+          //检验响应码
+          if(res.responseCode !== 200){
+            this.errorMessage = `Server Failed:${res.responseCode}`;
+            this.callBackManager.emit(Event.LOGIN_FAILED,new Error(this.errorMessage));
+            return;
+          }
+
+         //TODO:成功返回
+    }catch(err){
+
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    });
 
-    // const context = this.context as common.UIAbilityContext;
-    // try {
-    //   context.eventHub.emit(Event.LOGIN, {
-    //     username: this.username,
-    //     password: this.password
-    //   });
-    // } catch (error) {
-    //   this.isLoading = false;
-    //   this.errorMessage = '连接服务器失败，请稍后重试';
-    //   console.error('Login error:', error);
-    // }
+
   }
 
+
+
+  //本地验证表单信息
   private canLogin(): boolean {
     const usernameValid = /^[a-zA-Z0-9_]{5,20}$/.test(this.username);
     const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.password);

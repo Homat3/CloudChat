@@ -21,7 +21,8 @@
       "value": "账号或密码不能为空"
     },
     {
-      "name": ""
+      "name": "Register_label",
+      "value": "注册页面"
     }
   ]
 }

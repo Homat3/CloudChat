@@ -19,6 +19,10 @@
     {
       "name": "error_login_AccountOrPasswordRequireNotNull",
       "value": "Account or password require not empty"
+    },
+    {
+      "name": "Register_label",
+      "value": "Register"
     }
   ]
 }
