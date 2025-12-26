@@ -1,9 +1,9 @@
-export interface ClientMessage {
-  type: ClientMessageType;
+export interface WebSocketClientMessage {
+  type: WebsocketClientMessageType;
   payload: ClientPayload;
 }
 
-export enum ClientMessageType {
+export enum WebsocketClientMessageType {
   LOGIN = 'LOGIN',
   LOGIN_BY_TOKEN = 'LOGIN_BY_TOKEN',
   REGISTER = 'REGISTER',

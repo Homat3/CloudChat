@@ -9,10 +9,10 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { WebsocketService } from '../core/service/network/websocket/server.websocket';
 import { JSON } from '@kit.ArkTS';
-import { ClientMessage, ClientMessageType, LoginPayload } from '../core/protocol/websocket/client.protocol';
+import { WebSocketClientMessage, WebsocketClientMessageType, LoginPayload } from '../core/protocol/websocket/client.websocket.protocol';
 import { LoginFailurePayload,
   LoginSuccessPayload,
-  ServiceMessage, ServiceMessageType } from '../core/protocol/websocket/service.protocol';
+  WebsocketServiceMessage, WebsocketServiceMessageType } from '../core/protocol/websocket/service.websocket.protocol';
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
 import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
 import { PermissionManager } from './manager/permission-manager/PermissionManager';
@@ -105,17 +105,17 @@ export default class MainUIAbility extends UIAbility {
       ws.addNewMessageObserver((msg) => {
         //控制台响应
         console.log("Received: " + msg);
-        let receivedObject = JSON.parse(msg) as ServiceMessage;
+        let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
         //处理登录相应
-        if( receivedObject.type === ServiceMessageType.LOGIN_SUCCESS) {
+        if( receivedObject.type === WebsocketServiceMessageType.LOGIN_SUCCESS) {
           this.context.eventHub.emit(Event.LOGIN_SUCCESS, (receivedObject.payload as LoginSuccessPayload));
-        } else if(receivedObject.type === ServiceMessageType.LOGIN_FAILURE) {
+        } else if(receivedObject.type === WebsocketServiceMessageType.LOGIN_FAILURE) {
           this.context.eventHub.emit(Event.LOGIN_FAILED, (receivedObject.payload as LoginFailurePayload).error);
         }
       });
 
-      const loginInfo: ClientMessage = {
-        type: ClientMessageType.LOGIN,
+      const loginInfo: WebSocketClientMessage = {
+        type: WebsocketClientMessageType.LOGIN,
         payload: {
           username: data.username,
           password: data.password

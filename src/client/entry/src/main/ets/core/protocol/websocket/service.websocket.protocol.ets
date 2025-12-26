@@ -1,9 +1,9 @@
-export interface ServiceMessage {
-  type: ServiceMessageType;
+export interface WebsocketServiceMessage {
+  type: WebsocketServiceMessageType;
   payload: ServicePayload;
 }
 
-export enum ServiceMessageType {
+export enum WebsocketServiceMessageType {
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGIN_FAILURE = 'LOGIN_FAILURE',
   REGISTER_SUCCESS = 'REGISTER_SUCCESS',
