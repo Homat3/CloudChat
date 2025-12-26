@@ -17,12 +17,55 @@
       "value": "用于网络通讯"
     },
     {
-      "name": "error_login_AccountOrPasswordRequireNotNull",
-      "value": "账号或密码不能为空"
+      "name": "text_login_Title",
+      "value": "CloudChat"
     },
     {
-      "name": "Register_label",
-      "value": "注册页面"
+      "name": "text_login_Subtitle",
+      "value": "智能聊天"
+    },
+    {
+      "name": "text_login_UsernamePlaceholder",
+      "value": "请输入用户名"
+    },
+    {
+      "name": "text_login_PasswordPlaceholder",
+      "value": "请输入密码"
+    },
+    {
+      "name": "text_login_RememberMe",
+      "value": "记住我"
+    },
+    {
+      "name": "text_login_ForgotPassword",
+      "value": "忘记密码？"
+    },
+    {
+      "name": "text_login_LoggingIn",
+      "value": "登录中..."
+    },
+    {
+      "name": "text_login_Login",
+      "value": "登录"
+    },
+    {
+      "name": "text_login_RegisterAccount",
+      "value": "注册账号"
+    },
+    {
+      "name": "text_login_MoreAbilities",
+      "value": "功能开发中..."
+    },
+    {
+      "name": "error_login_LoginFailed",
+      "value": "登录失败"
+    },
+    {
+      "name": "error_login_UsernameInputError",
+      "value": "用户名需5-20位字母数字或下划线"
+    },
+    {
+      "name": ""
     }
   ]
 }

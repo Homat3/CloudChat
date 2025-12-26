@@ -1,17 +1,6 @@
 import { common } from '@kit.AbilityKit';
-import { HttpService } from '../../core/service/network/http/server.http';
 import { CallBackManager, Event } from '../../entryability/manager/call-back-manager/CallBackManager';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
-import { http } from '@kit.NetworkKit';
-import { HttpClientMessage, HttpClientMessageType } from '../../core/protocol/http/client.http.protocol';
-import { LoginPayload } from '../../core/protocol/websocket/client.websocket.protocol';
-import { beforeAll, expect } from '@ohos/hypium';
-import { AsyncCallback } from '@kit.BasicServicesKit';
-
-interface LoginInfo{
-  type : HttpClientMessageType
-  payload :LoginPayload
-}
 
 @Entry
 @Component
@@ -40,7 +29,7 @@ struct LoginPage {
       // 监听登录失败事件
       this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, (err: Error) => {
         this.isLoading = false;
-        this.errorMessage = err.message || '登录失败';
+        this.errorMessage = err.message || loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
       });
     } catch (error) {
       console.error(error);
@@ -63,8 +52,8 @@ struct LoginPage {
         //Logo
         Text('💬').fontSize(64).margin({ bottom: 8 })
         Column() {
-          Text('CloudChat').fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
-          Text('智能聊天').fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
+          Text($r("app.string.text_login_Title")).fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
+          Text($r("app.string.text_login_Subtitle")).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
         }
       }
       .margin({ top: 40, bottom: 30 })
@@ -75,7 +64,7 @@ struct LoginPage {
         // 用户名输入框
         TextInput({
           text: this.username,
-          placeholder: '请输入用户名'
+          placeholder: $r("app.string.text_login_UsernamePlaceholder")
         })
           .id('usernameInput')
           .type(InputType.Normal)
@@ -100,7 +89,7 @@ struct LoginPage {
         // 密码输入框
         TextInput({
           text: this.password,
-          placeholder: '请输入密码'
+          placeholder: $r("app.string.text_login_PasswordPlaceholder")
         })
           .id('passwordInput')
           .type(InputType.Password)
@@ -127,7 +116,7 @@ struct LoginPage {
               this.rememberMe = checked;
             }).size({ width: 18, height: 18 })
 
-            Text('记住我').margin({ left: 4 }).fontSize(14).fontColor($r("app.color.login_text_rememberMe_font"))
+            Text($r("app.string.text_login_RememberMe")).margin({ left: 4 }).fontSize(14).fontColor($r("app.color.login_text_rememberMe_font"))
           }
           .margin({ left: 20 })
           .onClick(() => {
@@ -137,11 +126,11 @@ struct LoginPage {
           Blank()
 
           //忘记密码
-          Text('忘记密码？').margin({ right: 4 }).fontSize(14).fontColor($r("app.color.login_text_forgetPassword_font"))
+          Text($r("app.string.text_login_ForgotPassword")).margin({ right: 4 }).fontSize(14).fontColor($r("app.color.login_text_forgetPassword_font"))
             .onClick(() => {
               try {
                 this.uiContext.getPromptAction().showToast({
-                  message: '功能开发中...',
+                  message: $r("app.string.text_login_MoreAbilities"),
                   duration: 2000
                 })
               } catch (error) {
@@ -152,7 +141,7 @@ struct LoginPage {
 
 
         //登录按钮
-        Button(this.isLoading ? '登录中...' : '登录')
+        Button(this.isLoading ? $r("app.string.text_login_LoggingIn") : $r("app.string.text_login_Login"))
           .id('loginButton')
           .width('80%')
           .height(50)
@@ -171,7 +160,7 @@ struct LoginPage {
           })
 
         //注册按钮
-        Button($r('app.string.Register_label'))
+        Button('注册账号')
           .id('registerButton')
           .width('80%')
           .height(50)
@@ -216,11 +205,11 @@ struct LoginPage {
     }
   }
 
-  //检测登录验证
-  private async handleLogin() {
-      if(!this.canLogin()){
-        return;
-      }
+  private handleLogin() {
+    if (!this.canLogin()) {
+      this.errorMessage = '用户名需5位以上字母数字，密码需8位以上';
+      return;
+    }
 
       this.isLoading = true;
       this.errorMessage = '';
@@ -286,12 +275,12 @@ struct LoginPage {
     const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.password);
 
     if (!usernameValid) {
-      this.errorMessage = '用户名需5-20位字母数字或下划线';
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_login_UsernameInputError"));
       return false;
     }
 
     if (!passwordValid) {
-      this.errorMessage = '密码需至少8位，包含字母和数字';
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_login_PasswordInputError"));
       return false;
     }
 
