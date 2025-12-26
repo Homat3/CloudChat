@@ -17,8 +17,6 @@ export enum HttpClientMessageType {
   REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
   ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
   LOAD_MESSAGES = 'LOAD_MESSAGES',
-  SEND_MESSAGE = 'SEND_MESSAGE',
-  MARK_READ = 'MARK_READ',
   UPLOAD_FILE = 'UPLOAD_FILE'
 }
 
@@ -36,8 +34,6 @@ type ClientPayload =
   | RefuseFriendRequestPayload
   | AcceptFriendRequestPayload
   | LoadMessagesPayload
-  | SendMessagePayload
-  | MarkReadPayload
   | UploadFilePayload;
 
 export interface LoginPayload {
@@ -103,19 +99,7 @@ export interface AcceptFriendRequestPayload {
   id: number;
 }
 
-export interface SendMessagePayload {
-  tempId: string;
-  senderId: number;
-  receiverId: number;
-  content: string;
-}
-
 export interface LoadMessagesPayload {
-  userId: number;
-  targetId: number;
-}
-
-export interface MarkReadPayload {
   userId: number;
   targetId: number;
 }

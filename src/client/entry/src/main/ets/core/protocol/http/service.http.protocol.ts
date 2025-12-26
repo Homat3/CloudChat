@@ -26,9 +26,6 @@ export enum HttpServiceMessageType {
   REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
   ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
   MESSAGES_LOADED = 'MESSAGES_LOADED',
-  MESSAGE_RECEIVED_SELF = 'MESSAGE_RECEIVED_SELF',
-  MESSAGE_SEND_FAILED = 'MESSAGE_SEND_FAILED',
-  MESSAGE_RECEIVED_OTHER = 'MESSAGE_RECEIVED_OTHER',
   FILE_UPLOADED = 'FILE_UPLOADED',
   FILE_UPLOADED_FAILED = 'FILE_UPLOADED_FAILED'
 }
@@ -56,9 +53,6 @@ export type ServicePayload =
   AcceptFriendRequestPayload |
   SearchForUserResultPayload |
   MessagesLoadedPayload |
-  MessageReceivedSelfPayload |
-  MessageSendFailedPayload |
-  MessageReceivedOtherPayload |
   FileUploadedPayload|
   FileUploadedFailedPayload;
 
@@ -192,27 +186,6 @@ export interface RefuseFriendRequestPayload {
 
 export interface AcceptFriendRequestPayload {
   id: number;
-}
-
-export interface MessageReceivedSelfPayload {
-  tempId: string;
-  id: number;
-  timestamp: string;
-}
-
-export interface MessageSendFailedPayload {
-  tempId: string;
-  error: string;
-}
-
-export interface MessageReceivedOtherPayload {
-  id: number;
-  senderId: number;
-  receiverId: number;
-  content: string;
-  timestamp: string;
-  status: 'sending' | 'sent' | 'read';
-  type: 'text' | 'image' | 'file';
 }
 
 export interface MessagesLoadedPayload {
