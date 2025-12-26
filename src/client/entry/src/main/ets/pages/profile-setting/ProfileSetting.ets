@@ -28,7 +28,7 @@ struct ProfileSetting {
         .margin({ top: 40 })
       // 邮箱信息
       Row() {
-        Text('邮箱:')
+        Text($r("app.string.text_profileSetting_Email"))
           .fontSize(16)
           .width(80)
         Text(this.userEmail)
@@ -58,7 +58,7 @@ struct ProfileSetting {
       // })
       // 消息通知开关
       Row() {
-        Text('消息通知')
+        Text($r("app.string.text_profileSetting_MessageNotify"))
           .fontSize(16)
           .width(80)
         Toggle({ type: ToggleType.Switch, isOn: this.notificationsEnabled })
@@ -75,7 +75,7 @@ struct ProfileSetting {
 
       // 深色模式开关
       Row() {
-        Text('深色模式')
+        Text($r("app.string.text_profileSetting_DarkMode"))
           .fontSize(16)
           .width(80)
         Toggle({ type: ToggleType.Switch, isOn: this.darkMode })

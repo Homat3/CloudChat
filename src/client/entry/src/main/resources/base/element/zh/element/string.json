@@ -15,7 +15,8 @@
     {
       "name": "permission_reason_INTERNET",
       "value": "用于网络通讯"
-    },{
+    },
+    {
       "name": "text_login_Title",
       "value": "CloudChat"
     },
@@ -70,6 +71,18 @@
     {
       "name": "error_login_UnableToOpenRegisterPage",
       "value": "无法打开注册页面"
+    },
+    {
+      "name": "text_profileSetting_Email",
+      "value": "邮箱"
+    },
+    {
+      "name": "text_profileSetting_MessageNotify",
+      "value": "消息通知"
+    },
+    {
+      "name": "text_profileSetting_DarkMode",
+      "value": "深色模式"
     }
   ]
 }
