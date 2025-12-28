@@ -23,6 +23,10 @@
     {
       "name": "Register_label",
       "value": "Register"
+    },
+    {
+      "name": "error_login_PasswordInputError",
+      "value": "Error"
     }
   ]
 }
