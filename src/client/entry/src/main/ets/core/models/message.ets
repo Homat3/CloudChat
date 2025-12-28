@@ -85,4 +85,5 @@ export class FileMessage implements Message {
     this.timestamp = timestamp;
     this.status = status;
   }
+
 }

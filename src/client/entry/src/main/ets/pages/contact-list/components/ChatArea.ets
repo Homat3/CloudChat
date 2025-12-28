@@ -1,18 +1,146 @@
 import { MessageItem } from "./MessageItem";
 import { common } from "@kit.AbilityKit";
+import { Contact, User } from "../../../core/models/models";
+import { Message, TextMessage } from "../../../core/models/message";
+import { CloudChat } from "../../../CloudChat";
 
 @Component
-/**
- * 中间的聊天界面
- */
+  /**
+   * 中间的聊天界面
+   */
 export struct ChatArea{
   // 状态变量
+  @Prop currentUser: User | null;
+  // @Prop selectedContact?: Contact;
+  @Prop selectedContactId: number;
+  @Prop messages: Message[] = this.messagesMap.get(this.selectedContactId) || [];
+  @Prop messagesMap: Map<number, Message[]>;
+  @Prop onMessageSelected: (id: number) => void;
+  @Prop onSendMessage: (contact: string) => void;
+  @Prop onFoldPanel: () => void;
+
+  @State newMessage: string = '';
+  @State showEmojiPicker: boolean = false;
+  @State showAttachmentMenu: boolean = false;
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   build(){
+    Column() {
+      //顶部标题
+      this.buildHeader()
 
+      //消息区
+      this.buildMessageList()
+
+      //输入区
+      this.buildInputArea()
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor($r('app.color.contact_list_chat_background'))
   }
+  @Builder
+  buildInputArea() {
+    Column() {
+      // 附加功能菜单
+      if (this.showAttachmentMenu) {
+      //   Row() {
+      //     Button($r('app.media.ic_file')).onClick(() => {/* 文件处理 */})
+      //     Button($r('app.media.ic_image')).onClick(() => {/* 图片处理 */})
+      //     Button($r('app.media.ic_emoji')).onClick(() => this.showEmojiPicker = true)
+      //   }
+      //   .padding(10)
+      }
+
+      // 主输入区域
+      Row() {
+        Button({ type: ButtonType.Circle }) {
+          Column({ space: 2 }) {
+            Circle().width(4).height(4).fill(Color.Gray)
+            Circle().width(4).height(4).fill(Color.Gray)
+            Circle().width(4).height(4).fill(Color.Gray)
+          }
+        }
+        .width(36)
+        .height(36)
+        .backgroundColor(Color.Transparent)
+        .margin({ left: 8 })
+        .onClick(() => this.showAttachmentMenu = !this.showAttachmentMenu)
+
+        TextInput({ text: this.newMessage, placeholder: '输入消息...' })
+          .layoutWeight(1)
+          .height(40) // 稍微缩小高度更精致
+          .backgroundColor(Color.White)
+          .borderRadius(20)
+          .onSubmit((): void => this.handleSend())
+          .onChange((value: string) => this.newMessage = value)
+
+        Button('发送')
+          .backgroundColor($r('app.color.send_button'))
+          .onClick(() => this.handleSend())
+      }
+      .padding(10)
+      .backgroundColor($r('app.color.input_background'))
+      .borderRadius(24)
+    }
+    .padding(8)
+  }
+
+  private handleSend() {
+    if (!this.newMessage.trim() || !this.currentUser) return;
+
+    const newMsg: TextMessage = new TextMessage(
+      Date.now(),
+      this.currentUser.userId,
+      this.selectedContactId,
+      this.newMessage,
+      new Date().toISOString(),
+      'sending'
+    );
+
+    // 更新本地状态
+    // this.messages = [...this.messages, newMsg];
+    // this.messagesMap.set(this.selectedContactId, this.messages);
+
+    // 通过WebSocket发送
+    // CloudChat.sendMessage(newMsg)
+    //   .then(() => newMsg.status = 'sent')
+    //   .catch(() => newMsg.status = 'failed')
+    //   .finally(() => this.messagesMap.set(this.selectedContactId, [...this.messages]));
+    //
+    // this.newMessage = '';
+    // this.showAttachmentMenu = false;
+  }
+
+  @Builder
+  buildMessageList() {
+    List({ space: 15 }) {
+      ForEach(this.messages, (msg: Message) => {
+        ListItem() {
+          MessageItem({
+            message: msg,
+            isCurrentUser: msg.senderId === this.currentUser?.userId,
+            onSelected: () => this.onMessageSelected(msg.id)
+          })
+        }
+      }, (msg: Message) => msg.id.toString())
+    }
+    .layoutWeight(1)
+    .width('100%')
+    .padding(10)
+    .scrollBar(BarState.Off)
+  }
+  @Builder
+  buildHeader() {
+    Row() {
+
+    }
+    .width('100%')
+    .padding(16)
+    .backgroundColor($r('app.color.header_background'))
+  }
+
 }

@@ -1,6 +1,7 @@
 import { ContactItem } from "./ContactItem";
 import { common } from "@kit.AbilityKit";
 import { Contact } from "../../../core/models/models";
+import { Message } from "../../../core/models/message";
 
 @Component
 /**
@@ -8,8 +9,16 @@ import { Contact } from "../../../core/models/models";
  */
 export struct ContactSidebar{
   // 状态变量
-  @State contacts: Array<Contact> = []
-  @State selectedIds: string[] = []
+  @Prop contacts: Array<Contact> = [];
+  @Link messagesMap: Map<number, Message[]>;
+  @Prop selectedContactId: number = 0
+  @Prop searchKeyword: string = ''
+  @Prop onContactSelected: (id: number) => void
+  @Prop onSearchChanged: (keyword: string) => void
+  @Prop onRefresh: () => void
+
+  @State filteredContacts: Array<Contact> = []
+  @State refreshing: boolean = false
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -17,6 +26,18 @@ export struct ContactSidebar{
   //初始化联系人数据
   aboutToAppear() {
     // 加载真实数据
+    this.filterContacts();
+  }
+
+  //过滤联系人
+  private filterContacts() {
+    if(this.searchKeyword.trim() === '') {
+      this.filteredContacts = [...this.contacts];
+    } else {
+      this.filteredContacts = this.contacts.filter(contact =>
+        contact.username.toLowerCase().includes(this.searchKeyword.toLowerCase())
+      );
+    }
   }
 
   build(){
@@ -27,21 +48,28 @@ export struct ContactSidebar{
         .margin(10)
         .onChange((value: string) => {
           //处理搜索逻辑
+          this.searchKeyword = value;
+          this.filterContacts();
+          this.onSearchChanged(value);
         })
 
       //联系人列表
-      List() {
-        // ForEach(this.contacts, (contact: Contact) => {
-        //   ListItem() {
-        //     ContactItem({ contact: contact })
-        //       .selected(this.selectedIds.includes(contact.id))
-        //       .onClick(() => {
-        //         //处理选中逻辑
-        //         this.toggleSelection(contact.id)
-        //       })
-        //   }
-        // }, (contact: Contact) => contact.id)  //指定唯一key
+      List({ space: 20, initialIndex: 0 }) {
+        ForEach(this.filteredContacts, (contact: Contact) => {
+          ListItem() {
+            ContactItem({
+              contact: contact,
+              selected: contact.contactId === this.selectedContactId,
+              onSelected: (id: number) => {
+                this.onContactSelected(id);
+              }
+            })
+          }
+        }, (contact: Contact) => contact.contactId.toString())
       }
+      .width('100%')
+      .layoutWeight(1)
+      .divider({ strokeWidth: 1, color: $r('app.color.list_divider')})
     }
   }
 

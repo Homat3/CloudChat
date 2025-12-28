@@ -47,6 +47,78 @@
     {
       "name": "contact_list_whole_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "list_divider",
+      "value": "#606266"
+    },
+    {
+      "name": "primary_text",
+      "value": "#606266"
+    },
+    {
+      "name": "online_status",
+      "value": "#00FF00"
+    },
+    {
+      "name": "offline_status",
+      "value": "#606266"
+    },
+    {
+      "name": "badge_text",
+      "value": "#606266"
+    },
+    {
+      "name": "badge_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "item_selected_bg",
+      "value": "#606266"
+    },
+    {
+      "name": "secondary_text",
+      "value": "#c0c4cc"
+    },
+    {
+      "name": "panel_background",
+      "value": "#DCDFE6"
+    },
+    {
+      "name": "send_button",
+      "value": "#409EFF"
+    },
+    {
+      "name": "input_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "header_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "my_message_bg",
+      "value": "#606266"
+    },
+    {
+      "name": "other_message_bg",
+      "value": "#606266"
+    },
+    {
+      "name": "my_message_text",
+      "value": "#c0c4cc"
+    },
+    {
+      "name": "other_message_text",
+      "value": "#c0c4cc"
+    },
+    {
+      "name": "ic_close",
+      "value": "#0000"
+    },
+    {
+      "name": "header_text",
+      "value": "#c0c4cc"
     }
   ]
 }

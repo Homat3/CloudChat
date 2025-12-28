@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
-import { User } from './core/models/models';
+import { Message, TextMessage } from './core/models/message';
+import { Contact, User } from './core/models/models';
 
 /**
  * @description CloudChat 全局属性
@@ -22,5 +23,48 @@ export class CloudChat{
 
   public static setContext(key: string, value: object): void {
     CloudChat.contexts.set(key, value);
+  }
+
+  // --- 模拟数据服务 ---
+
+  /**
+   * 模拟获取联系人列表
+   */
+  public static async getContacts(): Promise<Contact[]> {
+    return new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve([
+    //       new Contact(1, "张三", "test1@test.com", "", true),
+    //       new Contact(2, "李四", "test2@test.com", "", false),
+    //       new Contact(3, "王五", "test3@test.com", "", true),
+    //     ]);
+    //   }, 500);
+    });
+  }
+
+  /**
+   * 模拟获取某个联系人的消息记录
+   */
+  public static async getMessages(contactId: number): Promise<Message[]> {
+    return new Promise((resolve) => {
+      // // 模拟一些历史消息
+      // const msgs: Message[] = [
+      //   new TextMessage(Date.now() - 100000, contactId, 999, "你好，最近怎么样？", "", "sent"),
+      //   new TextMessage(Date.now() - 80000, 999, contactId, "挺好的，你呢？", "", "read"),
+      // ];
+      // resolve(msgs);
+    });
+  }
+
+  /**
+   * 发送消息
+   */
+  public static async sendMessage(msg: Message): Promise<boolean> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log(`[CloudChat] Message Sent: ${msg.content}`);
+        resolve(true);
+      }, 300);
+    });
   }
 }
