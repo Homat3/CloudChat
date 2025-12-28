@@ -1,8 +1,9 @@
 import { User } from '../../core/models/models'
-import { promptAction, router } from '@kit.ArkUI';
+import { App, promptAction, router } from '@kit.ArkUI';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
+import { loadStringResource } from '../../core/util/load-resource';
 
 @Entry
 @Component
@@ -34,14 +35,14 @@ struct Register {
           .fontSize(64)
           .margin({ bottom: 8 })
         Column() {
-          Text('CloudChat')
+          Text($r("app.string.text_all_Title"))
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
-            .fontColor('#409EFF')
+            .fontColor($r("app.color.register_title_font"))
 
-          Text('注册界面')
+          Text($r("app.string.text_register_RegisterYourAccount"))
             .fontSize(14)
-            .fontColor('#909399')
+            .fontColor($r("app.color.register_text_registerYourAccount_font"))
         }
       }
       .margin({ top: 40, bottom: 30 })
@@ -52,16 +53,16 @@ struct Register {
         // 用户名输入框
         TextInput({
           text: this.userName,
-          placeholder: '请输入用户名（5-20位字母数字）'
+          placeholder: $r("app.string.text_register_UsernamePlaceholder")
         })
           .type(InputType.Normal)
           .height(50)
           .width('100%')
           .padding(12)
-          .backgroundColor('Color.Transparent')
+          .backgroundColor(Color.Transparent)
           .border({
             width: this.userNameError ? 2 : 1,
-            color: this.userNameError ? Color.Red : '#DCDFE6'
+            color: this.userNameError ? Color.Red : $r("app.color.register_textInput_font_normal")
           })
           .onChange((value: string) => {
             this.userName = value;
@@ -82,15 +83,15 @@ struct Register {
         // 邮箱输入框
         TextInput({
           text: this.email,
-          placeholder: '请输入邮箱号'
+          placeholder: $r("app.string.text_register_EmailPlaceholder")
         })
           .type(InputType.Normal)
           .height(50)
           .width('100%')
-          .backgroundColor('Color.Transparent')
+          .backgroundColor(Color.Transparent)
           .border({
             width: this.emailError ? 2 : 1,
-            color: this.emailError ? Color.Red : '#DCDFE6'
+            color: this.emailError ? Color.Red : $r("app.color.register_textInput_font_normal")
           })
           .onChange((value: string) => {
             this.email = value;
@@ -111,15 +112,15 @@ struct Register {
         // 密码输入框
         TextInput({
           text: this.passWord,
-          placeholder: '请输入密码（至少8位，含字母数字）'
+          placeholder: $r("app.string.text_register_PasswordPlaceholder")
         })
           .type(InputType.Password)
           .height(50)
           .width('100%')
-          .backgroundColor('Color.Transparent')
+          .backgroundColor(Color.Transparent)
           .border({
             width: this.passwordError ? 2 : 1,
-            color: this.passwordError ? Color.Red : '#DCDFE6'
+            color: this.passwordError ? Color.Red : $r("app.color.register_textInput_font_normal")
           })
           .onChange((value: string) => {
             this.passWord = value;
@@ -144,15 +145,15 @@ struct Register {
         // 确认密码输入框
         TextInput({
           text: this.passWord_check,
-          placeholder: '请再次输入密码'
+          placeholder: $r("app.string.text_register_PasswordAgainPlaceholder")
         })
           .type(InputType.Password)
           .height(50)
           .width('100%')
-          .backgroundColor('Color.Transparent')
+          .backgroundColor(Color.Transparent)
           .border({
             width: this.confirmPasswordError ? 2 : 1,
-            color: this.confirmPasswordError ? Color.Red : '#DCDFE6'
+            color: this.confirmPasswordError ? Color.Red : $r("app.color.register_textInput_font_normal")
           })
           .onChange((value: string) => {
             this.passWord_check = value;
@@ -172,12 +173,12 @@ struct Register {
 
         // 注册按钮
         //TODO:发送注册信息
-        Button(this.isLoading ? '注册中...' : '注册')
+        Button(this.isLoading ? $r("app.string.text_register_Registering") : $r("app.string.text_register_Register"))
           .width('100%')
           .height(48)
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
-          .backgroundColor(this.canRegister() ? '#409EFF' : '#A0CFFF')
+          .backgroundColor(this.canRegister() ? $r("app.color.login_button_login_background_enabled") : $r("app.color.login_button_login_background_disabled"))
           .opacity(this.canRegister() ? 1 : 0.6)
           .enabled(this.canRegister() && !this.isLoading)
           .onClick(() => {
@@ -185,27 +186,25 @@ struct Register {
           })
 
         // 返回登录按钮
-        Button('返回登录')
+        Button($r("app.string.text_register_BackToLogin"))
           .width('100%')
           .height(48)
           .fontSize(16)
-          .fontColor('#409EFF')
+          .fontColor($r("app.color.register_button_back_font"))
           .backgroundColor(Color.Transparent)
           .borderRadius(8)
           .border({
             width: 1,
-            color: '#409EFF'
+            color: $r("app.color.register_button_back_border")
           })
           .margin({ top: 10 })
           .onClick(() => {
-            router.pushUrl({
+            this.uiContext.getRouter().pushUrl({
               url: Page.LOGIN_PAGE
-            }).catch(() => {
-              router.pushUrl({
-                url: 'pages/login/LoginPage'
-              });
+            }).catch((e: Error) => {
+              console.error(e.message);
             });
-          })
+          });
 
         // 系统错误提示
         if (this.errorMessage) {
@@ -217,14 +216,14 @@ struct Register {
           }
           .width('100%')
           .padding({ left: 8, right: 8, top: 8, bottom: 8 })
-          .backgroundColor('#FFEBEE')
+          .backgroundColor($r("app.color.register_row_error_background"))
           .borderRadius(8)
         }
 
         // 版本信息
-        Text('CloudChat v2.0.0 · 鸿蒙版')
+        Text($r("app.string.app_version"))
           .fontSize(12)
-          .fontColor('#909399')
+          .fontColor($r("app.color.register_test_version_font"))
           .margin({ top: 40 })
       }
       .width('85%')
@@ -232,7 +231,7 @@ struct Register {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#F5F7FA')
+    .backgroundColor($r("app.color.register_colum_main_background"))
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Center)
   }
@@ -255,10 +254,14 @@ struct Register {
     // 这里假设注册总是成功，直接跳转到联系人页面
     console.log('跳转到:', Page.CONTACT_LIST_PAGE);
     // 先显示成功提示
-    promptAction.showToast({
-      message: '注册成功',
-      duration: 1500
-    });
+    try {
+      this.uiContext.getPromptAction().showToast({
+        message: loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterSuccess")),
+        duration: 1500
+      });
+    } catch (error) {
+      console.error(error)
+    }
     // 直接跳转
     router.pushUrl({
       url: Page.CONTACT_LIST_PAGE
@@ -268,12 +271,16 @@ struct Register {
     }).catch((err: Error) => {
       console.error('跳转失败:', err);
       this.isLoading = false;
-      this.errorMessage = `跳转失败: ${err.message || '页面不存在'}`;
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterFailed")) + `: ${err.message}`;
       // 显示更详细的错误
-      promptAction.showToast({
-        message: `跳转失败: ${err.message || '未知错误'}`,
-        duration: 3000
-      });
+      try {
+        this.uiContext.getPromptAction().showToast({
+          message: `跳转失败: ${err.message || '未知错误'}`,
+          duration: 3000
+        });
+      } catch (error) {
+        console.error(error)
+      }
     });
   }
 
@@ -318,11 +325,11 @@ struct Register {
   // 各个字段的验证函数
   private validateUserName(username: string): string {
     if (!username.trim()) {
-      return '用户名不能为空';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameRequireNotNull"));
     }
     const usernameRegex = /^[a-zA-Z0-9_]{5,20}$/;
     if (!usernameRegex.test(username)) {
-      return '用户名需5-20位字母数字或下划线';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameInputError"));
     }
     return '';
   }
@@ -331,35 +338,35 @@ struct Register {
   //实时表单元素检验
   private validateEmail(email: string): string {
     if (!email.trim()) {
-      return '邮箱不能为空';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_EmailRequireNotNull"));
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return '请输入有效的邮箱地址';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_EmailInputError"));
     }
     return '';
   }
 
   private validatePassword(password: string): string {
     if (!password) {
-      return '密码不能为空';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordRequireNotNull"));
     }
     if (password.length < 8) {
-      return '密码至少需要8位';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordInputError"));
     }
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      return '密码需包含字母和数字';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordRequireLettersAndNumbers"));
     }
     return '';
   }
 
   private validateConfirmPassword(password: string, confirmPassword: string): string {
     if (!confirmPassword) {
-      return '请确认密码';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordRequireConfirm"));
     }
     if (password !== confirmPassword) {
-      return '两次输入的密码不一致';
+      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordConfirmError"));
     }
     return '';
   }

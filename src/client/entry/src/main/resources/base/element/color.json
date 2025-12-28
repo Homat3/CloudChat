@@ -49,6 +49,46 @@
       "value": "#FFFFFF"
     },
     {
+      "name": "register_title_font",
+      "value": "#409EFF"
+    },
+    {
+      "name": "register_text_registerYourAccount_font",
+      "value": "#909399"
+    },
+    {
+      "name": "register_textInput_font_normal",
+      "value": "#DCDFE6"
+    },
+    {
+      "name": "register_button_register_background_enabled",
+      "value": "#409EFF"
+    },
+    {
+      "name": "register_button_register_background_disabled",
+      "value": "#A0CFFF"
+    },
+    {
+      "name": "register_button_back_font",
+      "value": "#409EFF"
+    },
+    {
+      "name": "register_button_back_border",
+      "value": "#409EFF"
+    },
+    {
+      "name": "register_row_error_background",
+      "value": "#FFEBEE"
+    },
+    {
+      "name": "register_test_version_font",
+      "value": "#909399"
+    },
+    {
+      "name": "register_colum_main_background",
+      "value": "#F5F7FA"
+    },
+    {
       "name": "list_divider",
       "value": "#606266"
     },

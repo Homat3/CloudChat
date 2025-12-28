@@ -101,8 +101,8 @@ struct LoginPage {
         //Logo
         Text('💬').fontSize(64).margin({ bottom: 8 })
         Column() {
-          Text($r("app.string.text_login_Title")).fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
-          Text($r("app.string.text_login_Subtitle")).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
+          Text($r("app.string.text_all_Title")).fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
+          Text($r("app.string.text_all_Subtitle")).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
         }
       }
       .margin({ top: 40, bottom: 30 })
@@ -194,8 +194,8 @@ struct LoginPage {
           .id('loginButton')
           .width('80%')
           .height(50)
-          .backgroundColor($r(this.canLogin() && !this.isLoading ?
-            "app.color.login_button_login_background_enabled" : "app.color.login_button_login_background_disabled")
+          .backgroundColor(this.canLogin() && !this.isLoading ?
+            $r("app.color.login_button_login_background_enabled") : $r("app.color.login_button_login_background_disabled")
           )
           .alignRules({
             top: { anchor: 'passwordInput', align: VerticalAlign.Bottom },
@@ -229,7 +229,7 @@ struct LoginPage {
               console.error('Route failed:', error);
               try {
                 this.uiContext.getPromptAction().showToast({
-                  message: '无法打开注册页面',
+                  message: $r("app.string.error_login_UnableToOpenRegisterPage"),
                   duration: 2000
                 });
               } catch (error) {
@@ -282,8 +282,7 @@ struct LoginPage {
           this.uiAbilityContext.eventHub.emit(Event.LOGIN_SUCCESS);
         }else{
           console.log('令牌登录失败:',result.error);
-          this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED,new Error(result.error
-          ||'自动登录失败..'));
+          this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED,new Error(result.error));
         }
       })
       .catch((error:Error)=>{
@@ -316,13 +315,13 @@ struct LoginPage {
           this.uiAbilityContext.eventHub.emit(Event.LOGIN_SUCCESS);
         } else {
           // 登录失败
-          this.errorMessage = result.error || '登录失败';
+          this.errorMessage = result.error || loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
           this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED, new Error(this.errorMessage));
         }
       })
       .catch((error:Error) => {
         this.isLoading = false;
-        this.errorMessage = error.message || '登录异常';
+        this.errorMessage = error.message || loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
         this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED, new Error(this.errorMessage));
       });
   }

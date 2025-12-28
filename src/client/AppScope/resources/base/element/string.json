@@ -3,6 +3,10 @@
     {
       "name": "app_name",
       "value": "CloudChat"
+    },
+    {
+      "name": "app_version",
+      "value": "HarmonyOS - v1.0.0"
     }
   ]
 }
