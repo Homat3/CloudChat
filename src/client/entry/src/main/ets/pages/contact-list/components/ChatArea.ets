@@ -130,17 +130,36 @@ export struct ChatArea{
     }
     .layoutWeight(1)
     .width('100%')
-    .padding(10)
+    .padding({ left: 16, right: 16, top: 10, bottom: 10 })
     .scrollBar(BarState.Off)
   }
   @Builder
   buildHeader() {
     Row() {
+      Text(`联系人ID：${this.selectedContactId}`)
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.primary_text'))
 
+      Blank()
+      // 右侧功能按钮（如折叠详情面板）
+      Button({ type: ButtonType.Circle, stateEffect: true }) {
+        Column({ space: 4 }) {
+          Circle().width(4).height(4).fill(Color.Gray)
+          Circle().width(4).height(4).fill(Color.Gray)
+          Circle().width(4).height(4).fill(Color.Gray)
+        }
+      }
+      .width(36)
+      .height(36)
+      .backgroundColor(Color.Transparent)
+      .onClick(() => this.onFoldPanel())
     }
     .width('100%')
-    .padding(16)
+    .height(56)
+    .padding({ left: 20, right: 20 })
     .backgroundColor($r('app.color.header_background'))
-  }
+    .border({ width: { bottom: 0.5 }, color: $r('app.color.list_divider') })
 
+    }
 }
