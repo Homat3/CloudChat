@@ -1,5 +1,11 @@
 import { common } from "@kit.AbilityKit";
 import { Contact } from "../../../core/models/models";
+@Preview
+struct ContactItemPreview{
+    build() {
+        ContactItem()
+    }
+}
 
 @Component
 /**
@@ -14,24 +20,23 @@ export struct ContactItem{
 
     @Prop contact: Contact;
     @Prop selected: boolean = false;
-    @Prop onSelected: (id: number) => void = () => {};
 
     build(){
         Row() {
-            Image(this.contact.avatar ? this.contact.avatar : $r('app.media.default'))
+            Image(this.contact?.avatar ? this.contact.avatar : $r('app.media.default'))
                 .width(48)
                 .height(48)
                 .margin(8)
                 .borderRadius(24)
 
             Column() {
-                Text(this.contact.username)
+                Text(this.contact?.username)
                     .fontSize(16)
                     .fontColor($r('app.color.primary_text'))
 
-                Text(this.contact.online ? '在线' : '离线')
+                Text(this.contact?.online ? $r("app.string.text_contactList_all_Online") : $r("app.string.text_contactList_all_Offline"))
                     .fontSize(12)
-                    .fontColor(this.contact.online ? $r('app.color.online_status'): $r('app.color.offline_status'))
+                    .fontColor(this.contact?.online ? $r('app.color.online_status'): $r('app.color.offline_status'))
             }
             .layoutWeight(1)
             .margin({ right: 8})
@@ -49,7 +54,6 @@ export struct ContactItem{
         .backgroundColor(this.selected ? $r('app.color.item_selected_bg') : Color.Transparent)
         .borderRadius(8)
         .onClick(() => {
-            this.onSelected(this.contact.contactId);
         })
     }
 }

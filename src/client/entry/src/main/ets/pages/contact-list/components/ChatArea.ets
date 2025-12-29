@@ -70,7 +70,7 @@ export struct ChatArea{
         .margin({ left: 8 })
         .onClick(() => this.showAttachmentMenu = !this.showAttachmentMenu)
 
-        TextInput({ text: this.newMessage, placeholder: '输入消息...' })
+        TextInput({ text: this.newMessage, placeholder: $r("app.string.text_contactList_chatArea_PleaseInputMessage") })
           .layoutWeight(1)
           .height(40) // 稍微缩小高度更精致
           .backgroundColor(Color.White)
@@ -78,7 +78,7 @@ export struct ChatArea{
           .onSubmit((): void => this.handleSend())
           .onChange((value: string) => this.newMessage = value)
 
-        Button('发送')
+        Button($r("app.string.text_contactList_chatArea_Send"))
           .backgroundColor($r('app.color.send_button'))
           .onClick(() => this.handleSend())
       }

@@ -43,7 +43,7 @@ export struct ContactSidebar{
   build(){
     Column() {
       //搜索框
-      Search({ placeholder: '搜索联系人' })
+      Search({ placeholder: $r("app.string.text_contactList_contactSidebar_SearchForUsers") })
         .width('90%')
         .margin(10)
         .onChange((value: string) => {

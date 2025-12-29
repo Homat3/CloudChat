@@ -64,9 +64,9 @@ export struct DetailPanel{
             .margin({ bottom: 10 })
 
           Row() {
-            Text('状态: ')
+            Text($r("app.string.text_contactList_detailPanel_Status"))
               .fontColor($r('app.color.secondary_text'))
-            Text(this.currentContact.online ? '在线' : '离线')
+            Text(this.currentContact.online ? $r("app.string.text_contactList_all_Online") : $r("app.string.text_contactList_all_Offline"))
               .fontColor(this.currentContact.online ? Color.Green : Color.Gray)
               .fontWeight(FontWeight.Medium)
           }
