@@ -159,6 +159,38 @@
     {
       "name": "error_register_PasswordConfirmError",
       "value": "两次密码不一致"
+    },
+    {
+      "name": "text_contactList_ContactListPageLoaded",
+      "value": "ContactList 页面加载成功"
+    },
+    {
+      "name": "text_contactList_chatArea_Send",
+      "value": "发送"
+    },
+    {
+      "name": "text_contactList_chatArea_PleaseInputMessage",
+      "value": "请输入消息..."
+    },
+    {
+      "name": "text_contactList_all_Online",
+      "value": "在线"
+    },
+    {
+      "name": "text_contactList_all_Offline",
+      "value": "离线"
+    },
+    {
+      "name": "text_contactList_contactSidebar_SearchForUsers",
+      "value": "搜索联系人"
+    },
+    {
+      "name": "text_contactList_detailPanel_Status",
+      "value": "状态："
+    },
+    {
+      "name": "error_contactList_ContactListLoadFailed",
+      "value": "联系人列表加载失败"
     }
   ]
 }
