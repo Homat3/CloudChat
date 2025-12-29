@@ -4,6 +4,9 @@ import { Page } from '../../entryability/manager/window-stage-manager/WindowStag
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/util/load-resource';
+import { RegisterResult, RegisterService } from './register-service';
+import { UserManager } from './user-manager';
+import { RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';
 
 @Entry
 @Component
@@ -26,6 +29,8 @@ struct Register {
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+
+  private registerService:RegisterService = new RegisterService();
 
   build() {
     Column({ space: 8 }) {
@@ -241,46 +246,58 @@ struct Register {
   // 直接跳转版本
   private handleRegister() {
     console.log('开始注册处理');
-    // 1. 验证表单
+    // 验证表单
     if (!this.validateAll()) {
       console.log('表单验证失败');
       return;
     }
-    // 2. 设置加载状态
+    // 设置加载状态
     this.isLoading = true;
     this.errorMessage = '';
     console.log('表单验证通过，准备直接跳转');
 
-    // 这里假设注册总是成功，直接跳转到联系人页面
-    console.log('跳转到:', Page.CONTACT_LIST_PAGE);
-    // 先显示成功提示
-    try {
-      this.uiContext.getPromptAction().showToast({
-        message: loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterSuccess")),
-        duration: 1500
-      });
-    } catch (error) {
-      console.error(error)
-    }
-    // 直接跳转
-    router.pushUrl({
-      url: Page.CONTACT_LIST_PAGE
-    }).then(() => {
-      console.log('跳转成功');
-      this.isLoading = false; // 理论上跳转成功后这个页面就销毁了
-    }).catch((err: Error) => {
-      console.error('跳转失败:', err);
-      this.isLoading = false;
-      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterFailed")) + `: ${err.message}`;
-      // 显示更详细的错误
-      try {
-        this.uiContext.getPromptAction().showToast({
-          message: `跳转失败: ${err.message || '未知错误'}`,
-          duration: 3000
-        });
-      } catch (error) {
-        console.error(error)
-      }
+    // // 这里假设注册总是成功，直接跳转到联系人页面
+    // console.log('跳转到:', Page.CONTACT_LIST_PAGE);
+
+    this.registerService.register(this.userName,this.passWord,this.email)
+      .then((result:RegisterResult)=>{
+        this.isLoading = false;
+
+        if (result.success && result.user) {
+          console.log('注册成功，用户对象:', result.user);
+
+          // 注册成功，保存用户数据
+          // 注意：UserManager.saveUserData现在需要RegisterSuccessPayload，但我们可以传递User对象转换
+          const userPayload : RegisterSuccessPayload= {
+            userId: result.user.userId,
+            username: result.user.username,
+            email: result.user.email,
+            avatar: result.user.avatar,
+            token: result.user.token || ''
+          };
+          const savedUser = UserManager.saveUserData(userPayload, true);
+
+
+          // 显示成功提示
+          promptAction.showToast({
+            message: loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterSuccess")),
+            duration: 1500
+          });
+          router.pushUrl({
+            url: Page.CONTACT_LIST_PAGE
+          }).catch((err:Error) => {
+            console.error('跳转失败:',err);
+          })
+        } else {
+          // 注册失败
+          console.log('注册失败:', result.error);
+          this.errorMessage = result.error || '注册失败';
+        }
+      })
+      .catch((err: Error) => {
+          console.error('跳转失败:', err);
+          this.isLoading = false;
+          this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterFailed")) + `: ${err.message}`;
     });
   }
 
