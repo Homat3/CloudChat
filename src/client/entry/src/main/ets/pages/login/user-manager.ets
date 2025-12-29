@@ -17,7 +17,7 @@ export class UserManager {
       AppStorage.setOrCreate('user_id', userData.userId);
       AppStorage.setOrCreate('username', userData.username);
       AppStorage.setOrCreate('user_token', userData.token);
-      AppStorage.setOrCreate('user_email', userData.email || '');
+      AppStorage.setOrCreate('user_email', userData.email);
       AppStorage.setOrCreate('user_avatar', userData.avatar);
       AppStorage.setOrCreate('is_logged_in', true);
 

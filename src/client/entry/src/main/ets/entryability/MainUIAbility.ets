@@ -7,17 +7,15 @@ import {
 } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { WebsocketService } from '../core/service/network/websocket/server.websocket';
 import { JSON } from '@kit.ArkTS';
-import { WebSocketClientMessage, WebsocketClientMessageType, LoginPayload } from '../core/protocol/websocket/client.websocket.protocol';
-import { LoginFailurePayload,
-  LoginSuccessPayload,
-  WebsocketServiceMessage, WebsocketServiceMessageType } from '../core/protocol/websocket/service.websocket.protocol';
+import { LoginSuccessPayload } from '../core/protocol/websocket/service.websocket.protocol';
 import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
 import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
 import { PermissionManager } from './manager/permission-manager/PermissionManager';
 import { CloudChat } from '../CloudChat';
 import { User } from '../core/models/models';
+import { handleLogin, handleLoginByToken } from './server/login-server';
+import { LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -38,7 +36,8 @@ export default class MainUIAbility extends UIAbility {
     // 消息响应注册
     this.callBackManager = new CallBackManager(this.context.eventHub);
     try {
-      this.callBackManager.addEventSubscription(Event.LOGIN, this.handleLogin);
+      this.callBackManager.addEventSubscription(Event.LOGIN, (payload: LoginPayload): void => handleLogin(this.context, payload));
+      this.callBackManager.addEventSubscription(Event.LOGIN_BY_TOKEN, (payload: LoginByTokenPayload): void => handleLoginByToken(this.context, payload));
       this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, this.handleLoginFailed);
       this.callBackManager.addEventSubscription(Event.LOGIN_SUCCESS, this.handleLoginSuccess);
     } catch (error) {
@@ -95,37 +94,6 @@ export default class MainUIAbility extends UIAbility {
   onBackground(): void {
     //回到应用后台
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
-  }
-
-  // 登录逻辑
-  private handleLogin(data: LoginPayload): void {
-    const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
-    try {
-      ws.connect();
-      ws.addNewMessageObserver((msg) => {
-        //控制台响应
-        console.log("Received: " + msg);
-        let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
-        //处理登录相应
-        if( receivedObject.type === WebsocketServiceMessageType.LOGIN_SUCCESS) {
-          this.context.eventHub.emit(Event.LOGIN_SUCCESS, (receivedObject.payload as LoginSuccessPayload));
-        } else if(receivedObject.type === WebsocketServiceMessageType.LOGIN_FAILURE) {
-          this.context.eventHub.emit(Event.LOGIN_FAILED, (receivedObject.payload as LoginFailurePayload).error);
-        }
-      });
-
-      const loginInfo: WebSocketClientMessage = {
-        type: WebsocketClientMessageType.LOGIN,
-        payload: {
-          username: data.username,
-          password: data.password
-        }
-      }
-      ws.send(loginInfo);
-    } catch(e) {
-      console.error(e);
-      this.context.eventHub.emit(Event.LOGIN_FAILED, "连接服务器失败");
-    }
   }
 
   // 登录错误逻辑

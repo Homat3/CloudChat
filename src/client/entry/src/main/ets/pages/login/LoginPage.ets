@@ -1,43 +1,9 @@
 import { common } from '@kit.AbilityKit';
-import { HttpClientMessageType, LoginPayload, LogoutPayload } from '../../core/protocol/http/client.http.protocol';
-import { HttpService } from '../../core/service/network/http/server.http';
 import { loadStringResource } from '../../core/util/load-resource';
 import { CallBackManager, Event } from '../../entryability/manager/call-back-manager/CallBackManager';
 import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
-import { http } from '@kit.NetworkKit';
 import { UserManager } from './user-manager';
-import { LoginResult, LoginService } from './login-service';
-import { LoginSuccessPayload } from '../../core/protocol/http/service.http.protocol';
 
-//import { AppStorage } from '@kit.ArkTS'; // 添加AppStorage导入
-
-//发送的登录消息
-interface LoginInfo {
-  type: HttpClientMessageType,
-  payload: LoginPayload
-}
-
-// 定义用户数据类型
-interface UserData {
-  userId: number;
-  username: string;
-  token: string;
-  avatar: string;
-}
-
-// 定义服务器响应类型
-interface GeneratedTypeLiteralInterface_1 {
-  userId?: number;
-  username?: string;
-  token?: string;
-  avatar?: string;
-  error?: string;
-}
-
-interface LoginResponse {
-  type: string;
-  payload?: GeneratedTypeLiteralInterface_1
-}
 
 @Entry
 @Component
@@ -53,7 +19,6 @@ struct LoginPage {
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
   // 管理器
   private callBackManager: CallBackManager = new CallBackManager(this.uiAbilityContext.eventHub);   // call back 管理器
-  private loginService: LoginService = new LoginService();
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
@@ -64,13 +29,6 @@ struct LoginPage {
           this.username = rememberedUsername;
           this.rememberMe = true;
         }
-
-       // 监听登录成功事件
-        this.callBackManager.addEventSubscription(Event.LOGIN_SUCCESS, () => {
-        this.uiContext.getRouter().replaceUrl({ url: 'pages/Home' }).catch((e: Error) => {
-          console.error(e.message);
-        });
-      });
       // 监听登录失败事件
       this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, (err: Error) => {
         this.isLoading = false;
@@ -254,7 +212,6 @@ struct LoginPage {
     }
   }
 
-
   //检查本地令牌并尝试自动登录
   private checkLocalTokenAndAutoLogin():void{
     const localTokenInfo = UserManager.getLocalTokenInfo();
@@ -264,35 +221,12 @@ struct LoginPage {
       this.isLoading = true;
 
       this.username = localTokenInfo.username;
-      //延迟发送请求
-      setTimeout(()=>{
-        this.performTokenLogin(localTokenInfo.username,localTokenInfo.token);
-      },200);
+
+      this.uiAbilityContext.eventHub.emit(Event.LOGIN_BY_TOKEN, {username: localTokenInfo.username, token: localTokenInfo.token});
     }
   }
 
-  //执行令牌登录
-  private performTokenLogin(username: string,token: string):void{
-    this.loginService.tokenLogin(username,token)
-      .then((result)=>{
-        this.isLoading = false;
-
-        if(result.success && result.userData){
-          UserManager.saveUserData(result.userData,this.rememberMe);
-          this.uiAbilityContext.eventHub.emit(Event.LOGIN_SUCCESS);
-        }else{
-          console.log('令牌登录失败:',result.error);
-          this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED,new Error(result.error));
-        }
-      })
-      .catch((error:Error)=>{
-        this.isLoading = false;
-        console.error('令牌登录失败',error);
-        this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED,error);
-      });
-  }
-
-  //检测登录验证
+  //登录
   private handleLogin() {
     if (!this.canLogin()) {
       return;
@@ -300,35 +234,7 @@ struct LoginPage {
 
     this.isLoading = true;
     this.errorMessage = '';
-
-    // 使用LoginService进行登录
-    this.loginService.passwordLogin(this.username, this.password)
-      .then((result: LoginResult) => {
-        this.isLoading = false;
-
-        if (result.success && result.userData) {
-          // 登录成功，保存用户数据
-          this.saveUserData(result.userData);
-
-          // 触发登录成功事件
-          // 使用eventHub而不是callBackManager.emit
-          this.uiAbilityContext.eventHub.emit(Event.LOGIN_SUCCESS);
-        } else {
-          // 登录失败
-          this.errorMessage = result.error || loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
-          this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED, new Error(this.errorMessage));
-        }
-      })
-      .catch((error:Error) => {
-        this.isLoading = false;
-        this.errorMessage = error.message || loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
-        this.uiAbilityContext.eventHub.emit(Event.LOGIN_FAILED, new Error(this.errorMessage));
-      });
-  }
-
-  ///保存用户信息
-  private saveUserData(userData: LoginSuccessPayload): void {
-    UserManager.saveUserData(userData, this.rememberMe);
+    this.uiAbilityContext.eventHub.emit(Event.LOGIN, {username: this.username, password: this.password});
   }
 
   //本地验证表单信息

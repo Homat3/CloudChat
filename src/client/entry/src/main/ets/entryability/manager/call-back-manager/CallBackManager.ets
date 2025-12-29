@@ -1,11 +1,11 @@
-import { NoSuchEventSubscribedError, EventAlreadySubscribedError } from './CallBackManagerError';
+import { EventAlreadySubscribedError, NoSuchEventSubscribedError } from './CallBackManagerError';
 import { common } from '@kit.AbilityKit';
 
 /**
  * @description call back 管理器 负责处理特定组件的消息响应
  * @author Infinomat
  */
-export class CallBackManager{
+export class CallBackManager {
   private eventHub: common.EventHub;
   private callBackMap: Map<Event, Function> = new Map();
 
@@ -33,12 +33,13 @@ export class CallBackManager{
    * manager.put(MY_EVENT, callBack);
    * ...
    */
-  public addEventSubscription(event: Event, callBack: Function){
+  public addEventSubscription(event: Event, callBack: Function) {
     this.eventHub.on(event, callBack);
-    if (!this.callBackMap.has(event)){
+    if (!this.callBackMap.has(event)) {
       this.callBackMap.set(event, callBack);
+    } else {
+      throw new EventAlreadySubscribedError(event);
     }
-    else throw new EventAlreadySubscribedError(event);
   }
 
   /**
@@ -47,12 +48,13 @@ export class CallBackManager{
    * @param event 类型: {@see Event} 代表: 事件
    * @throws NoSuchEventSubscribedError 当事件本就没被注册的时候抛出
    */
-  public removeEventSubscription(event: Event){
-    if (this.callBackMap.has(event)){
+  public removeEventSubscription(event: Event) {
+    if (this.callBackMap.has(event)) {
       this.eventHub.off(event);
       this.callBackMap.delete(event);
+    } else {
+      throw new NoSuchEventSubscribedError(event);
     }
-    else throw new NoSuchEventSubscribedError(event);
   }
 
   /**
@@ -63,10 +65,11 @@ export class CallBackManager{
    */
   public getCallBackFunction(event: Event): Function {
     const functions = this.callBackMap.get(event);
-    if (functions){
+    if (functions) {
       return functions;
+    } else {
+      throw new NoSuchEventSubscribedError(event);
     }
-    else throw new NoSuchEventSubscribedError(event);
   }
 }
 
@@ -74,7 +77,7 @@ export class CallBackManager{
  * @description 事件规范标识
  * @author Infinomat
  * @example
- * ------------------------------------------------
+* ------------------------------------------------
  * // 像这样定义事件
  * export enum Event{
  *   ...
@@ -84,8 +87,9 @@ export class CallBackManager{
  * ------------------------------------------------
  * // 然后就可以使用 CallBackManager 的 put 方法订阅
  */
-export enum Event{
+export enum Event {
   LOGIN = "LOGIN",
+  LOGIN_BY_TOKEN = "LOGIN_BY_TOKEN",
   LOGIN_SUCCESS = "LOGIN_SUCCESS",
   LOGIN_FAILED = "LOGIN_FAILED"
 }
