@@ -4,7 +4,7 @@ import { HttpClientMessage,
   LoadContactsPayload } from '../../core/protocol/http/client.http.protocol';
 import { HttpService } from '../../core/service/network/http/server.http';
 import { http } from '@kit.NetworkKit';
-import { Event } from "../manager/call-back-manager/CallBackManager"
+import { Event } from "../../core/manager/call-back-manager/CallBackManager"
 import {
   ContactsLoadedFailedPayload,
   ContactsLoadedPayload,

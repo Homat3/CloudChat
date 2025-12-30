@@ -1,22 +1,22 @@
-import { window } from '@kit.ArkUI';
-import { PageSwitchError } from './WindowStageManagerError';
+import { Router, window } from '@kit.ArkUI';
+import { PageSwitchError } from './PageManagerError';
 
 
 /**
  * @description window stage 管理器 负责处理页面切换
  * @author Infinomat
  */
-export class WindowStageManager{
+export class PageManager{
 
-  private windowStage: window.WindowStage;  // 窗口平台
+  private router: Router;  // 窗口平台
 
   /**
    * @description window stage 管理器构造函数
    * @author Infinomat
    * @param stage 类型: {@see window.WindowStage} 代表: 窗口容器
    */
-  constructor(stage: window.WindowStage) {
-    this.windowStage = stage;
+  constructor(router: Router) {
+    this.router = router;
   }
 
   /**
@@ -33,13 +33,8 @@ export class WindowStageManager{
    * manager.switchPage(MY_PAGE);
    * ...
    */
-  public switchPage(targetPage: Page){
-    this.windowStage.loadContent(targetPage, (err) => {
-      if (err.code) {
-        throw new PageSwitchError("Failed to load the page: " + JSON.stringify(err) + " Check if the path \"" + targetPage + "\" is correct");
-      }
-      console.info('Succeeded in loading the content.');
-    });
+  public async switchPage(targetPage: Page): Promise<void> {
+    return this.router.pushUrl({ url: targetPage });
   }
 }
 

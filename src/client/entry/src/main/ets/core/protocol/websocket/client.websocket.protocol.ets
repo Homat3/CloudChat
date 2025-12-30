@@ -4,28 +4,20 @@ export interface WebSocketClientMessage {
 }
 
 export enum WebsocketClientMessageType {
-  LOGIN = 'LOGIN',
-  LOGIN_BY_TOKEN = 'LOGIN_BY_TOKEN',
+  HDL_INFO = 'HDL_INFO',
   REGISTER = 'REGISTER',
   SEND_MESSAGE = 'SEND_MESSAGE',
   MARK_READ = 'MARK_READ'
 }
 
 type ClientPayload =
-  | LoginPayload
-  | LoginByTokenPayload
+  | HdlInfoPayload
   | RegisterPayload
   | SendMessagePayload
   | MarkReadPayload;
 
-export interface LoginPayload {
-  username: string;
-  password: string;
-}
-
-export interface LoginByTokenPayload {
-  username: string;
-  token: string;
+export interface HdlInfoPayload {
+  userId: number;
 }
 
 export interface RegisterPayload {

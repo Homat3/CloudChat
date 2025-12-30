@@ -17,11 +17,10 @@ import {
   WebsocketServiceMessage,
   WebsocketServiceMessageType } from "../../core/protocol/websocket/service.websocket.protocol";
 import {
-  LoginPayload as wLoginPayload,
   WebSocketClientMessage,
-  LoginByTokenPayload as wLoginByTokenPayload,
-  WebsocketClientMessageType } from "../../core/protocol/websocket/client.websocket.protocol";
-import { Event } from "../manager/call-back-manager/CallBackManager"
+  WebsocketClientMessageType,
+  HdlInfoPayload} from "../../core/protocol/websocket/client.websocket.protocol";
+import { Event } from "../../core/manager/call-back-manager/CallBackManager"
 
 export function handleLogin(context: common.UIAbilityContext, data: hLoginPayload) {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
@@ -45,20 +44,23 @@ export function handleLogin(context: common.UIAbilityContext, data: hLoginPayloa
       if (res.responseCode === 200) {
         switch (resultData.type){
           case HttpServiceMessageType.LOGIN_SUCCESS:
-            websocketNormalVerify(context, data as wLoginPayload, resultData.payload as hLoginSuccessPayload);
+            const successData = resultData.payload as hLoginSuccessPayload;
+            websocketNormalVerify(context, { userId: successData.userId }, successData);
+            break;
           case HttpServiceMessageType.LOGIN_FAILURE:
             context.eventHub.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
+            break;
           default:
             throw new Error("Unknown error");
         }
       }
     } catch (e) {
-      context.eventHub.emit(Event.LOGIN_FAILED, e);
+      console.error(e);
     }
   });
 }
 
-function websocketNormalVerify(context: common.UIAbilityContext, data: wLoginPayload, verifyData: hLoginSuccessPayload){
+function websocketNormalVerify(context: common.UIAbilityContext, data: HdlInfoPayload, verifyData: hLoginSuccessPayload){
   const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
   try {
     ws.connect();
@@ -80,10 +82,11 @@ function websocketNormalVerify(context: common.UIAbilityContext, data: wLoginPay
     });
 
     const loginInfo: WebSocketClientMessage = {
-      type: WebsocketClientMessageType.LOGIN,
+      type: WebsocketClientMessageType.HDL_INFO,
       payload: data
     }
     ws.send(loginInfo);
+    context.eventHub.emit(Event.LOGIN_SUCCESS, verifyData);
   } catch(e) {
     console.error(e);
     context.eventHub.emit(Event.LOGIN_FAILED, "Failed to connect the service");
@@ -110,8 +113,18 @@ export function handleLoginByToken(context: common.UIAbilityContext, data: hLogi
       const resultData = res.result as HttpServiceMessage;
       console.log('Password_login Response:', resultData);
 
-      if (res.responseCode === 200 && resultData.type === HttpServiceMessageType.LOGIN_SUCCESS) {
-        websocketTokenVerify(context, data as wLoginByTokenPayload, resultData.payload as hLoginSuccessPayload)
+      if (res.responseCode === 200) {
+        switch (resultData.type){
+          case HttpServiceMessageType.LOGIN_SUCCESS:
+            const successData = resultData.payload as hLoginSuccessPayload;
+            websocketTokenVerify(context, { userId: successData.userId }, successData);
+            break;
+          case HttpServiceMessageType.LOGIN_FAILURE:
+            context.eventHub.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
+            break;
+          default:
+            throw new Error("Unknown error");
+        }
       }
     } catch (e) {
       context.eventHub.emit(Event.LOGIN_FAILED, e);
@@ -119,7 +132,7 @@ export function handleLoginByToken(context: common.UIAbilityContext, data: hLogi
   });
 }
 
-function websocketTokenVerify(context: common.UIAbilityContext, data: wLoginByTokenPayload, verifyData: hLoginSuccessPayload){
+function websocketTokenVerify(context: common.UIAbilityContext, data: HdlInfoPayload, verifyData: hLoginSuccessPayload){
   const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
   try {
     ws.connect();
@@ -141,7 +154,7 @@ function websocketTokenVerify(context: common.UIAbilityContext, data: wLoginByTo
     });
 
     const loginInfo: WebSocketClientMessage = {
-      type: WebsocketClientMessageType.LOGIN_BY_TOKEN,
+      type: WebsocketClientMessageType.HDL_INFO,
       payload: data
     }
     ws.send(loginInfo);

@@ -1,5 +1,5 @@
 import { UIAbility } from "@kit.AbilityKit";
-import { WebsocketService } from "../../../core/service/network/websocket/server.websocket";
+import { WebsocketService } from "../../service/network/websocket/server.websocket";
 
 /**
  * @description 在 Ability 的 OnCreate 事件中调用以开启测试函数
