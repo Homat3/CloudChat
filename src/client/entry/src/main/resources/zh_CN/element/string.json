@@ -62,7 +62,7 @@
     },
     {
       "name": "error_login_UsernameInputError",
-      "value": "用户名需5-20位字母数字或下划线"
+      "value": "用户名不能为空"
     },
     {
       "name": "error_login_PasswordInputError",

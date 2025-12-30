@@ -1,6 +1,6 @@
 import { User } from '../../core/models/models'
 import { App, promptAction, router } from '@kit.ArkUI';
-import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
+import { Page } from '../../core/manager/page-manager/PageManager';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/util/load-resource';

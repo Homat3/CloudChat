@@ -6,7 +6,7 @@ import { common } from '@kit.AbilityKit';
 import { Contact, User } from '../../core/models/models';
 import { Message } from '../../core/models/message';
 import { CloudChat } from '../../CloudChat';
-import { CallBackManager, Event } from '../../entryability/manager/call-back-manager/CallBackManager';
+import { CallBackManager, Event } from '../../core/manager/call-back-manager/CallBackManager';
 
 @Entry
 @Component
