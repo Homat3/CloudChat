@@ -1323,3 +1323,11 @@ HdlInfoMsg* HdlInfoMsg::parse_from_JSON(std::string JSON, int payload_pos) {
 int HdlInfoMsg::get_user_id() {
 	return user_id_;
 }
+
+std::string HdlGotMsg::to_JSON() {
+	return "{\"type\":\"" + type_ + "\",payload:{}}";
+}
+
+HdlGotMsg::HdlGotMsg() : ServerMsg(HDL_GOT) {
+	
+}

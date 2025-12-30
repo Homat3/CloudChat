@@ -75,6 +75,7 @@
 #define FRIEND_REQUEST_ACCEPTED_FAILED "FRIEND_REQUEST_ACCEPTED_FAILED" // 通过好友请求失败
 #define FILE_UPLOADED                  "FILE_UPLOADED"					// 文件上传成功
 #define FILE_UPLOADED_FAILED           "FILE_UPLOADED_FAILED"			// 文件上传失败
+#define HDL_GOT                        "HDL_GOT"						// 已获取 hdl 信息
 
 class CloudChatMessage { // 聊天消息类
 private:
@@ -688,6 +689,12 @@ public:
 	HdlInfoMsg(int user_id);
 	static HdlInfoMsg* parse_from_JSON(std::string JSON, int payload_pos);
 	int get_user_id();
+};
+
+class HdlGotMsg : public ServerMsg { // 回复客户端已获取 hdl
+public:
+	HdlGotMsg();
+	std::string to_JSON() override;
 };
 
 ClientMsg* parse_protocal_msg(std::string JSON); // 将 JSON 字符串解析为 ClientMsg 对象
