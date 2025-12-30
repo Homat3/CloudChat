@@ -121,7 +121,7 @@
       "value": "注册成功"
     },
     {
-      "name": "text_register_RegisterFailed",
+      "name": "error_register_RegisterFailed",
       "value": "注册失败"
     },
     {
@@ -208,5 +208,6 @@
       "name": "text_contactList_chatArea_ContactId",
       "value": "联系人ID："
     }
+
   ]
 }

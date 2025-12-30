@@ -16,6 +16,7 @@ import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
 import { handleLoadMessages } from './server/message-server';
+import { handleRegister } from './server/register-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -32,6 +33,7 @@ export default class MainUIAbility extends UIAbility {
 
     EventBus.on(Event.LOGIN, handleLogin);
     EventBus.on(Event.LOGIN_BY_TOKEN, handleLoginByToken);
+    EventBus.on(Event.REGISTER,handleRegister);
     EventBus.on(Event.LOAD_CONTACT_LIST, handleLoadContacts);
     EventBus.on(Event.LOAD_MESSAGES, handleLoadMessages);
 

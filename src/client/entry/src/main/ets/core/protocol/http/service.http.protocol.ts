@@ -69,6 +69,7 @@ export interface LoginFailurePayload {
 }
 
 export interface RegisterSuccessPayload {
+  error: string;
   userId: number;
   username: string;
   email: string;

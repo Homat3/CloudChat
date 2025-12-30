@@ -1,12 +1,14 @@
-import { User } from '../../core/models/models'
-import { App, promptAction, router } from '@kit.ArkUI';
+
 import { Page } from '../../core/manager/page-manager/Page';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
-import { RegisterResult, RegisterService } from './register-service';
-import { UserManager } from './user-manager';
+import { PageManager } from '../../core/manager/page-manager/PageManager';
+import { EventBus } from '../../core/service/event/EventBus';
+import { Event} from '../../core/service/event/Event';
 import { RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';
+import { CloudChat } from '../../CloudChat';
+import { User } from '../../core/models/models';
+import { RegisterPayload } from '../../core/protocol/http/client.http.protocol';
 
 @Entry
 @Component
@@ -29,8 +31,28 @@ struct Register {
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+  private pageManager:PageManager = new PageManager(this.uiContext.getRouter());
 
-  private registerService:RegisterService = new RegisterService();
+  aboutToAppear(): void {
+    try{
+      EventBus.on(Event.REGISTER_FAILED,(payload:RegisterSuccessPayload)=>{
+        this.isLoading = false;
+        this.errorMessage = payload.error + loadStringResource(this.uiAbilityContext,$r('app.string.error_register_RegisterFailed'));
+      });
+
+      //注册成功事件
+      EventBus.on(Event.REGISTER_SUCCESS,(successInfo:RegisterSuccessPayload)=>{
+        CloudChat.currentUser = new User(successInfo.userId,successInfo.username,
+        successInfo.email,successInfo.avatar,successInfo.token);
+        this.uiContext.getRouter().replaceUrl({url:Page.CONTACT_LIST_PAGE}).catch((err:Error)=>{
+          console.error(err.message);
+        })
+      });
+
+    }catch(error){
+      console.error(error);
+    }
+  }
 
   build() {
     Column({ space: 8 }) {
@@ -71,8 +93,7 @@ struct Register {
           })
           .onChange((value: string) => {
             this.userName = value;
-            this.userNameError = this.validateUserName(value);
-            this.updateErrorMessage();
+            this.errorMessage = '';
           })
 
         // 用户名错误提示
@@ -100,20 +121,8 @@ struct Register {
           })
           .onChange((value: string) => {
             this.email = value;
-            this.emailError = this.validateEmail(value);
-            this.updateErrorMessage();
+            this.errorMessage = '';
           })
-
-        // 邮箱错误提示（实时）
-        if (this.emailError) {
-          Text(this.emailError)
-            .fontColor(Color.Red)
-            .fontSize(12)
-            .width('100%')
-            .textAlign(TextAlign.Start)
-            .padding({ left: 4 })
-        }
-
         // 密码输入框
         TextInput({
           text: this.passWord,
@@ -129,12 +138,7 @@ struct Register {
           })
           .onChange((value: string) => {
             this.passWord = value;
-            this.passwordError = this.validatePassword(value);
-            // 如果确认密码已输入，需要重新验证确认密码
-            if (this.passWord_check) {
-              this.confirmPasswordError = this.validateConfirmPassword(value, this.passWord_check);
-            }
-            this.updateErrorMessage();
+           this.errorMessage = '';
           })
 
         // 密码错误提示（实时）
@@ -162,22 +166,11 @@ struct Register {
           })
           .onChange((value: string) => {
             this.passWord_check = value;
-            this.confirmPasswordError = this.validateConfirmPassword(this.passWord, value);
-            this.updateErrorMessage();
+            this.errorMessage = '';
           })
 
-        // 确认密码错误提示（实时）
-        if (this.confirmPasswordError) {
-          Text(this.confirmPasswordError)
-            .fontColor(Color.Red)
-            .fontSize(12)
-            .width('100%')
-            .textAlign(TextAlign.Start)
-            .padding({ left: 4 })
-        }
 
         // 注册按钮
-        //TODO:发送注册信息
         Button(this.isLoading ? $r("app.string.text_register_Registering") : $r("app.string.text_register_Register"))
           .width('100%')
           .height(48)
@@ -241,89 +234,13 @@ struct Register {
     .alignItems(HorizontalAlign.Center)
   }
 
-  //内部实现
-
-  // 直接跳转版本
-  private handleRegister() {
-    console.log('开始注册处理');
-    // 验证表单
-    if (!this.validateAll()) {
-      console.log('表单验证失败');
+  private handleRegister(){
+    if(!this.canRegister()){
       return;
     }
-    // 设置加载状态
     this.isLoading = true;
     this.errorMessage = '';
-    console.log('表单验证通过，准备直接跳转');
-
-    // // 这里假设注册总是成功，直接跳转到联系人页面
-    // console.log('跳转到:', Page.CONTACT_LIST_PAGE);
-
-    this.registerService.register(this.userName,this.passWord,this.email)
-      .then((result:RegisterResult)=>{
-        this.isLoading = false;
-
-        if (result.success && result.user) {
-          console.log('注册成功，用户对象:', result.user);
-
-          // 注册成功，保存用户数据
-          // 注意：UserManager.saveUserData现在需要RegisterSuccessPayload，但我们可以传递User对象转换
-          const userPayload : RegisterSuccessPayload= {
-            userId: result.user.userId,
-            username: result.user.username,
-            email: result.user.email,
-            avatar: result.user.avatar,
-            token: result.user.token || ''
-          };
-          const savedUser = UserManager.saveUserData(userPayload, true);
-
-
-          // 显示成功提示
-          promptAction.showToast({
-            message: loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterSuccess")),
-            duration: 1500
-          });
-          router.pushUrl({
-            url: Page.CONTACT_LIST_PAGE
-          }).catch((err:Error) => {
-            console.error('跳转失败:',err);
-          })
-        } else {
-          // 注册失败
-          console.log('注册失败:', result.error);
-          this.errorMessage = result.error || '注册失败';
-        }
-      })
-      .catch((err: Error) => {
-          console.error('跳转失败:', err);
-          this.isLoading = false;
-          this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.text_register_RegisterFailed")) + `: ${err.message}`;
-    });
-  }
-
-  // 更新全局错误信息
-  private updateErrorMessage(): void {
-    this.errorMessage = '';
-  }
-
-  // 验证所有字段
-  private validateAll(): boolean {
-    console.log('验证所有字段');
-
-    this.userNameError = this.validateUserName(this.userName);
-    this.emailError = this.validateEmail(this.email);
-    this.passwordError = this.validatePassword(this.passWord);
-    this.confirmPasswordError = this.validateConfirmPassword(this.passWord, this.passWord_check);
-
-    const hasError = !!(this.userNameError || this.emailError || this.passwordError || this.confirmPasswordError);
-
-    if (hasError) {
-      console.log('验证失败，存在错误');
-    } else {
-      console.log('所有字段验证通过');
-    }
-
-    return !hasError;
+    EventBus.emit(Event.REGISTER,{username:this.userName,password:this.passWord,email:this.email} as RegisterPayload)
   }
 
   // 检查是否可以注册
@@ -335,56 +252,29 @@ struct Register {
       this.passWord_check.length > 0 &&
       !this.isLoading;
 
+    const usernameValid = !(this.userName.trim().length === 0);
+    const emailValid =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
+    const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.passWord);
+    const passwordCheckedValid = (this.passWord_check == this.passWord) &&  !(this.userName.trim().length === 0);
+
+    if(!usernameValid){
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameRequireNotNull"));
+      return false;
+    }
+    if(!emailValid){
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_EmailInputError"));
+      return false;
+    }
+    if(!passwordValid){
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordInputError"));
+      return false;
+    }
+    if(!passwordCheckedValid){
+      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordConfirmError"));
+      return false;
+    }
     console.log(`canRegister检查: ${canRegister}`);
     return canRegister;
   }
 
-  // 各个字段的验证函数
-  private validateUserName(username: string): string {
-    if (!username.trim()) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameRequireNotNull"));
-    }
-    const usernameRegex = /^[a-zA-Z0-9_]{5,20}$/;
-    if (!usernameRegex.test(username)) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameInputError"));
-    }
-    return '';
-  }
-
-
-  //实时表单元素检验
-  private validateEmail(email: string): string {
-    if (!email.trim()) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_EmailRequireNotNull"));
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_EmailInputError"));
-    }
-    return '';
-  }
-
-  private validatePassword(password: string): string {
-    if (!password) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordRequireNotNull"));
-    }
-    if (password.length < 8) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordInputError"));
-    }
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordRequireLettersAndNumbers"));
-    }
-    return '';
-  }
-
-  private validateConfirmPassword(password: string, confirmPassword: string): string {
-    if (!confirmPassword) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordRequireConfirm"));
-    }
-    if (password !== confirmPassword) {
-      return loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordConfirmError"));
-    }
-    return '';
-  }
 }
