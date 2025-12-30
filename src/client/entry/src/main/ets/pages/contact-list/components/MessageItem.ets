@@ -15,8 +15,6 @@ export struct MessageItem{
 
   @Prop message: Message;
   @Prop isCurrentUser: boolean;
-  @Prop onSelected: () => void = () => {};
-
 
   build() {
     Column() {
@@ -44,6 +42,5 @@ export struct MessageItem{
     }
     .margin({ top: 8, bottom: 8 })
     .width('100%')
-    .onClick(() => this.onSelected())
   }
 }

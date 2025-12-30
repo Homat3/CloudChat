@@ -56,6 +56,9 @@ export function handleLogin(data: hLoginPayload) {
             throw new Error("Unknown error");
         }
       }
+      else {
+        console.error("Http error code: " + res.responseCode);
+      }
     } catch (e) {
       console.error(e);
     }

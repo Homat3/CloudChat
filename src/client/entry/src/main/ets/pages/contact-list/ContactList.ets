@@ -41,6 +41,10 @@ struct ContactList {
     try {
       EventBus.on(Event.CONTACT_LIST_LOADED, this.catchContacts);
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
+      EventBus.on(Event.REFRESH_CONTACT_LIST, this.loadContacts);
+      EventBus.on(Event.SEND_MESSAGE, this.sendMessage);
+      EventBus.on(Event.FOLD_PANEL, this.foldPanel);
+      EventBus.on(Event.CONTACT_CHANGED, this.contactChanged);
     } catch (error) {
       console.error(error);
     }
@@ -77,6 +81,18 @@ struct ContactList {
     EventBus.emit(Event.LOAD_MESSAGES);
   }
 
+  sendMessage(message: string){
+    // TODO
+  }
+
+  foldPanel(){
+    this.isPanelFolded = !this.isPanelFolded
+  }
+
+  contactChanged(contact: Contact){
+    this.selectedContact = contact;
+  }
+
   //三栏布局
   build() {
     Row(){
@@ -84,15 +100,7 @@ struct ContactList {
       ContactSidebar({
         contacts: this.contacts,
         selectedContact: this.selectedContact,
-        searchKeyword: this.searchKeyword,
-        onContactSelected: (contact: Contact) => {
-          this.selectedContact = contact;
-          this.isPanelFolded = true; // Optional: Auto close detail when switching
-        },
-        onSearchChanged: (val: string) => {
-          this.searchKeyword = val;
-        },
-        onRefresh: this.loadContacts
+        searchKeyword: this.searchKeyword
       })
         .width('25%')
         .height('100%')
@@ -103,15 +111,7 @@ struct ContactList {
         currentUser: this.curUser,
         //messagesMap: this.messagesMap,
         selectedContact: this.selectedContact,
-        onMessageSelected: (msg: Message) => {
-          this.selectedMessage = msg;
-        },
-        onSendMessage: (msg: Message) => {
-          // TODO websocket发送消息
-        },
-        onFoldPanel: () => {
-          this.isPanelFolded = !this.isPanelFolded;
-        }
+        selectedMessage: this.selectedMessage
       })
         .layoutWeight(1)
         .height('100%')
@@ -119,10 +119,7 @@ struct ContactList {
       if(!this.isPanelFolded){
         DetailPanel({
           selectedContact: this.selectedContact,
-          selectedMessage: this.selectedMessage,
-          onClose: () => {
-            this.isPanelFolded = true;
-          }
+          selectedMessage: this.selectedMessage
         })
           .width('20%')
           .height('100%')

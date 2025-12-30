@@ -10,11 +10,8 @@ import { Message } from "../../../core/models/message";
 export struct ContactSidebar{
   // 状态变量
   @Prop contacts: Array<Contact> = [];
-  @Prop selectedContact: Contact | null;
-  @Prop searchKeyword: string = ''
-  @Prop onContactSelected: (contact: Contact) => void
-  @Prop onSearchChanged: (keyword: string) => void
-  @Prop onRefresh: () => void
+  @Link selectedContact: Contact | null;
+  @Link searchKeyword: string
 
   @State filteredContacts: Array<Contact> = []
   @State refreshing: boolean = false
@@ -49,7 +46,6 @@ export struct ContactSidebar{
           //处理搜索逻辑
           this.searchKeyword = value;
           this.filterContacts();
-          this.onSearchChanged(value);
         })
 
       //联系人列表
@@ -59,9 +55,6 @@ export struct ContactSidebar{
             ContactItem({
               contact: contact,
               selected: contact.contactId === this.selectedContact?.contactId,
-              onSelected: (contact: Contact) => {
-                this.onContactSelected(contact);
-              }
             })
           }
         }, (contact: Contact) => contact.contactId.toString())
@@ -72,5 +65,4 @@ export struct ContactSidebar{
       .divider({ strokeWidth: 1, color: $r('app.color.list_divider')})
     }
   }
-
 }

@@ -3,6 +3,8 @@ import { common } from "@kit.AbilityKit";
 import { Contact, User } from "../../../core/models/models";
 import { Message, TextMessage } from "../../../core/models/message";
 import { CloudChat } from "../../../CloudChat";
+import { Event } from "../../../core/service/event/Event";
+import { EventBus } from "../../../core/service/event/EventBus";
 
 @Component
   /**
@@ -13,9 +15,7 @@ export struct ChatArea{
   @Prop currentUser: User | null;
   @Prop selectedContact: Contact | null;
   //@Link messagesMap: Map<number, Message[]>;
-  @Prop onMessageSelected: (msg: Message) => void;
-  @Prop onSendMessage: (msg: Message) => void;
-  @Prop onFoldPanel: () => void;
+  @Link selectedMessage: Message | null;
 
   //@State messages: Message[] | null = null;
   @State newMessage: string = '';
@@ -73,7 +73,7 @@ export struct ChatArea{
       .width(36)
       .height(36)
       .backgroundColor(Color.Transparent)
-      .onClick(() => this.onFoldPanel())
+      .onClick(() => EventBus.emit(Event.FOLD_PANEL));
     }
     .width('100%')
     .height(56)
@@ -161,6 +161,6 @@ export struct ChatArea{
       'sending'
     );
 
-    this.onSendMessage(newMsg);
+    EventBus.emit(Event.SEND_MESSAGE, this.newMessage);
   }
 }
