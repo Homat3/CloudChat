@@ -11,21 +11,31 @@ import { CloudChat } from "../../../CloudChat";
 export struct ChatArea{
   // 状态变量
   @Prop currentUser: User | null;
-  // @Prop selectedContact?: Contact;
-  @Prop selectedContactId: number;
-  @Prop messages: Message[] = this.messagesMap.get(this.selectedContactId) || [];
+  @Prop selectedContact: Contact | null;
   @Prop messagesMap: Map<number, Message[]>;
-  @Prop onMessageSelected: (id: number) => void;
-  @Prop onSendMessage: (contact: string) => void;
+  @Prop onMessageSelected: (msg: Message) => void;
+  @Prop onSendMessage: (msg: Message) => void;
   @Prop onFoldPanel: () => void;
 
+  @State messages: Message[] | null = null;
   @State newMessage: string = '';
   @State showEmojiPicker: boolean = false;
   @State showAttachmentMenu: boolean = false;
 
+
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+
+  aboutToAppear(): void {
+    // 加载消息
+    if (this.selectedContact){
+      const messages = this.messagesMap.get(this.selectedContact.contactId);
+      if (messages){
+        this.messages = this.messages;
+      }
+    }
+  }
 
   build(){
     Column() {
@@ -42,6 +52,56 @@ export struct ChatArea{
     .height('100%')
     .backgroundColor($r('app.color.contact_list_chat_background'))
   }
+
+  @Builder
+  buildHeader() {
+    Row() {
+      Text($r("app.string.text_contactList_chatArea_ContactId") + `${this.selectedContact?.contactId}`)
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.primary_text'))
+
+      Blank()
+      // 右侧功能按钮（如折叠详情面板）
+      Button({ type: ButtonType.Circle, stateEffect: true }) {
+        Column({ space: 4 }) {
+          Circle().width(4).height(4).fill(Color.Gray)
+          Circle().width(4).height(4).fill(Color.Gray)
+          Circle().width(4).height(4).fill(Color.Gray)
+        }
+      }
+      .width(36)
+      .height(36)
+      .backgroundColor(Color.Transparent)
+      .onClick(() => this.onFoldPanel())
+    }
+    .width('100%')
+    .height(56)
+    .padding({ left: 20, right: 20 })
+    .backgroundColor($r('app.color.header_background'))
+    .border({ width: { bottom: 0.5 }, color: $r('app.color.list_divider') })
+  }
+
+  @Builder
+  buildMessageList() {
+    List({ space: 15 }) {
+      ForEach(this.messages, (msg: Message) => {
+        ListItem() {
+          MessageItem({
+            message: msg,
+            isCurrentUser: msg.senderId === this.currentUser?.userId,
+            onSelected: () => this.onMessageSelected(msg)
+          })
+        }
+      }, (msg: Message) => msg.id.toString())
+    }
+    .layoutWeight(1)
+    .width('100%')
+    .height('100%')
+    .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+    .scrollBar(BarState.Off)
+  }
+
   @Builder
   buildInputArea() {
     Column() {
@@ -90,76 +150,17 @@ export struct ChatArea{
   }
 
   private handleSend() {
-    if (!this.newMessage.trim() || !this.currentUser) return;
+    if (!this.newMessage.trim() || !this.currentUser || !this.selectedContact) return;
 
     const newMsg: TextMessage = new TextMessage(
       Date.now(),
       this.currentUser.userId,
-      this.selectedContactId,
+      this.selectedContact.contactId,
       this.newMessage,
       new Date().toISOString(),
       'sending'
     );
 
-    // 更新本地状态
-    // this.messages = [...this.messages, newMsg];
-    // this.messagesMap.set(this.selectedContactId, this.messages);
-
-    // 通过WebSocket发送
-    // CloudChat.sendMessage(newMsg)
-    //   .then(() => newMsg.status = 'sent')
-    //   .catch(() => newMsg.status = 'failed')
-    //   .finally(() => this.messagesMap.set(this.selectedContactId, [...this.messages]));
-    //
-    // this.newMessage = '';
-    // this.showAttachmentMenu = false;
+    this.onSendMessage(newMsg);
   }
-
-  @Builder
-  buildMessageList() {
-    List({ space: 15 }) {
-      ForEach(this.messages, (msg: Message) => {
-        ListItem() {
-          MessageItem({
-            message: msg,
-            isCurrentUser: msg.senderId === this.currentUser?.userId,
-            onSelected: () => this.onMessageSelected(msg.id)
-          })
-        }
-      }, (msg: Message) => msg.id.toString())
-    }
-    .layoutWeight(1)
-    .width('100%')
-    .padding({ left: 16, right: 16, top: 10, bottom: 10 })
-    .scrollBar(BarState.Off)
-  }
-  @Builder
-  buildHeader() {
-    Row() {
-      Text(`联系人ID：${this.selectedContactId}`)
-        .fontSize(18)
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('app.color.primary_text'))
-
-      Blank()
-      // 右侧功能按钮（如折叠详情面板）
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
-        Column({ space: 4 }) {
-          Circle().width(4).height(4).fill(Color.Gray)
-          Circle().width(4).height(4).fill(Color.Gray)
-          Circle().width(4).height(4).fill(Color.Gray)
-        }
-      }
-      .width(36)
-      .height(36)
-      .backgroundColor(Color.Transparent)
-      .onClick(() => this.onFoldPanel())
-    }
-    .width('100%')
-    .height(56)
-    .padding({ left: 20, right: 20 })
-    .backgroundColor($r('app.color.header_background'))
-    .border({ width: { bottom: 0.5 }, color: $r('app.color.list_divider') })
-
-    }
 }

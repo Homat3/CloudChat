@@ -1,5 +1,6 @@
 import { common } from "@kit.AbilityKit";
 import { CloudChat } from "../../../CloudChat";
+import { Message } from "../../../core/models/message";
 import { Contact } from "../../../core/models/models";
 
 @Component
@@ -16,17 +17,9 @@ export struct DetailPanel{
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  @Prop selectedContactId: number;
-  @Prop selectedMessageId: number;
+  @Prop selectedContact: Contact | null;
+  @Prop selectedMessage: Message | null;
   @Prop onClose: () => void;
-  @Prop contacts: Contact[] = [];
-
-  get currentContact(): Contact | undefined {
-    return this.contacts.find(c => c.contactId === this.selectedContactId);
-  }
-  aboutToAppear() {
-
-  }
 
   build() {
     Column() {
@@ -49,16 +42,16 @@ export struct DetailPanel{
       .justifyContent(FlexAlign.End)
 
       // 详细信息区域
-      if (this.currentContact) {
+      if (this.selectedContact) {
         // Info Area
         Column() {
-          Image(this.currentContact.avatar ? this.currentContact.avatar : $r('app.media.default'))
+          Image(this.selectedContact.avatar)
             .width(100)
             .height(100)
             .margin(20)
             .borderRadius(50)
 
-          Text(this.currentContact.username)
+          Text(this.selectedContact.username)
             .fontSize(22)
             .fontWeight(FontWeight.Bold)
             .margin({ bottom: 10 })
@@ -66,8 +59,8 @@ export struct DetailPanel{
           Row() {
             Text($r("app.string.text_contactList_detailPanel_Status"))
               .fontColor($r('app.color.secondary_text'))
-            Text(this.currentContact.online ? $r("app.string.text_contactList_all_Online") : $r("app.string.text_contactList_all_Offline"))
-              .fontColor(this.currentContact.online ? Color.Green : Color.Gray)
+            Text(this.selectedContact.online ? $r("app.string.text_contactList_all_Online") : $r("app.string.text_contactList_all_Offline"))
+              .fontColor(this.selectedContact.online ? Color.Green : Color.Gray)
               .fontWeight(FontWeight.Medium)
           }
           .margin({ bottom: 20 })
@@ -75,7 +68,7 @@ export struct DetailPanel{
           Divider().width('80%').color($r('app.color.list_divider'))
 
           // Action Buttons
-          Button('发送消息')
+          Button($r("app.string.text_contactList_detailPanel_SendMessage"))
             .width('80%')
             .margin({ top: 20 })
             .onClick(() => {
@@ -83,7 +76,7 @@ export struct DetailPanel{
               this.onClose();
             })
 
-          Button('删除好友')
+          Button($r("app.string.text_contactList_detailPanel_DeleteFriend"))
             .width('80%')
             .margin({ top: 10 })
             .backgroundColor(Color.Red)
@@ -97,7 +90,7 @@ export struct DetailPanel{
       } else {
         // No contact selected state
         Column() {
-          Text("未选择联系人")
+          Text($r("app.string.text_contactList_detailPanel_NoContactSelected"))
             .fontColor(Color.Gray)
             .margin({top: 50})
         }.width('100%').alignItems(HorizontalAlign.Center)

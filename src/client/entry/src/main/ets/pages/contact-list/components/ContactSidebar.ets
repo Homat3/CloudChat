@@ -11,9 +11,9 @@ export struct ContactSidebar{
   // 状态变量
   @Prop contacts: Array<Contact> = [];
   @Link messagesMap: Map<number, Message[]>;
-  @Prop selectedContactId: number = 0
+  @Prop selectedContact: Contact | null;
   @Prop searchKeyword: string = ''
-  @Prop onContactSelected: (id: number) => void
+  @Prop onContactSelected: (contact: Contact) => void
   @Prop onSearchChanged: (keyword: string) => void
   @Prop onRefresh: () => void
 
@@ -59,14 +59,15 @@ export struct ContactSidebar{
           ListItem() {
             ContactItem({
               contact: contact,
-              selected: contact.contactId === this.selectedContactId,
-              onSelected: (id: number) => {
-                this.onContactSelected(id);
+              selected: contact.contactId === this.selectedContact?.contactId,
+              onSelected: (contact: Contact) => {
+                this.onContactSelected(contact);
               }
             })
           }
         }, (contact: Contact) => contact.contactId.toString())
       }
+      .height('100%')
       .width('100%')
       .layoutWeight(1)
       .divider({ strokeWidth: 1, color: $r('app.color.list_divider')})

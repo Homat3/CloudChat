@@ -12,8 +12,8 @@ import { CallBackManager, Event } from '../../entryability/manager/call-back-man
 @Component
 struct ContactList {
   // 状态变量
-  @State selectedContactId: number = 0;
-  @State selectedMessageId: number = 0;
+  @State selectedContact: Contact | null = null;
+  @State selectedMessage: Message | null = null;
   @State searchKeyword: string = '';
   @State curUser:User | null = null ;
   @State isPanelFolded : boolean = false//是否选择折叠
@@ -50,7 +50,7 @@ struct ContactList {
   }
 
   catchContacts(){
-    const contacts = CloudChat.contacts;
+    this.contacts = CloudChat.contacts;
     this.isLoading = false;
     try {
       this.uiContext.getPromptAction().showToast({
@@ -83,10 +83,10 @@ struct ContactList {
       ContactSidebar({
         contacts: this.contacts,
         messagesMap: $messagesMap,
-        selectedContactId: this.selectedContactId,
+        selectedContact: this.selectedContact,
         searchKeyword: this.searchKeyword,
-        onContactSelected: (id: number) => {
-          this.selectedContactId = id;
+        onContactSelected: (contact: Contact) => {
+          this.selectedContact = contact;
           this.isPanelFolded = true; // Optional: Auto close detail when switching
         },
         onSearchChanged: (val: string) => {
@@ -101,12 +101,12 @@ struct ContactList {
       //中间区域
       ChatArea({
         currentUser: this.curUser,
-        selectedContactId: this.selectedContactId,
+        selectedContact: this.selectedContact,
         messagesMap: this.messages,
-        onMessageSelected: (id: number) => {
-          this.selectedMessageId = id;
+        onMessageSelected: (msg: Message) => {
+          this.selectedMessage = msg;
         },
-        onSendMessage: (content: string) => {
+        onSendMessage: (msg: Message) => {
           // TODO websocket发送消息
         },
         onFoldPanel: () => {
@@ -118,9 +118,8 @@ struct ContactList {
 
       if(!this.isPanelFolded){
         DetailPanel({
-          selectedContactId: this.selectedContactId,
-          selectedMessageId: this.selectedMessageId,
-          contacts: this.contacts,
+          selectedContact: this.selectedContact,
+          selectedMessage: this.selectedMessage,
           onClose: () => {
             this.isPanelFolded = true;
           }

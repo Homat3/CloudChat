@@ -20,6 +20,7 @@ export struct ContactItem{
 
     @Prop contact: Contact;
     @Prop selected: boolean = false;
+    @Prop onSelected: (contact: Contact) => void
 
     build(){
         Row() {
@@ -54,6 +55,7 @@ export struct ContactItem{
         .backgroundColor(this.selected ? $r('app.color.item_selected_bg') : Color.Transparent)
         .borderRadius(8)
         .onClick(() => {
+            this.onSelected(this.contact);
         })
     }
 }

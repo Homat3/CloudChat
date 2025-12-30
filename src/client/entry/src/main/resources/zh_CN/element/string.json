@@ -189,8 +189,24 @@
       "value": "状态："
     },
     {
+      "name": "text_contactList_detailPanel_SendMessage",
+      "value": "发送消息"
+    },
+    {
+      "name": "text_contactList_detailPanel_DeleteFriend",
+      "value": "删除好友"
+    },
+    {
+      "name": "text_contactList_detailPanel_NoContactSelected",
+      "value": "没有选择联系人"
+    },
+    {
       "name": "error_contactList_ContactListLoadFailed",
       "value": "联系人列表加载失败"
+    },
+    {
+      "name": "text_contactList_chatArea_ContactId",
+      "value": "联系人ID："
     }
   ]
 }
