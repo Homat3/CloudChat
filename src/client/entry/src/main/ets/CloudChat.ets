@@ -14,7 +14,7 @@ export class CloudChat{
   }
 
   public static set currentUser(user: User | null){
-    CloudChat.currentUser = user;
+    CloudChat._currentUser = user;
   }
 
   /**

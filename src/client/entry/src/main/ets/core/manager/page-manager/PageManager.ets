@@ -1,4 +1,5 @@
-import { Router, window } from '@kit.ArkUI';
+import { Router } from '@kit.ArkUI';
+import { Page } from './Page';
 import { PageSwitchError } from './PageManagerError';
 
 
@@ -52,8 +53,3 @@ export class PageManager{
  * ------------------------------------------------
  * // 然后就可以使用 WindowStageManager 的 switchPage 方法切换页面
  */
-export enum Page{
-  CONTACT_LIST_PAGE = "pages/contact-list/ContactList",
-  LOGIN_PAGE = "pages/login/LoginPage",
-  REGISTER_PAGE = "pages/register/Register"
-}

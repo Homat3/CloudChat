@@ -6,7 +6,8 @@ import { common } from '@kit.AbilityKit';
 import { Contact, User } from '../../core/models/models';
 import { Message } from '../../core/models/message';
 import { CloudChat } from '../../CloudChat';
-import { CallBackManager, Event } from '../../core/manager/call-back-manager/CallBackManager';
+import { Event } from '../../core/service/event/Event';
+import { EventBus } from '../../core/service/event/EventBus';
 
 @Entry
 @Component
@@ -18,17 +19,15 @@ struct ContactList {
   @State curUser:User | null = null ;
   @State isPanelFolded : boolean = false//是否选择折叠
   @State showAddContact: boolean = false;
+  @State messagesMap: Map<number, Message[]> = new Map();
 
   @State contacts: Contact[] = [];
-  @State messages: Map<number, Message[]> = new Map();
   @State filteredContacts: Array<Contact> = [];
   @State isLoading: boolean = true;
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-  // 管理器
-  private callBackManager: CallBackManager = new CallBackManager(this.uiAbilityContext.eventHub);   // call back 管理器
 
   // 添加页面生命周期
   aboutToAppear() {
@@ -39,8 +38,8 @@ struct ContactList {
 
     //注册监听
     try {
-      this.callBackManager.addEventSubscription(Event.CONTACT_LIST_LOADED, this.catchContacts);
-      this.callBackManager.addEventSubscription(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
+      EventBus.on(Event.CONTACT_LIST_LOADED, this.catchContacts);
+      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
     } catch (error) {
       console.error(error);
     }
@@ -82,7 +81,6 @@ struct ContactList {
       //左侧联系人栏
       ContactSidebar({
         contacts: this.contacts,
-        messagesMap: $messagesMap,
         selectedContact: this.selectedContact,
         searchKeyword: this.searchKeyword,
         onContactSelected: (contact: Contact) => {
@@ -101,8 +99,8 @@ struct ContactList {
       //中间区域
       ChatArea({
         currentUser: this.curUser,
+        messagesMap: this.messagesMap,
         selectedContact: this.selectedContact,
-        messagesMap: this.messages,
         onMessageSelected: (msg: Message) => {
           this.selectedMessage = msg;
         },

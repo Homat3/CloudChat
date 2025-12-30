@@ -12,7 +12,7 @@ export struct ChatArea{
   // 状态变量
   @Prop currentUser: User | null;
   @Prop selectedContact: Contact | null;
-  @Prop messagesMap: Map<number, Message[]>;
+  @Link messagesMap: Map<number, Message[]>;
   @Prop onMessageSelected: (msg: Message) => void;
   @Prop onSendMessage: (msg: Message) => void;
   @Prop onFoldPanel: () => void;

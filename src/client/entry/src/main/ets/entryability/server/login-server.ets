@@ -20,7 +20,8 @@ import {
   WebSocketClientMessage,
   WebsocketClientMessageType,
   HdlInfoPayload} from "../../core/protocol/websocket/client.websocket.protocol";
-import { Event } from "../../core/manager/call-back-manager/CallBackManager"
+import { Event } from "../../core/service/event/Event"
+import { EventBus } from "../../core/service/event/EventBus";
 
 export function handleLogin(context: common.UIAbilityContext, data: hLoginPayload) {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
@@ -33,7 +34,7 @@ export function handleLogin(context: common.UIAbilityContext, data: hLoginPayloa
   //发送http请求
   httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
     if(err){
-      context.eventHub.emit(Event.LOGIN_FAILED, err.message);
+      EventBus.emit(Event.LOGIN_FAILED, err.message);
       return;
     }
     //解析数据
@@ -48,7 +49,7 @@ export function handleLogin(context: common.UIAbilityContext, data: hLoginPayloa
             websocketNormalVerify(context, { userId: successData.userId }, successData);
             break;
           case HttpServiceMessageType.LOGIN_FAILURE:
-            context.eventHub.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
+            EventBus.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
             break;
           default:
             throw new Error("Unknown error");
@@ -72,12 +73,12 @@ function websocketNormalVerify(context: common.UIAbilityContext, data: HdlInfoPa
       if( receivedObject.type === WebsocketServiceMessageType.LOGIN_SUCCESS) {
         const wData = receivedObject.payload as wLoginSuccessPayload;
         if (verifyData == wData){
-          context.eventHub.emit(Event.LOGIN_SUCCESS, wData);
+          EventBus.emit(Event.LOGIN_SUCCESS, wData);
         } else {
-          context.eventHub.emit(Event.LOGIN_FAILED, "Multiple results");
+          EventBus.emit(Event.LOGIN_FAILED, "Multiple results");
         }
       } else if(receivedObject.type === WebsocketServiceMessageType.LOGIN_FAILURE) {
-        context.eventHub.emit(Event.LOGIN_FAILED, (receivedObject.payload as wLoginFailurePayload).error);
+        EventBus.emit(Event.LOGIN_FAILED, (receivedObject.payload as wLoginFailurePayload).error);
       }
     });
 
@@ -86,10 +87,9 @@ function websocketNormalVerify(context: common.UIAbilityContext, data: HdlInfoPa
       payload: data
     }
     ws.send(loginInfo);
-    context.eventHub.emit(Event.LOGIN_SUCCESS, verifyData);
+    EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
   } catch(e) {
     console.error(e);
-    context.eventHub.emit(Event.LOGIN_FAILED, "Failed to connect the service");
   }
 }
 
@@ -105,7 +105,7 @@ export function handleLoginByToken(context: common.UIAbilityContext, data: hLogi
   //发送http请求
   httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
     if(err){
-      context.eventHub.emit(Event.LOGIN_FAILED, err.message);
+      EventBus.emit(Event.LOGIN_FAILED, err.message);
       return;
     }
     //解析数据
@@ -120,14 +120,14 @@ export function handleLoginByToken(context: common.UIAbilityContext, data: hLogi
             websocketTokenVerify(context, { userId: successData.userId }, successData);
             break;
           case HttpServiceMessageType.LOGIN_FAILURE:
-            context.eventHub.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
+            EventBus.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
             break;
           default:
             throw new Error("Unknown error");
         }
       }
     } catch (e) {
-      context.eventHub.emit(Event.LOGIN_FAILED, e);
+      console.error(e);
     }
   });
 }
@@ -144,12 +144,12 @@ function websocketTokenVerify(context: common.UIAbilityContext, data: HdlInfoPay
       if( receivedObject.type === WebsocketServiceMessageType.LOGIN_SUCCESS) {
         const wData = receivedObject.payload as wLoginSuccessPayload;
         if (verifyData == wData){
-          context.eventHub.emit(Event.LOGIN_SUCCESS, wData);
+          EventBus.emit(Event.LOGIN_SUCCESS, wData);
         } else {
-          context.eventHub.emit(Event.LOGIN_FAILED, "Multiple results");
+          EventBus.emit(Event.LOGIN_FAILED, "Multiple results");
         }
       } else if(receivedObject.type === WebsocketServiceMessageType.LOGIN_FAILURE) {
-        context.eventHub.emit(Event.LOGIN_FAILED, (receivedObject.payload as wLoginFailurePayload).error);
+        EventBus.emit(Event.LOGIN_FAILED, (receivedObject.payload as wLoginFailurePayload).error);
       }
     });
 
@@ -160,6 +160,6 @@ function websocketTokenVerify(context: common.UIAbilityContext, data: HdlInfoPay
     ws.send(loginInfo);
   } catch(e) {
     console.error(e);
-    context.eventHub.emit(Event.LOGIN_FAILED, "Failed to connect the service");
+    EventBus.emit(Event.LOGIN_FAILED, "Failed to connect the service");
   }
 }
