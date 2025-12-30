@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit';
 import { HttpClientMessage,
   HttpClientMessageType,
   LoadContactsPayload } from '../../core/protocol/http/client.http.protocol';
@@ -12,7 +11,7 @@ import { CloudChat } from '../../CloudChat';
 import { EventBus } from '../../core/service/event/EventBus';
 import { Event } from '../../core/service/event/Event';
 
-export function handleLoadContacts(context: common.UIAbilityContext, data: LoadContactsPayload) {
+export function handleLoadContacts(data: LoadContactsPayload) {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
   const loginRequest: HttpClientMessage ={
     type : HttpClientMessageType.LOAD_CONTACTS,

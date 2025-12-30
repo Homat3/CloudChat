@@ -17,7 +17,7 @@ struct LoginPage {
   // 状态
   @State username: string = '';
   @State password: string = '';
-  @State errorMessage: string = '';
+  @State errorMessage: string | null = null;
   @State isLoading: boolean = false;
   @State rememberMe: boolean = false;
   // 上下文
@@ -94,7 +94,7 @@ struct LoginPage {
           .margin({ top: 30 })
           .onChange((value: string) => {
             this.username = value;
-            this.errorMessage = '';
+            this.errorMessage = null;
           })
 
         // 密码输入框
@@ -117,7 +117,7 @@ struct LoginPage {
           })
           .onChange((value: string) => {
             this.password = value;
-            this.errorMessage = '';
+            this.errorMessage = null;
           })
 
         Row() {
@@ -235,7 +235,7 @@ struct LoginPage {
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
+    this.errorMessage = null;
 
     EventBus.emit(Event.LOGIN, {username: this.username, password: this.password} as LoginPayload);
   }
@@ -255,7 +255,7 @@ struct LoginPage {
       return false;
     }
 
-    this.errorMessage = '';
+    this.errorMessage = null;
     return true;
   }
 }

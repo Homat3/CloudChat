@@ -19,7 +19,7 @@ struct ContactList {
   @State curUser:User | null = null ;
   @State isPanelFolded : boolean = false//是否选择折叠
   @State showAddContact: boolean = false;
-  @State messagesMap: Map<number, Message[]> = new Map();
+  @State messagesMap: Map<number, Message[]> | null = null;
 
   @State contacts: Contact[] = [];
   @State filteredContacts: Array<Contact> = [];
@@ -35,6 +35,7 @@ struct ContactList {
 
     //获取当前用户
     this.curUser = CloudChat.currentUser;
+    this.messagesMap = CloudChat.messageMap;
 
     //注册监听
     try {
@@ -72,7 +73,8 @@ struct ContactList {
 
   loadContacts() {
     this.isLoading = true;
-    this.uiAbilityContext.eventHub.emit(Event.LOAD_CONTACT_LIST);
+    EventBus.emit(Event.LOAD_CONTACT_LIST);
+    EventBus.emit(Event.LOAD_MESSAGES);
   }
 
   //三栏布局
@@ -99,7 +101,7 @@ struct ContactList {
       //中间区域
       ChatArea({
         currentUser: this.curUser,
-        messagesMap: this.messagesMap,
+        //messagesMap: this.messagesMap,
         selectedContact: this.selectedContact,
         onMessageSelected: (msg: Message) => {
           this.selectedMessage = msg;

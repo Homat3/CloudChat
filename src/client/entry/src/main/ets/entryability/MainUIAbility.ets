@@ -15,6 +15,7 @@ import { Event } from '../core/service/event/Event';
 import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
+import { handleLoadMessages } from './server/message-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -29,9 +30,10 @@ export default class MainUIAbility extends UIAbility {
       console.error(error.name + ": " + error.message);
     });   // 权限集申请
 
-    EventBus.on(Event.LOGIN, (payload: LoginPayload): void => handleLogin(this.context, payload));
-    EventBus.on(Event.LOGIN_BY_TOKEN, (payload: LoginByTokenPayload): void => handleLoginByToken(this.context, payload));
-    EventBus.on(Event.LOAD_CONTACT_LIST, (payload: LoadContactsPayload): void => handleLoadContacts(this.context, payload));
+    EventBus.on(Event.LOGIN, handleLogin);
+    EventBus.on(Event.LOGIN_BY_TOKEN, handleLoginByToken);
+    EventBus.on(Event.LOAD_CONTACT_LIST, handleLoadContacts);
+    EventBus.on(Event.LOAD_MESSAGES, handleLoadMessages);
 
     try {
       //颜色跟随系统

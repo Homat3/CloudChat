@@ -12,12 +12,12 @@ export struct ChatArea{
   // 状态变量
   @Prop currentUser: User | null;
   @Prop selectedContact: Contact | null;
-  @Link messagesMap: Map<number, Message[]>;
+  //@Link messagesMap: Map<number, Message[]>;
   @Prop onMessageSelected: (msg: Message) => void;
   @Prop onSendMessage: (msg: Message) => void;
   @Prop onFoldPanel: () => void;
 
-  @State messages: Message[] | null = null;
+  //@State messages: Message[] | null = null;
   @State newMessage: string = '';
   @State showEmojiPicker: boolean = false;
   @State showAttachmentMenu: boolean = false;
@@ -27,15 +27,15 @@ export struct ChatArea{
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  aboutToAppear(): void {
-    // 加载消息
-    if (this.selectedContact){
-      const messages = this.messagesMap.get(this.selectedContact.contactId);
-      if (messages){
-        this.messages = this.messages;
-      }
-    }
-  }
+  // aboutToAppear(): void {
+  //   // 加载消息
+  //   if (this.selectedContact){
+  //     const messages = this.messagesMap.get(this.selectedContact.contactId);
+  //     if (messages){
+  //       this.messages = this.messages;
+  //     }
+  //   }
+  // }
 
   build(){
     Column() {
@@ -84,22 +84,22 @@ export struct ChatArea{
 
   @Builder
   buildMessageList() {
-    List({ space: 15 }) {
-      ForEach(this.messages, (msg: Message) => {
-        ListItem() {
-          MessageItem({
-            message: msg,
-            isCurrentUser: msg.senderId === this.currentUser?.userId,
-            onSelected: () => this.onMessageSelected(msg)
-          })
-        }
-      }, (msg: Message) => msg.id.toString())
-    }
-    .layoutWeight(1)
-    .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16, top: 10, bottom: 10 })
-    .scrollBar(BarState.Off)
+    // List({ space: 15 }) {
+    //   ForEach(this.messages, (msg: Message) => {
+    //     ListItem() {
+    //       MessageItem({
+    //         message: msg,
+    //         isCurrentUser: msg.senderId === this.currentUser?.userId,
+    //         onSelected: () => this.onMessageSelected(msg)
+    //       })
+    //     }
+    //   }, (msg: Message) => msg.id.toString())
+    // }
+    // .layoutWeight(1)
+    // .width('100%')
+    // .height('100%')
+    // .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+    // .scrollBar(BarState.Off)
   }
 
   @Builder
