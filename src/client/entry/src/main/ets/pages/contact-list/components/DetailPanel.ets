@@ -12,14 +12,13 @@ import { Contact } from "../../../core/models/models";
    */
 export struct DetailPanel{
   // 状态变量
+  @Prop selectedContact: Contact | null;
+  @Prop selectedMessage: Message | null;
+  @Prop onClose: () => void;
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-
-  @Prop selectedContact: Contact | null;
-  @Prop selectedMessage: Message | null;
-  @Prop onClose: () => void;
 
   build() {
     Column() {
@@ -43,7 +42,7 @@ export struct DetailPanel{
 
       // 详细信息区域
       if (this.selectedContact) {
-        // Info Area
+        // 消息区域
         Column() {
           Image(this.selectedContact.avatar)
             .width(100)
@@ -67,7 +66,7 @@ export struct DetailPanel{
 
           Divider().width('80%').color($r('app.color.list_divider'))
 
-          // Action Buttons
+          // 激活键
           Button($r("app.string.text_contactList_detailPanel_SendMessage"))
             .width('80%')
             .margin({ top: 20 })
@@ -88,7 +87,7 @@ export struct DetailPanel{
         .alignItems(HorizontalAlign.Center)
         .width('100%')
       } else {
-        // No contact selected state
+        // 无选中联系人状态
         Column() {
           Text($r("app.string.text_contactList_detailPanel_NoContactSelected"))
             .fontColor(Color.Gray)
