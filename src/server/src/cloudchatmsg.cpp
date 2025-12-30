@@ -484,6 +484,8 @@ ClientMsg* parse_protocal_msg(std::string JSON) {
 		return LoadFriendRequestMsg::parse_from_JSON(JSON, payload_pos);
 	} else if (type == UPLOAD_FILE) {
 		return UploadFileMsg::parse_from_JSON(JSON, payload_pos);
+	} else if (type == HDL_INFO) {
+		return HdlInfoMsg::parse_from_JSON(JSON, payload_pos);
 	}
 	return new ClientMsg(ILLEGAL_MSG);
 }
@@ -1325,9 +1327,10 @@ int HdlInfoMsg::get_user_id() {
 }
 
 std::string HdlGotMsg::to_JSON() {
-	return "{\"type\":\"" + type_ + "\",payload:{}}";
+	return "{\"type\":\"" + type_ + "\",\"payload\":{\"userId\":" + std::to_string(
+		user_id_) + "}}";
 }
 
-HdlGotMsg::HdlGotMsg() : ServerMsg(HDL_GOT) {
-	
+HdlGotMsg::HdlGotMsg(int user_id) : ServerMsg(HDL_GOT) {
+	user_id_ = user_id;
 }
