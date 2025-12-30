@@ -1,8 +1,14 @@
 import { common } from '@kit.AbilityKit';
-import { loadStringResource } from '../../core/util/load-resource';
-import { CallBackManager, Event } from '../../core/manager/call-back-manager/CallBackManager';
-import { Page, PageManager } from '../../core/manager/page-manager/PageManager';
+import { loadStringResource } from '../../core/service/resource/load-resource';
+import { Event } from '../../core/service/event/Event';
+import { Page } from '../../core/manager/page-manager/Page';
 import { UserManager } from './user-manager';
+import { LoginFailurePayload, LoginSuccessPayload } from '../../core/protocol/websocket/service.websocket.protocol';
+import { CloudChat } from '../../CloudChat';
+import { User } from '../../core/models/models';
+import { PageManager } from '../../core/manager/page-manager/PageManager';
+import { EventBus } from '../../core/service/event/EventBus';
+import { LoginPayload } from '../../core/protocol/http/client.http.protocol';
 
 
 @Entry
@@ -11,44 +17,41 @@ struct LoginPage {
   // 状态
   @State username: string = '';
   @State password: string = '';
-  @State errorMessage: string = '';
+  @State errorMessage: string | null = null;
   @State isLoading: boolean = false;
   @State rememberMe: boolean = false;
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-  // 管理器
-  private callBackManager: CallBackManager = new CallBackManager(this.uiAbilityContext.eventHub);   // call back 管理器
-  private pageManager: PageManager = new PageManager(this.uiContext.getRouter())  // page 管理器
+  // 页面切换器
+  private pageManager: PageManager = new PageManager(this.uiContext.getRouter());
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
     try {
-        //记住的用户名
-        const rememberedUsername = UserManager.getRememberedUsername();
-        if(rememberedUsername){
-          this.username = rememberedUsername;
-          this.rememberMe = true;
-        }
+      //记住的用户名
+      const rememberedUsername = UserManager.getRememberedUsername();
+      if(rememberedUsername){
+        this.username = rememberedUsername;
+        this.rememberMe = true;
+      }
+
       // 监听登录失败事件
-      this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, (err: Error) => {
+      EventBus.on(Event.LOGIN_FAILED, (payload: LoginFailurePayload) => {
         this.isLoading = false;
-        this.errorMessage = err.message || loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
+        this.errorMessage = payload.error + loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
       });
 
+      // 监听登录成功事件
+      EventBus.on(Event.LOGIN_SUCCESS, (successInfo: LoginSuccessPayload) => {
+        CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
+        this.uiContext.getRouter().replaceUrl({ url: Page.CONTACT_LIST_PAGE }).catch((err: Error) => {
+          console.error(err.message);
+        });
+      });
 
       this.checkLocalTokenAndAutoLogin();
 
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  aboutToDisappear(): void {
-    // 移除事件监听
-    try {
-      this.callBackManager.removeEventSubscription(Event.LOGIN_SUCCESS);
-      this.callBackManager.removeEventSubscription(Event.LOGIN_FAILED);
     } catch (error) {
       console.error(error);
     }
@@ -91,7 +94,7 @@ struct LoginPage {
           .margin({ top: 30 })
           .onChange((value: string) => {
             this.username = value;
-            this.errorMessage = '';
+            this.errorMessage = null;
           })
 
         // 密码输入框
@@ -114,7 +117,7 @@ struct LoginPage {
           })
           .onChange((value: string) => {
             this.password = value;
-            this.errorMessage = '';
+            this.errorMessage = null;
           })
 
         Row() {
@@ -221,7 +224,7 @@ struct LoginPage {
 
       this.username = localTokenInfo.username;
 
-      this.uiAbilityContext.eventHub.emit(Event.LOGIN_BY_TOKEN, {username: localTokenInfo.username, token: localTokenInfo.token});
+      EventBus.emit(Event.LOGIN_BY_TOKEN, localTokenInfo);
     }
   }
 
@@ -232,8 +235,9 @@ struct LoginPage {
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.uiAbilityContext.eventHub.emit(Event.LOGIN, {username: this.username, password: this.password});
+    this.errorMessage = null;
+
+    EventBus.emit(Event.LOGIN, {username: this.username, password: this.password} as LoginPayload);
   }
 
   //本地验证表单信息
@@ -251,7 +255,7 @@ struct LoginPage {
       return false;
     }
 
-    this.errorMessage = '';
+    this.errorMessage = null;
     return true;
   }
 }

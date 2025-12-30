@@ -10,7 +10,6 @@ import { Message } from "../../../core/models/message";
 export struct ContactSidebar{
   // 状态变量
   @Prop contacts: Array<Contact> = [];
-  @Link messagesMap: Map<number, Message[]>;
   @Prop selectedContact: Contact | null;
   @Prop searchKeyword: string = ''
   @Prop onContactSelected: (contact: Contact) => void

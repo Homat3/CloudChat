@@ -6,6 +6,7 @@ export interface WebsocketServiceMessage {
 export enum WebsocketServiceMessageType {
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGIN_FAILURE = 'LOGIN_FAILURE',
+  HDL_GOT = 'HDL_GOT',
   REGISTER_SUCCESS = 'REGISTER_SUCCESS',
   REGISTER_FAILURE = 'REGISTER_FAILURE',
   MESSAGE_RECEIVED_SELF = 'MESSAGE_RECEIVED_SELF',
@@ -16,6 +17,7 @@ export enum WebsocketServiceMessageType {
 export type ServicePayload =
   LoginSuccessPayload |
   LoginFailurePayload |
+  HdlGotPayload |
   RegisterSuccessPayload |
   RegisterFailurePayload |
   MessageReceivedSelfPayload |
@@ -40,6 +42,10 @@ export interface RegisterSuccessPayload {
   email: string;
   avatar: string;
   token: string;
+}
+
+export interface HdlGotPayload{
+  userId: number
 }
 
 export interface RegisterFailurePayload {
