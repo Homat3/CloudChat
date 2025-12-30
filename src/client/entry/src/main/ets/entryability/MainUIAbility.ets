@@ -15,7 +15,8 @@ import { PermissionManager } from './manager/permission-manager/PermissionManage
 import { CloudChat } from '../CloudChat';
 import { User } from '../core/models/models';
 import { handleLogin, handleLoginByToken } from './server/login-server';
-import { LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
+import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
+import { handleLoadContacts } from './server/contact-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -40,6 +41,8 @@ export default class MainUIAbility extends UIAbility {
       this.callBackManager.addEventSubscription(Event.LOGIN_BY_TOKEN, (payload: LoginByTokenPayload): void => handleLoginByToken(this.context, payload));
       this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, this.handleLoginFailed);
       this.callBackManager.addEventSubscription(Event.LOGIN_SUCCESS, this.handleLoginSuccess);
+
+      this.callBackManager.addEventSubscription(Event.LOAD_CONTACT_LIST, (payload: LoadContactsPayload): void => handleLoadContacts(this.context, payload));
     } catch (error) {
       console.error("Unknown error");
     }

@@ -7,6 +7,7 @@ import { Contact, User } from './core/models/models';
  */
 export class CloudChat{
   private static _currentUser: User | null = null;
+  private static _contactList: Contact[];
 
   public static get currentUser(){
     return CloudChat._currentUser;
@@ -19,16 +20,12 @@ export class CloudChat{
   /**
    * 模拟获取联系人列表
    */
-  public static async getContacts(): Promise<Contact[]> {
-    return new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve([
-    //       new Contact(1, "张三", "test1@test.com", "", true),
-    //       new Contact(2, "李四", "test2@test.com", "", false),
-    //       new Contact(3, "王五", "test3@test.com", "", true),
-    //     ]);
-    //   }, 500);
-    });
+  public static get contacts() {
+    return CloudChat._contactList;
+  }
+
+  public static set contacts(contacts: Contact[]){
+    CloudChat._contactList = contacts;
   }
 
   /**

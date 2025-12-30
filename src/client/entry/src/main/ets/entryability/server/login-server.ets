@@ -4,11 +4,11 @@ import { HttpClientMessage,
   LoginPayload as hLoginPayload } from "../../core/protocol/http/client.http.protocol";
 import { HttpService } from "../../core/service/network/http/server.http";
 import { common } from '@kit.AbilityKit';
-import { Event } from "../manager/call-back-manager/CallBackManager"
 import {
   HttpServiceMessage,
   HttpServiceMessageType,
-  LoginSuccessPayload as hLoginSuccessPayload } from "../../core/protocol/http/service.http.protocol";
+  LoginSuccessPayload as hLoginSuccessPayload,
+  LoginFailurePayload as hLoginFailurePayload } from "../../core/protocol/http/service.http.protocol";
 import { http } from "@kit.NetworkKit";
 import { WebsocketService } from "../../core/service/network/websocket/server.websocket";
 import {
@@ -21,6 +21,7 @@ import {
   WebSocketClientMessage,
   LoginByTokenPayload as wLoginByTokenPayload,
   WebsocketClientMessageType } from "../../core/protocol/websocket/client.websocket.protocol";
+import { Event } from "../manager/call-back-manager/CallBackManager"
 
 export function handleLogin(context: common.UIAbilityContext, data: hLoginPayload) {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
@@ -41,8 +42,15 @@ export function handleLogin(context: common.UIAbilityContext, data: hLoginPayloa
       const resultData = res.result as HttpServiceMessage;
       console.log('Password_login Response:', resultData);
 
-      if (res.responseCode === 200 && resultData.type === HttpServiceMessageType.LOGIN_SUCCESS) {
-        websocketNormalVerify(context, data as wLoginPayload, resultData.payload as hLoginSuccessPayload)
+      if (res.responseCode === 200) {
+        switch (resultData.type){
+          case HttpServiceMessageType.LOGIN_SUCCESS:
+            websocketNormalVerify(context, data as wLoginPayload, resultData.payload as hLoginSuccessPayload);
+          case HttpServiceMessageType.LOGIN_FAILURE:
+            context.eventHub.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
+          default:
+            throw new Error("Unknown error");
+        }
       }
     } catch (e) {
       context.eventHub.emit(Event.LOGIN_FAILED, e);
