@@ -9,9 +9,9 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { JSON } from '@kit.ArkTS';
 import { LoginSuccessPayload } from '../core/protocol/websocket/service.websocket.protocol';
-import { Page, WindowStageManager } from './manager/window-stage-manager/WindowStageManager';
-import { CallBackManager, Event } from './manager/call-back-manager/CallBackManager';
-import { PermissionManager } from './manager/permission-manager/PermissionManager';
+import { Page, WindowStageManager } from '../core/manager/page-manager/PageManager';
+import { CallBackManager, Event } from '../core/manager/call-back-manager/CallBackManager';
+import { PermissionManager } from '../core/manager/permission-manager/PermissionManager';
 import { CloudChat } from '../CloudChat';
 import { User } from '../core/models/models';
 import { handleLogin, handleLoginByToken } from './server/login-server';
@@ -22,20 +22,21 @@ const DOMAIN = 0x0000;  //日志域标识
 
 //应用入口
 export default class MainUIAbility extends UIAbility {
-  private windowStageManager: WindowStageManager | null = null;   // window stage 管理器
-  private callBackManager: CallBackManager | null = null;   // call back 管理器
-  private permissionManager: PermissionManager | null = null; // permission 管理器
+  private get permissionManager(): PermissionManager{
+    return new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
+  }
+  private get callBackManager(): CallBackManager {
+    return new CallBackManager(this.context.eventHub);
+  }
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
       // 权限注册
-    this.permissionManager = new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
     this.permissionManager.putPermissionGroup("COMMON", ['ohos.permission.INTERNET']);  // 基本权限集
     this.permissionManager.requestAllPermissions().catch((error: Error) => {
       console.error(error.name + ": " + error.message);
     });   // 权限集申请
 
     // 消息响应注册
-    this.callBackManager = new CallBackManager(this.context.eventHub);
     try {
       this.callBackManager.addEventSubscription(Event.LOGIN, (payload: LoginPayload): void => handleLogin(this.context, payload));
       this.callBackManager.addEventSubscription(Event.LOGIN_BY_TOKEN, (payload: LoginByTokenPayload): void => handleLoginByToken(this.context, payload));
@@ -74,11 +75,14 @@ export default class MainUIAbility extends UIAbility {
     //窗口阶段对象，管理UI显示
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    this.windowStageManager = new WindowStageManager(windowStage);
-
     // 初始化加载联系人列表
     try {
-      this.windowStageManager.switchPage(Page.LOGIN_PAGE);
+      windowStage.loadContent(Page.LOGIN_PAGE, (err) => {
+        if (err.code) {
+          console.error("Failed to load the page: " + JSON.stringify(err) + " Check if the path \"" + Page.LOGIN_PAGE + "\" is correct");
+        }
+        console.info('Succeeded in loading the content.');
+      });
     } catch (error) {
       console.error(error);
     }
@@ -102,21 +106,10 @@ export default class MainUIAbility extends UIAbility {
   // 登录错误逻辑
   private handleLoginFailed(errorMessage: string){
     console.error(errorMessage);
-    try {
-      this.windowStageManager?.switchPage(Page.LOGIN_PAGE);
-    } catch (error) {
-      console.error(error);
-    }
-    console.log("Return to LoginPage");
   }
 
   // 登录成功逻辑
   private handleLoginSuccess(successInfo: LoginSuccessPayload){
-    try {
-      this.windowStageManager?.switchPage(Page.CONTACT_LIST_PAGE);
-      CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
-    } catch (error) {
-      console.error(error)
-    }
+    CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
   }
 }

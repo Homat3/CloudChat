@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/util/load-resource';
-import { CallBackManager, Event } from '../../entryability/manager/call-back-manager/CallBackManager';
-import { Page } from '../../entryability/manager/window-stage-manager/WindowStageManager';
+import { CallBackManager, Event } from '../../core/manager/call-back-manager/CallBackManager';
+import { Page, PageManager } from '../../core/manager/page-manager/PageManager';
 import { UserManager } from './user-manager';
 
 
@@ -19,6 +19,7 @@ struct LoginPage {
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
   // 管理器
   private callBackManager: CallBackManager = new CallBackManager(this.uiAbilityContext.eventHub);   // call back 管理器
+  private pageManager: PageManager = new PageManager(this.uiContext.getRouter())  // page 管理器
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
@@ -181,9 +182,7 @@ struct LoginPage {
           })
           .margin({ top: 10 })
           .onClick(() => {
-            this.uiContext.getRouter().pushUrl({
-              url: Page.REGISTER_PAGE
-            }).catch((error: Error) => {
+            this.pageManager.switchPage(Page.REGISTER_PAGE).catch((error: Error) => {
               console.error('Route failed:', error);
               try {
                 this.uiContext.getPromptAction().showToast({
@@ -239,7 +238,7 @@ struct LoginPage {
 
   //本地验证表单信息
   private canLogin(): boolean {
-    const usernameValid = /^[a-zA-Z0-9_]{5,20}$/.test(this.username);
+    const usernameValid = !(this.username.trim().length === 0);
     const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.password);
 
     if (!usernameValid) {
