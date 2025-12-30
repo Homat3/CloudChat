@@ -1,9 +1,9 @@
 import { User } from '../../core/models/models'
 import { App, promptAction, router } from '@kit.ArkUI';
-import { Page } from '../../core/manager/page-manager/PageManager';
+import { Page } from '../../core/manager/page-manager/Page';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
-import { loadStringResource } from '../../core/util/load-resource';
+import { loadStringResource } from '../../core/service/resource/load-resource';
 import { RegisterResult, RegisterService } from './register-service';
 import { UserManager } from './user-manager';
 import { RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';

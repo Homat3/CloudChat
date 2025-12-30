@@ -481,5 +481,5 @@ void GetHdlInfo(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, HdlInf
 
 	g_online_users[hdl] = user_id; // 保存 hdl 信息
 
-	SendMsgToClient(cloudchat_srv, hdl, new HdlGotMsg()); // 回复客户端
+	SendMsgToClient(cloudchat_srv, hdl, new HdlGotMsg(user_id)); // 回复客户端
 }

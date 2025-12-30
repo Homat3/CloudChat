@@ -1,0 +1,29 @@
+/**
+ * @description 事件规范标识
+ * @author Infinomat
+ * @example
+* ------------------------------------------------
+ * // 像这样定义事件
+ * export enum Event{
+ *   ...
+ *   MY_EVENT = "MY_EVENT",
+ *   ...
+ * }
+ */
+export enum Event {
+  LOGIN = "LOGIN",
+  LOGIN_BY_TOKEN = "LOGIN_BY_TOKEN",
+  LOGIN_SUCCESS = "LOGIN_SUCCESS",
+  LOGIN_FAILED = "LOGIN_FAILED",
+  LOAD_CONTACT_LIST = "LOAD_CONTACT_LIST",
+  CONTACT_LIST_LOADED = "CONTACT_LIST_LOADED",
+  CONTACT_LIST_LOAD_FAILED = "CONTACT_LIST_LOAD_FAILED",
+  LOAD_MESSAGES = "LOAD_MESSAGES",
+  MESSAGES_LOADED = "MESSAGES_LOADED",
+  MESSAGES_LOADED_FAILED = "MESSAGES_LOADED_FAILED",
+
+  REFRESH_CONTACT_LIST = "REFRESH_CONTACT_LIST",
+  SEND_MESSAGE = "SEND_MESSAGE",
+  CONTACT_CHANGED = "CONTACT_CHANGED",
+  FOLD_PANEL = "FOLD_PANEL"
+}

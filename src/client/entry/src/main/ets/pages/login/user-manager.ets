@@ -1,12 +1,5 @@
+import { LoginByTokenPayload } from "../../core/protocol/http/client.http.protocol";
 import { LoginSuccessPayload } from "../../core/protocol/http/service.http.protocol";
-
-export type LoginUserData = LoginSuccessPayload;
-
-
-export interface LocalTokenInfo {
-  username: string;
-  token: string;
-}
 
 export class UserManager {
   // 保存用户数据
@@ -46,7 +39,7 @@ export class UserManager {
   /**
    * 获取本地的令牌
    */
-  static getLocalTokenInfo(): LocalTokenInfo | null {
+  static getLocalTokenInfo(): LoginByTokenPayload | null {
     const username = AppStorage.get<string>('username');
     const token = AppStorage.get<string>('user_token');
 

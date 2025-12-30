@@ -8,26 +8,20 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { JSON } from '@kit.ArkTS';
-import { LoginSuccessPayload } from '../core/protocol/websocket/service.websocket.protocol';
-import { Page, WindowStageManager } from '../core/manager/page-manager/PageManager';
-import { CallBackManager, Event } from '../core/manager/call-back-manager/CallBackManager';
+import { Page } from '../core/manager/page-manager/Page';
 import { PermissionManager } from '../core/manager/permission-manager/PermissionManager';
-import { CloudChat } from '../CloudChat';
-import { User } from '../core/models/models';
-import { handleLogin, handleLoginByToken } from './server/login-server';
+import { EventBus } from '../core/service/event/EventBus';
+import { Event } from '../core/service/event/Event';
 import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
+import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
+import { handleLoadMessages } from './server/message-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
 //应用入口
 export default class MainUIAbility extends UIAbility {
-  private get permissionManager(): PermissionManager{
-    return new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
-  }
-  private get callBackManager(): CallBackManager {
-    return new CallBackManager(this.context.eventHub);
-  }
+  private permissionManager = new PermissionManager(this.context, abilityAccessCtrl.createAtManager());
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
       // 权限注册
@@ -36,17 +30,10 @@ export default class MainUIAbility extends UIAbility {
       console.error(error.name + ": " + error.message);
     });   // 权限集申请
 
-    // 消息响应注册
-    try {
-      this.callBackManager.addEventSubscription(Event.LOGIN, (payload: LoginPayload): void => handleLogin(this.context, payload));
-      this.callBackManager.addEventSubscription(Event.LOGIN_BY_TOKEN, (payload: LoginByTokenPayload): void => handleLoginByToken(this.context, payload));
-      this.callBackManager.addEventSubscription(Event.LOGIN_FAILED, this.handleLoginFailed);
-      this.callBackManager.addEventSubscription(Event.LOGIN_SUCCESS, this.handleLoginSuccess);
-
-      this.callBackManager.addEventSubscription(Event.LOAD_CONTACT_LIST, (payload: LoadContactsPayload): void => handleLoadContacts(this.context, payload));
-    } catch (error) {
-      console.error("Unknown error");
-    }
+    EventBus.on(Event.LOGIN, handleLogin);
+    EventBus.on(Event.LOGIN_BY_TOKEN, handleLoginByToken);
+    EventBus.on(Event.LOAD_CONTACT_LIST, handleLoadContacts);
+    EventBus.on(Event.LOAD_MESSAGES, handleLoadMessages);
 
     try {
       //颜色跟随系统
@@ -56,19 +43,6 @@ export default class MainUIAbility extends UIAbility {
     }
     //日志记录
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
-  }
-
-  onDestroy(): void {
-    if (this.callBackManager){
-      // 移除事件监听
-      try {
-        this.callBackManager.removeEventSubscription(Event.LOGIN);
-        this.callBackManager.removeEventSubscription(Event.LOGIN_FAILED);
-        this.callBackManager.removeEventSubscription(Event.LOGIN_SUCCESS);
-      } catch (error) {
-        console.error(error);
-      }
-    }
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -101,15 +75,5 @@ export default class MainUIAbility extends UIAbility {
   onBackground(): void {
     //回到应用后台
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
-  }
-
-  // 登录错误逻辑
-  private handleLoginFailed(errorMessage: string){
-    console.error(errorMessage);
-  }
-
-  // 登录成功逻辑
-  private handleLoginSuccess(successInfo: LoginSuccessPayload){
-    CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
   }
 }

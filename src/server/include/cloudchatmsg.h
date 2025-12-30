@@ -692,8 +692,11 @@ public:
 };
 
 class HdlGotMsg : public ServerMsg { // 回复客户端已获取 hdl
+private:
+	int user_id_;
+	
 public:
-	HdlGotMsg();
+	HdlGotMsg(int user_id);
 	std::string to_JSON() override;
 };
 

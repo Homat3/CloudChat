@@ -3,6 +3,8 @@ import { common } from "@kit.AbilityKit";
 import { Contact, User } from "../../../core/models/models";
 import { Message, TextMessage } from "../../../core/models/message";
 import { CloudChat } from "../../../CloudChat";
+import { Event } from "../../../core/service/event/Event";
+import { EventBus } from "../../../core/service/event/EventBus";
 
 @Component
   /**
@@ -12,14 +14,10 @@ export struct ChatArea{
   // 状态变量
   @Prop currentUser: User | null;
   @Prop selectedContact: Contact | null;
-  @Prop messagesMap: Map<number, Message[]>;
-  @Prop onMessageSelected: (msg: Message) => void;
-  @Prop onSendMessage: (msg: Message) => void;
-  @Prop onFoldPanel: () => void;
-  @Prop onBack: () => void;
-  @Prop onShowDetail: () => void;
+  //@Link messagesMap: Map<number, Message[]>;
+  @Link selectedMessage: Message | null;
 
-  @State messages: Message[] | null = null;
+  //@State messages: Message[] | null = null;
   @State newMessage: string = '';
   @State showEmojiPicker: boolean = false;
   @State showAttachmentMenu: boolean = false;
@@ -29,15 +27,15 @@ export struct ChatArea{
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  aboutToAppear(): void {
-    // 加载消息
-    if (this.selectedContact){
-      const messages = this.messagesMap.get(this.selectedContact.contactId);
-      if (messages){
-        this.messages = this.messages;
-      }
-    }
-  }
+  // aboutToAppear(): void {
+  //   // 加载消息
+  //   if (this.selectedContact){
+  //     const messages = this.messagesMap.get(this.selectedContact.contactId);
+  //     if (messages){
+  //       this.messages = this.messages;
+  //     }
+  //   }
+  // }
 
   build(){
     Column() {
@@ -58,25 +56,13 @@ export struct ChatArea{
   @Builder
   buildHeader() {
     Row() {
-      //左上角返回按钮
-      Button({ type: ButtonType.Circle, stateEffect: true}) {
-
-      }
-      .width(40)
-      .height(40)
-      .backgroundColor(Color.Transparent)
-      .onClick(() => this.onBack())
-
-      // 联系人名称/ID
-      Text(this.selectedContact ? `联系人: ${this.selectedContact.contactId}` : '聊天')
+      Text($r("app.string.text_contactList_chatArea_ContactId") + `${this.selectedContact?.contactId}`)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.primary_text'))
-        .margin({ left: 10 })
 
       Blank()
-
-      //右上角详情页按钮
+      // 右侧功能按钮（如折叠详情面板）
       Button({ type: ButtonType.Circle, stateEffect: true }) {
         Column({ space: 4 }) {
           Circle().width(4).height(4).fill(Color.Gray)
@@ -84,10 +70,10 @@ export struct ChatArea{
           Circle().width(4).height(4).fill(Color.Gray)
         }
       }
-      .width(40)
-      .height(40)
+      .width(36)
+      .height(36)
       .backgroundColor(Color.Transparent)
-      .onClick(() => this.onShowDetail())
+      .onClick(() => EventBus.emit(Event.FOLD_PANEL));
     }
     .width('100%')
     .height(56)
@@ -98,22 +84,22 @@ export struct ChatArea{
 
   @Builder
   buildMessageList() {
-    List({ space: 15 }) {
-      ForEach(this.messages, (msg: Message) => {
-        ListItem() {
-          MessageItem({
-            message: msg,
-            isCurrentUser: msg.senderId === this.currentUser?.userId,
-            onSelected: () => this.onMessageSelected(msg)
-          })
-        }
-      }, (msg: Message) => msg.id.toString())
-    }
-    .layoutWeight(1)
-    .width('100%')
-    .height('100%')
-    .padding({ left: 16, right: 16, top: 10, bottom: 10 })
-    .scrollBar(BarState.Off)
+    // List({ space: 15 }) {
+    //   ForEach(this.messages, (msg: Message) => {
+    //     ListItem() {
+    //       MessageItem({
+    //         message: msg,
+    //         isCurrentUser: msg.senderId === this.currentUser?.userId,
+    //         onSelected: () => this.onMessageSelected(msg)
+    //       })
+    //     }
+    //   }, (msg: Message) => msg.id.toString())
+    // }
+    // .layoutWeight(1)
+    // .width('100%')
+    // .height('100%')
+    // .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+    // .scrollBar(BarState.Off)
   }
 
   @Builder
@@ -175,6 +161,6 @@ export struct ChatArea{
       'sending'
     );
 
-    this.onSendMessage(newMsg);
+    EventBus.emit(Event.SEND_MESSAGE, this.newMessage);
   }
 }

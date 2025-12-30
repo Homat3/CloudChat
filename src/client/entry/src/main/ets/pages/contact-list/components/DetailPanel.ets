@@ -2,6 +2,8 @@ import { common } from "@kit.AbilityKit";
 import { CloudChat } from "../../../CloudChat";
 import { Message } from "../../../core/models/message";
 import { Contact } from "../../../core/models/models";
+import { Event } from "../../../core/service/event/Event";
+import { EventBus } from "../../../core/service/event/EventBus";
 
 @Component
   /**
@@ -14,7 +16,6 @@ export struct DetailPanel{
   // 状态变量
   @Prop selectedContact: Contact | null;
   @Prop selectedMessage: Message | null;
-  @Prop onClose: () => void;
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
@@ -35,7 +36,7 @@ export struct DetailPanel{
         .height(32)
         .backgroundColor(Color.Transparent)
         .margin(12)
-        .onClick(() => this.onClose())
+        .onClick(() => EventBus.emit(Event.FOLD_PANEL))
       }
       .width('100%')
       .justifyContent(FlexAlign.End)
@@ -70,10 +71,7 @@ export struct DetailPanel{
           Button($r("app.string.text_contactList_detailPanel_SendMessage"))
             .width('80%')
             .margin({ top: 20 })
-            .onClick(() => {
-              // Logic to just close panel and focus chat
-              this.onClose();
-            })
+            .onClick(() => EventBus.emit(Event.FOLD_PANEL))
 
           Button($r("app.string.text_contactList_detailPanel_DeleteFriend"))
             .width('80%')

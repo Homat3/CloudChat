@@ -1,5 +1,8 @@
 import { common } from "@kit.AbilityKit";
 import { Contact } from "../../../core/models/models";
+import { Event } from "../../../core/service/event/Event";
+import { EventBus } from "../../../core/service/event/EventBus";
+
 @Preview
 struct ContactItemPreview{
     build() {
@@ -20,7 +23,6 @@ export struct ContactItem{
 
     @Prop contact: Contact;
     @Prop selected: boolean = false;
-    @Prop onSelected: (contact: Contact) => void
 
     build(){
         Row() {
@@ -55,7 +57,7 @@ export struct ContactItem{
         .backgroundColor(this.selected ? $r('app.color.item_selected_bg') : Color.Transparent)
         .borderRadius(8)
         .onClick(() => {
-            this.onSelected(this.contact);
+            EventBus.emit(Event.CONTACT_CHANGED, this.contact);
         })
     }
 }

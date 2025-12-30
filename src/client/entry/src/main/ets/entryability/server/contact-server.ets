@@ -1,17 +1,17 @@
-import { common } from '@kit.AbilityKit';
 import { HttpClientMessage,
   HttpClientMessageType,
   LoadContactsPayload } from '../../core/protocol/http/client.http.protocol';
 import { HttpService } from '../../core/service/network/http/server.http';
 import { http } from '@kit.NetworkKit';
-import { Event } from "../../core/manager/call-back-manager/CallBackManager"
 import {
   ContactsLoadedFailedPayload,
   ContactsLoadedPayload,
   HttpServiceMessage, HttpServiceMessageType } from '../../core/protocol/http/service.http.protocol';
 import { CloudChat } from '../../CloudChat';
+import { EventBus } from '../../core/service/event/EventBus';
+import { Event } from '../../core/service/event/Event';
 
-export function handleLoadContacts(context: common.UIAbilityContext, data: LoadContactsPayload) {
+export function handleLoadContacts(data: LoadContactsPayload) {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
   const loginRequest: HttpClientMessage ={
     type : HttpClientMessageType.LOAD_CONTACTS,
@@ -22,7 +22,7 @@ export function handleLoadContacts(context: common.UIAbilityContext, data: LoadC
   //发送http请求
   httpService.post('/load/contacts', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
     if(err){
-      context.eventHub.emit(Event.CONTACT_LIST_LOAD_FAILED, err.message);
+      EventBus.emit(Event.CONTACT_LIST_LOAD_FAILED, err.message);
       return;
     }
     //解析数据
@@ -35,17 +35,17 @@ export function handleLoadContacts(context: common.UIAbilityContext, data: LoadC
           case HttpServiceMessageType.CONTACTS_LOADED:
             const result = resultData.payload as ContactsLoadedPayload
             CloudChat.contacts = result.contacts;
-            context.eventHub.emit(Event.CONTACT_LIST_LOADED, result);
+            EventBus.emit(Event.CONTACT_LIST_LOADED, result);
             break;
           case HttpServiceMessageType.CONTACTS_LOADED_FAILED:
-            context.eventHub.emit(Event.CONTACT_LIST_LOAD_FAILED, resultData.payload as ContactsLoadedFailedPayload);
+            EventBus.emit(Event.CONTACT_LIST_LOAD_FAILED, resultData.payload as ContactsLoadedFailedPayload);
             break;
           default:
             throw new Error("Unknown error");
         }
       }
     } catch (e) {
-      context.eventHub.emit(Event.CONTACT_LIST_LOAD_FAILED, e);
+      EventBus.emit(Event.CONTACT_LIST_LOAD_FAILED, e);
     }
   });
 }
