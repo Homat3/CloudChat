@@ -19,8 +19,12 @@ export struct MessageItem{
 
 
   build() {
-    Column() {
-      Row() {
+    Row() {
+      //如果是对方发送，头像在左侧
+      if(!this.isCurrentUser) {
+        this.buildAvatar()
+      }
+
         Column() {
           Text(this.message.content)
             .padding(12)
@@ -36,14 +40,31 @@ export struct MessageItem{
                 : $r('app.color.other_message_text')
             )
           Text(this.message.timestamp)
+            .fontSize(10)
+            .fontColor(Color.Gray)
+            .margin({ top: 4 })
         }
-      }
-      .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
-      .width('80%')
+        .alignItems(this.isCurrentUser ? HorizontalAlign.End : HorizontalAlign.Start)
+        .margin({ left: 8, right: 8 })
+
+        //如果是自己发送，头像在右侧
+        if(this.isCurrentUser) {
+          this.buildAvatar()
+        }
 
     }
-    .margin({ top: 8, bottom: 8 })
     .width('100%')
+    .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
+    .padding({ left: 10, right: 10 })
+    .margin({ top: 8, bottom: 8 })
     .onClick(() => this.onSelected())
+  }
+
+  @Builder
+  buildAvatar() {
+    Image($r('app.media.default'))
+      .width(40)
+      .height(40)
+      .borderRadius(20)
   }
 }

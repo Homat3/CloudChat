@@ -16,6 +16,8 @@ export struct ChatArea{
   @Prop onMessageSelected: (msg: Message) => void;
   @Prop onSendMessage: (msg: Message) => void;
   @Prop onFoldPanel: () => void;
+  @Prop onBack: () => void;
+  @Prop onShowDetail: () => void;
 
   @State messages: Message[] | null = null;
   @State newMessage: string = '';
@@ -56,13 +58,25 @@ export struct ChatArea{
   @Builder
   buildHeader() {
     Row() {
-      Text($r("app.string.text_contactList_chatArea_ContactId") + `${this.selectedContact?.contactId}`)
+      //左上角返回按钮
+      Button({ type: ButtonType.Circle, stateEffect: true}) {
+
+      }
+      .width(40)
+      .height(40)
+      .backgroundColor(Color.Transparent)
+      .onClick(() => this.onBack())
+
+      // 联系人名称/ID
+      Text(this.selectedContact ? `联系人: ${this.selectedContact.contactId}` : '聊天')
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.primary_text'))
+        .margin({ left: 10 })
 
       Blank()
-      // 右侧功能按钮（如折叠详情面板）
+
+      //右上角详情页按钮
       Button({ type: ButtonType.Circle, stateEffect: true }) {
         Column({ space: 4 }) {
           Circle().width(4).height(4).fill(Color.Gray)
@@ -70,10 +84,10 @@ export struct ChatArea{
           Circle().width(4).height(4).fill(Color.Gray)
         }
       }
-      .width(36)
-      .height(36)
+      .width(40)
+      .height(40)
       .backgroundColor(Color.Transparent)
-      .onClick(() => this.onFoldPanel())
+      .onClick(() => this.onShowDetail())
     }
     .width('100%')
     .height(56)
