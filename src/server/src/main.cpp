@@ -142,6 +142,9 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	std::string JSON_msg = msg->get_payload();
 	ClientMsg* client_msg = parse_protocal_msg(JSON_msg);
 	std::string type = client_msg->get_type();
+	
+	time_t now = time(0);
+	std::cout << "[" << ctime(&now) << "]" << std::endl;
 
 	if (type == LOGIN) {
 		Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
@@ -226,6 +229,9 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 	std::string type = client_msg->get_type();
 
 	std::string response_body;
+	
+	time_t now = time(0);
+	std::cout << "[" << ctime(&now) << "]" << std::endl;
 
 	if (type == LOGIN) {
 		response_body = Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
