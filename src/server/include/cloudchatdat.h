@@ -39,6 +39,7 @@ public:
 	CloudChatUser* GetUserByName(std::string name);						// 通过用户名获取用户
 	bool DeleteUser(int id);											// 删除用户
 	std::vector<CloudChatUser> SearchUsersByName(std::string username); // 通过用户名搜索相关用户
+	CloudChatUser* GetUserByEmail(std::string email);					// 通过邮箱地址获取用户
 	// friend_requests
 	bool AddFriendRequest(FriendRequest friend_request);			   // 添加好友请求
 	std::vector<FriendRequest> GetFriendRequestsByUserId(int user_id); // 根据用户 ID 获取好友请求列表

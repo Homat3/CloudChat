@@ -104,7 +104,7 @@ void OnOpen(websocketpp::connection_hdl hdl) { // 客户端连接建立时服务
     
     // 获取IP地址（字符串形式）
     std::string remote_ip = remote_ep.address().to_string();
-    std::cout << "客户端已连接，IP地址: " << remote_ip << std::endl;
+    std::cout << "客户端 Websocket 已连接，IP地址: " << remote_ip << std::endl;
 }
 
 void OnClose(websocketpp::connection_hdl hdl) {	// 客户端断开连接时服务端的提示信息
@@ -123,7 +123,7 @@ void OnClose(websocketpp::connection_hdl hdl) {	// 客户端断开连接时服�
     
 		// 获取IP地址（字符串形式）
 		std::string remote_ip = remote_ep.address().to_string();
-		std::cout << "客户端已断开连接，IP地址: " << remote_ip << std::endl;
+		std::cout << "客户端 Websocket 已断开连接，IP地址: " << remote_ip << std::endl;
 	} catch (const boost::system::system_error& e) {
 		std::cerr << "获取远程端点失败：" << e.what() << std::endl;
 	}

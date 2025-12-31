@@ -619,3 +619,34 @@ void CloudChatDatabase::Pump() {
 CloudChatDatabase::~CloudChatDatabase() {
 	th_pump_.join();
 }
+
+CloudChatUser* CloudChatDatabase::GetUserByEmail(std::string email) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+			"SELECT * FROM users WHERE email = ?"
+		);
+		pstmt->setString(1, email);
+
+		sql::ResultSet* res = pstmt->executeQuery();
+		CloudChatUser* user = nullptr;
+
+		if(res->next()){
+			user = new CloudChatUser(
+				res->getInt("id"),
+				res->getString("username"),
+				res->getString("password"),
+				res->getString("avatar"),
+				res->getString("token"),
+				res->getString("email"),
+				res->getBoolean("online")
+			);
+			delete res;
+			delete pstmt;
+			return user;
+		}
+	} catch (sql::SQLException &e) {
+		std::cout << "# ERR: SQLException in " << e.what() << std::endl;
+		return nullptr;
+	}
+	return nullptr;
+}
