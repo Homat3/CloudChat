@@ -1,16 +1,16 @@
-import {MessagePage} from './components/MessagePage'
-import {ProfileSetting} from  '../profile-setting/ProfileSetting'
-import { ContactRequest } from './components/ContactRequest';
+import { Home } from './components/home/Home';
+import { ProfileSetting } from './components/profile-setting/ProfileSetting'
+import { ContactRequest } from './components/contact-request/ContactRequest';
 
 @Entry
 @Component
-struct ContactList {
+struct MainContainer {
   @State currentIndex : number = 0;
   //导航栏
   build() {
     Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
       TabContent() {
-        MessagePage()
+        Home()
       }.tabBar('消息主页');
 
       TabContent() {

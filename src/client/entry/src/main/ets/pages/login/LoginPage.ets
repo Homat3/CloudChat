@@ -45,7 +45,7 @@ struct LoginPage {
       // 监听登录成功事件
       EventBus.on(Event.LOGIN_SUCCESS, (successInfo: LoginSuccessPayload) => {
         CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
-        this.uiContext.getRouter().replaceUrl({ url: Page.CONTACT_LIST_PAGE }).catch((err: Error) => {
+        this.uiContext.getRouter().replaceUrl({ url: Page.MAIN }).catch((err: Error) => {
           console.error(err.message);
         });
       });

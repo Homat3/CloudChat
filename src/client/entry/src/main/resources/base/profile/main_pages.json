@@ -1,7 +1,7 @@
 {
   "src": [
-    "pages/contact-list/ContactList",
-    "pages/profile-setting/ProfileSetting",
+    "pages/main/MainContainer",
+    "pages/main/components/profile-setting/ProfileSetting",
     "pages/login/LoginPage",
     "pages/register/RegisterPage"
   ]

@@ -1,5 +1,5 @@
 export enum Page{
-  CONTACT_LIST_PAGE = "pages/contact-list/ContactList",
+  MAIN = "pages/main/MainContainer",
   LOGIN_PAGE = "pages/login/LoginPage",
   REGISTER_PAGE = "pages/register/RegisterPage"
 }

@@ -1,13 +1,13 @@
-import { Message } from '../../../core/models/message';
-import { Contact, User } from '../../../core/models/models';
+import { Message } from '../../../../core/models/message';
+import { Contact, User } from '../../../../core/models/models';
 import { common } from '@kit.AbilityKit';
-import { CloudChat } from '../../../CloudChat';
-import { EventBus } from '../../../core/service/event/EventBus';
-import { Event } from '../../../core/tag/Event';
-import { ContactSidebar } from './ContactSidebar';
+import { CloudChat } from '../../../../CloudChat';
+import { EventBus } from '../../../../core/service/event/EventBus';
+import { Event } from '../../../../core/tag/Event';
+import { ContactList } from './ContactList';
 
 @Component
-export struct MessagePage{
+export struct Home {
   // 状态变量
   @State selectedContact: Contact | null = null;
   @State selectedMessage: Message | null = null;
@@ -37,9 +37,11 @@ export struct MessagePage{
     try {
       EventBus.on(Event.CONTACT_LIST_LOADED, this.catchContacts);
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
+
       EventBus.on(Event.REFRESH_CONTACT_LIST, this.loadContacts);
+
       EventBus.on(Event.SEND_MESSAGE, this.sendMessage);
-      EventBus.on(Event.OPEN_PANEL, this.openPanel);
+
       EventBus.on(Event.CONTACT_CHANGED, this.contactChanged);
     } catch (error) {
       console.error(error);
@@ -81,16 +83,12 @@ export struct MessagePage{
     // TODO
   }
 
-  openPanel(){
-    // TODO
-  }
-
   contactChanged(contact: Contact){
     this.selectedContact = contact;
   }
 
   build(){
-    ContactSidebar({
+    ContactList({
       contacts: this.contacts,
       selectedContact: this.selectedContact,
       searchKeyword: this.searchKeyword

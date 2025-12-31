@@ -45,7 +45,7 @@ struct Register {
       //注册成功事件
       EventBus.on(Event.REGISTER_SUCCESS,(payload: RegisterSuccessPayload)=>{
         CloudChat.currentUser = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
-        this.uiContext.getRouter().replaceUrl({url:Page.CONTACT_LIST_PAGE}).catch((err:Error)=>{
+        this.uiContext.getRouter().replaceUrl({url:Page.MAIN}).catch((err:Error)=>{
           console.error(err.message);
         })
       });

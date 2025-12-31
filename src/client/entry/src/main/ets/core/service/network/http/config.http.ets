@@ -13,6 +13,7 @@ interface HttpConfigInterface {
   readTimeout: number,
   connectTimeout: number // 5s
 }
+
 export class HttpConfig implements HttpConfigInterface{
   //单例模式
   private static instance = new HttpConfig();

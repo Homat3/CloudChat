@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
-import { User } from '../../../core/models/models';
-import { CloudChat } from '../../../CloudChat';
+import { User } from '../../../../core/models/models';
+import { CloudChat } from '../../../../CloudChat';
 
 @Component
 export struct ContactRequest {

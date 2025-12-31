@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
-import { CloudChat } from '../../CloudChat';
-import { User } from '../../core/models/models';
-import { EventBus } from '../../core/service/event/EventBus';
-import { Event } from '../../core/tag/Event';
+import { CloudChat } from '../../../../CloudChat';
+import { User } from '../../../../core/models/models';
+import { EventBus } from '../../../../core/service/event/EventBus';
+import { Event } from '../../../../core/tag/Event';
 
 @Entry
 @Component
