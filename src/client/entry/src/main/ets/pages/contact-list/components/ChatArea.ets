@@ -3,7 +3,7 @@ import { common } from "@kit.AbilityKit";
 import { Contact, User } from "../../../core/models/models";
 import { Message, TextMessage } from "../../../core/models/message";
 import { CloudChat } from "../../../CloudChat";
-import { Event } from "../../../core/service/event/Event";
+import { Event } from "../../../core/tag/Event";
 import { EventBus } from "../../../core/service/event/EventBus";
 
 @Component

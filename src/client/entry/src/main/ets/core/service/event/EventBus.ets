@@ -1,4 +1,4 @@
-import { Event } from "./Event";
+import { Event } from "../../tag/Event";
 
 export class EventBus{
   private static eventBus: Map<Event, Array<Function>> = new Map();

@@ -1,5 +1,5 @@
-import { LoginByTokenPayload } from "../../core/protocol/http/client.http.protocol";
-import { LoginSuccessPayload } from "../../core/protocol/http/service.http.protocol";
+import { LoginByTokenPayload } from "../../protocol/http/client.http.protocol";
+import { LoginSuccessPayload } from "../../protocol/http/service.http.protocol";
 
 export class UserManager {
   // 保存用户数据

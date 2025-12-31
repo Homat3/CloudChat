@@ -1,12 +1,11 @@
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
-import { Event } from '../../core/service/event/Event';
-import { Page } from '../../core/manager/page-manager/Page';
-import { UserManager } from './user-manager';
+import { Event } from '../../core/tag/Event';
+import { Page } from '../../core/tag/Page';
+import { UserManager } from '../../core/manager/user-manager/user-manager';
 import { LoginFailurePayload, LoginSuccessPayload } from '../../core/protocol/websocket/service.websocket.protocol';
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
-import { PageManager } from '../../core/manager/page-manager/PageManager';
 import { EventBus } from '../../core/service/event/EventBus';
 import { LoginPayload } from '../../core/protocol/http/client.http.protocol';
 
@@ -23,8 +22,6 @@ struct LoginPage {
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-  // 页面切换器
-  private pageManager: PageManager = new PageManager(this.uiContext.getRouter());
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
@@ -185,7 +182,7 @@ struct LoginPage {
           })
           .margin({ top: 10 })
           .onClick(() => {
-            this.pageManager.switchPage(Page.REGISTER_PAGE).catch((error: Error) => {
+            this.uiContext.getRouter().pushUrl({ url: Page.REGISTER_PAGE }).catch((error: Error) => {
               console.error('Route failed:', error);
               try {
                 this.uiContext.getPromptAction().showToast({

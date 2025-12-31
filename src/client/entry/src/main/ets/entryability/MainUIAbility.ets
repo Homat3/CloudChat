@@ -8,10 +8,10 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { JSON } from '@kit.ArkTS';
-import { Page } from '../core/manager/page-manager/Page';
+import { Page } from '../core/tag/Page';
 import { PermissionManager } from '../core/manager/permission-manager/PermissionManager';
 import { EventBus } from '../core/service/event/EventBus';
-import { Event } from '../core/service/event/Event';
+import { Event } from '../core/tag/Event';
 import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';

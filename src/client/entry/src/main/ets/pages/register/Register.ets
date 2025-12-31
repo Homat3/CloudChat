@@ -1,10 +1,9 @@
 
-import { Page } from '../../core/manager/page-manager/Page';
+import { Page } from '../../core/tag/Page';
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
-import { PageManager } from '../../core/manager/page-manager/PageManager';
 import { EventBus } from '../../core/service/event/EventBus';
-import { Event} from '../../core/service/event/Event';
+import { Event} from '../../core/tag/Event';
 import { RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
@@ -31,7 +30,6 @@ struct Register {
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-  private pageManager:PageManager = new PageManager(this.uiContext.getRouter());
 
   aboutToAppear(): void {
     try{
@@ -42,8 +40,7 @@ struct Register {
 
       //注册成功事件
       EventBus.on(Event.REGISTER_SUCCESS,(successInfo:RegisterSuccessPayload)=>{
-        CloudChat.currentUser = new User(successInfo.userId,successInfo.username,
-        successInfo.email,successInfo.avatar,successInfo.token);
+        CloudChat.currentUser = new User(successInfo.userId,successInfo.username, successInfo.email,successInfo.avatar,successInfo.token);
         this.uiContext.getRouter().replaceUrl({url:Page.CONTACT_LIST_PAGE}).catch((err:Error)=>{
           console.error(err.message);
         })

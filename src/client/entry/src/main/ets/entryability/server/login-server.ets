@@ -21,7 +21,7 @@ import {
   WebSocketClientMessage,
   WebsocketClientMessageType,
   HdlInfoPayload} from "../../core/protocol/websocket/client.websocket.protocol";
-import { Event } from "../../core/service/event/Event"
+import { Event } from "../../core/tag/Event"
 import { EventBus } from "../../core/service/event/EventBus";
 
 export function handleLogin(data: hLoginPayload) {

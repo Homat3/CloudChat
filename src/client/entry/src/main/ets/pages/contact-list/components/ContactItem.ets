@@ -1,6 +1,6 @@
 import { common } from "@kit.AbilityKit";
 import { Contact } from "../../../core/models/models";
-import { Event } from "../../../core/service/event/Event";
+import { Event } from "../../../core/tag/Event";
 import { EventBus } from "../../../core/service/event/EventBus";
 
 @Preview
