@@ -60,20 +60,6 @@ export struct ChatArea{
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.primary_text'))
-
-      Blank()
-      // 右侧功能按钮（如折叠详情面板）
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
-        Column({ space: 4 }) {
-          Circle().width(4).height(4).fill(Color.Gray)
-          Circle().width(4).height(4).fill(Color.Gray)
-          Circle().width(4).height(4).fill(Color.Gray)
-        }
-      }
-      .width(36)
-      .height(36)
-      .backgroundColor(Color.Transparent)
-      .onClick(() => EventBus.emit(Event.FOLD_PANEL));
     }
     .width('100%')
     .height(56)

@@ -17,7 +17,7 @@ struct ContactList {
   @State selectedMessage: Message | null = null;
   @State searchKeyword: string = '';
   @State curUser:User | null = null ;
-  @State isPanelFolded : boolean = false//是否选择折叠
+  @State isPanelFolded : boolean = true//是否选择折叠
   @State showAddContact: boolean = false;
   @State messagesMap: Map<number, Message[]> | null = null;
 
@@ -41,9 +41,9 @@ struct ContactList {
     try {
       EventBus.on(Event.CONTACT_LIST_LOADED, this.catchContacts);
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
+
       EventBus.on(Event.REFRESH_CONTACT_LIST, this.loadContacts);
       EventBus.on(Event.SEND_MESSAGE, this.sendMessage);
-      EventBus.on(Event.FOLD_PANEL, this.foldPanel);
       EventBus.on(Event.CONTACT_CHANGED, this.contactChanged);
     } catch (error) {
       console.error(error);
@@ -85,10 +85,6 @@ struct ContactList {
     // TODO
   }
 
-  foldPanel(){
-    this.isPanelFolded = !this.isPanelFolded
-  }
-
   contactChanged(contact: Contact){
     this.selectedContact = contact;
   }
@@ -116,13 +112,27 @@ struct ContactList {
         .layoutWeight(1)
         .height('100%')
 
-      if(!this.isPanelFolded){
-        DetailPanel({
-          selectedContact: this.selectedContact,
-          selectedMessage: this.selectedMessage
-        })
-          .width('20%')
-          .height('100%')
+      Column(){
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          // 使用文本替代图标，确保无资源也能运行
+          Text('D')
+            .fontSize(20)
+            .fontColor($r('app.color.secondary_text'))
+            .fontWeight(FontWeight.Lighter)
+        }
+        .width(32)
+        .height(32)
+        .backgroundColor(Color.Transparent)
+        .margin(12)
+        .onClick(() => this.isPanelFolded = !this.isPanelFolded)
+        if(!this.isPanelFolded){
+          DetailPanel({
+            selectedContact: this.selectedContact,
+            selectedMessage: this.selectedMessage
+          })
+            .width('20%')
+            .height('100%')
+        }
       }
     }
     .width('100%')
