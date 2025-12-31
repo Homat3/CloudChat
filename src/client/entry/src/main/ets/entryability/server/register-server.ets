@@ -36,7 +36,6 @@ export function handleRegister(data: hRegisterPayload){
   //发送http协议
   httpService.post('/register',registerRequest,(err: BusinessError,res:http.HttpResponse)=>{
     if(err){
-      console.error(err.message);
       EventBus.emit(Event.REGISTER_FAILED, { error: err.message } as RegisterFailurePayload);
       return;
     }
@@ -60,7 +59,7 @@ export function handleRegister(data: hRegisterPayload){
         }
       }
     }catch(e){
-      console.error(e);
+      EventBus.emit(Event.LOGIN_FAILED, { error: e } as RegisterFailurePayload);
     }
   });
 }
@@ -90,7 +89,7 @@ function WebSocketVerify (data: HdlInfoPayload, verifyData: hRegisterSuccessPayl
       payload: data
     }
     ws.send(registerInfo);
-  }catch(e){
-    console.error(e);
+  } catch(e){
+    EventBus.emit(Event.LOGIN_FAILED, { error: e } as RegisterFailurePayload);
   }
 }

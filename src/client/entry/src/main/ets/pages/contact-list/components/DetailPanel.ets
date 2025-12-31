@@ -23,24 +23,6 @@ export struct DetailPanel{
 
   build() {
     Column() {
-      // 头部关闭按钮
-      Row() {
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          // 使用文本替代图标，确保无资源也能运行
-          Text('×')
-            .fontSize(20)
-            .fontColor($r('app.color.secondary_text'))
-            .fontWeight(FontWeight.Lighter)
-        }
-        .width(32)
-        .height(32)
-        .backgroundColor(Color.Transparent)
-        .margin(12)
-        .onClick(() => EventBus.emit(Event.FOLD_PANEL))
-      }
-      .width('100%')
-      .justifyContent(FlexAlign.End)
-
       // 详细信息区域
       if (this.selectedContact) {
         // 消息区域
@@ -71,7 +53,6 @@ export struct DetailPanel{
           Button($r("app.string.text_contactList_detailPanel_SendMessage"))
             .width('80%')
             .margin({ top: 20 })
-            .onClick(() => EventBus.emit(Event.FOLD_PANEL))
 
           Button($r("app.string.text_contactList_detailPanel_DeleteFriend"))
             .width('80%')
