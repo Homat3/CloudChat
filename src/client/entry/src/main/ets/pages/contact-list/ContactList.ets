@@ -1,6 +1,6 @@
 import {MessagePage} from './components/MessagePage'
 import {ProfileSetting} from  '../profile-setting/ProfileSetting'
-import { AddContactPanel } from './components/AddContactPanel';
+import { ContactRequest } from './components/ContactRequest';
 
 @Entry
 @Component
@@ -14,7 +14,7 @@ struct ContactList {
       }.tabBar('消息主页');
 
       TabContent() {
-        AddContactPanel()
+        ContactRequest()
       }.tabBar('添加联系人');
 
       TabContent() {
