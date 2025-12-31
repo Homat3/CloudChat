@@ -1,40 +1,42 @@
-import { HttpClientMessage,
-  HttpClientMessageType,
-  LoginByTokenPayload as hLoginByTokenPayload,
-  LoginPayload as hLoginPayload } from "../../core/protocol/http/client.http.protocol";
-import { HttpService } from "../../core/service/network/http/server.http";
-import { common } from '@kit.AbilityKit';
 import {
-  HttpServiceMessage,
-  HttpServiceMessageType,
+  LoginByTokenPayload as hLoginByTokenPayload,
+  LoginPayload as hLoginPayload,
+  HttpClientMessage,
+  HttpClientMessageType
+} from '../../core/protocol/http/client.http.protocol';
+import { HttpService } from '../../core/service/network/http/server.http';
+import {
+  LoginFailurePayload as hLoginFailurePayload,
   LoginSuccessPayload as hLoginSuccessPayload,
-  LoginFailurePayload as hLoginFailurePayload } from "../../core/protocol/http/service.http.protocol";
-import { http } from "@kit.NetworkKit";
-import { WebsocketService } from "../../core/service/network/websocket/server.websocket";
+  HttpServiceMessage,
+  HttpServiceMessageType
+} from '../../core/protocol/http/service.http.protocol';
+import { http } from '@kit.NetworkKit';
+import { WebsocketService } from '../../core/service/network/websocket/server.websocket';
 import {
   HdlGotPayload,
-  LoginFailurePayload as wLoginFailurePayload,
-  LoginSuccessPayload as wLoginSuccessPayload,
   WebsocketServiceMessage,
-  WebsocketServiceMessageType } from "../../core/protocol/websocket/service.websocket.protocol";
+  WebsocketServiceMessageType
+} from '../../core/protocol/websocket/service.websocket.protocol';
 import {
+  HdlInfoPayload,
   WebSocketClientMessage,
-  WebsocketClientMessageType,
-  HdlInfoPayload} from "../../core/protocol/websocket/client.websocket.protocol";
-import { Event } from "../../core/tag/Event"
-import { EventBus } from "../../core/service/event/EventBus";
+  WebsocketClientMessageType
+} from '../../core/protocol/websocket/client.websocket.protocol';
+import { Event } from '../../core/tag/Event';
+import { EventBus } from '../../core/service/event/EventBus';
 
 export function handleLogin(data: hLoginPayload) {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
-  const loginRequest: HttpClientMessage ={
-    type : HttpClientMessageType.LOGIN,
-    payload : data
+  const loginRequest: HttpClientMessage = {
+    type: HttpClientMessageType.LOGIN,
+    payload: data
   };
 
-  console.log('Send Request:',loginRequest);
+  console.log('Send Request:', loginRequest);
   //发送http请求
-  httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
-    if(err){
+  httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse) => {
+    if (err) {
       EventBus.emit(Event.LOGIN_FAILED, err.message);
       return;
     }
@@ -44,7 +46,7 @@ export function handleLogin(data: hLoginPayload) {
       console.log('Password_login Response:', resultData);
 
       if (res.responseCode === 200) {
-        switch (resultData.type){
+        switch (resultData.type) {
           case HttpServiceMessageType.LOGIN_SUCCESS:
             const successData = resultData.payload as hLoginSuccessPayload;
             websocketNormalVerify({ userId: successData.userId }, successData);
@@ -55,8 +57,7 @@ export function handleLogin(data: hLoginPayload) {
           default:
             throw new Error("Unknown error");
         }
-      }
-      else {
+      } else {
         console.error("Http error code: " + res.responseCode);
       }
     } catch (e) {
@@ -65,7 +66,7 @@ export function handleLogin(data: hLoginPayload) {
   });
 }
 
-function websocketNormalVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPayload){
+function websocketNormalVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPayload) {
   const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
   try {
     ws.connect();
@@ -74,11 +75,10 @@ function websocketNormalVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPa
       console.log("Received: " + msg);
       let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
       //处理登录相应
-      if( receivedObject.type === WebsocketServiceMessageType.HDL_GOT) {
+      if (receivedObject.type === WebsocketServiceMessageType.HDL_GOT) {
         if ((receivedObject.payload as HdlGotPayload).userId === verifyData.userId) {
           EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
-        }
-        else {
+        } else {
           EventBus.emit(Event.LOGIN_FAILED, "Multiple Id");
         }
       }
@@ -89,23 +89,23 @@ function websocketNormalVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPa
       payload: data
     }
     ws.send(hdlInfo);
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 }
 
 //执行令牌登录
-export function handleLoginByToken(data: hLoginByTokenPayload): void{
+export function handleLoginByToken(data: hLoginByTokenPayload): void {
   const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
-  const loginRequest: HttpClientMessage ={
-    type : HttpClientMessageType.LOGIN_BY_TOKEN,
-    payload : data
+  const loginRequest: HttpClientMessage = {
+    type: HttpClientMessageType.LOGIN_BY_TOKEN,
+    payload: data
   };
 
-  console.log('Send Request:',loginRequest);
+  console.log('Send Request:', loginRequest);
   //发送http请求
-  httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
-    if(err){
+  httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse) => {
+    if (err) {
       EventBus.emit(Event.LOGIN_FAILED, err.message);
       return;
     }
@@ -115,7 +115,7 @@ export function handleLoginByToken(data: hLoginByTokenPayload): void{
       console.log('Password_login Response:', resultData);
 
       if (res.responseCode === 200) {
-        switch (resultData.type){
+        switch (resultData.type) {
           case HttpServiceMessageType.LOGIN_SUCCESS:
             const successData = resultData.payload as hLoginSuccessPayload;
             websocketTokenVerify({ userId: successData.userId }, successData);
@@ -133,7 +133,7 @@ export function handleLoginByToken(data: hLoginByTokenPayload): void{
   });
 }
 
-function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPayload){
+function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPayload) {
   const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
   try {
     ws.connect();
@@ -144,8 +144,7 @@ function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPay
       //处理登录相应
       if ((receivedObject.payload as HdlGotPayload).userId === verifyData.userId) {
         EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
-      }
-      else {
+      } else {
         EventBus.emit(Event.LOGIN_FAILED, "Multiple Id");
       }
     });
@@ -155,7 +154,7 @@ function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPay
       payload: data
     }
     ws.send(loginInfo);
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     EventBus.emit(Event.LOGIN_FAILED, "Failed to connect the service");
   }
