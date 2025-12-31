@@ -19,6 +19,7 @@ import {
 import { WebsocketService } from "../../core/service/network/websocket/server.websocket";
 import {
   HdlGotPayload,
+  RegisterFailurePayload,
   RegisterFailurePayload as wRegisterFailurePayload,
   RegisterSuccessPayload as wRegisterSuccessPayload,
   WebsocketServiceMessage,
@@ -33,10 +34,10 @@ export function handleRegister(data: hRegisterPayload){
   };
 
   //发送http协议
-  httpService.post('/register',registerRequest,(err:BusinessError,res:http.HttpResponse)=>{
+  httpService.post('/register',registerRequest,(err: BusinessError,res:http.HttpResponse)=>{
     if(err){
       console.error(err.message);
-      EventBus.emit(Event.REGISTER_FAILED, err.message);
+      EventBus.emit(Event.REGISTER_FAILED, { error: err.message } as RegisterFailurePayload);
       return;
     }
 
@@ -79,7 +80,7 @@ function WebSocketVerify (data: HdlInfoPayload, verifyData: hRegisterSuccessPayl
           EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
         }
         else {
-          EventBus.emit(Event.LOGIN_FAILED, "Multiple Id");
+          EventBus.emit(Event.LOGIN_FAILED, { error: "Multiple Id" } as RegisterFailurePayload);
         }
       }
     });
