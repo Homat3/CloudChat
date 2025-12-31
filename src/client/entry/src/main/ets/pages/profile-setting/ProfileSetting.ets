@@ -1,14 +1,15 @@
 import { common } from '@kit.AbilityKit'
+import { CloudChat } from '../../CloudChat';
+import { User } from '../../core/models/models';
 
 @Entry
 @Component
 struct ProfileSetting {
-  @State userAvatar: string = 'https://example.com/avatar.jpg'
-  @State userEmail: string = 'zhangsan@example.com'
-  @State userPhone: string = '13800138000'
+  @State user:User | null = CloudChat.currentUser
   @State notificationsEnabled: boolean = true
   @State darkMode: boolean = false
   @State language: string = 'zh-CN'
+
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -16,7 +17,7 @@ struct ProfileSetting {
   build() {
     RelativeContainer() {
       // 用户头像
-      Image(this.userAvatar)
+      Image(this.user?.avatar)
         .id('avatar')
         .width(80)
         .height(80)
@@ -26,12 +27,29 @@ struct ProfileSetting {
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
         .margin({ top: 40 })
+
+      //用户名
+      Row(){
+        Text($r('app.string.text_profileList_username'))
+          .fontSize(16)
+          .width(80)
+        Text(this.user?.email)
+          .fontSize(16)
+          .fontColor(Color.Gray)
+      }
+      .id('usernameRow')
+      .alignRules({
+        top: { anchor: 'avatar', align: VerticalAlign.Bottom },
+        left: { anchor: '__container__', align: HorizontalAlign.Start }
+      })
+      .margin({ top: 40, left: 20 })
+
       // 邮箱信息
       Row() {
         Text($r("app.string.text_profileSetting_Email"))
           .fontSize(16)
           .width(80)
-        Text(this.userEmail)
+        Text(this.user?.email)
           .fontSize(16)
           .fontColor(Color.Gray)
       }
@@ -42,20 +60,8 @@ struct ProfileSetting {
       })
       .margin({ top: 40, left: 20 })
 
-      // // 手机信息
-      // Row() {
-      //   Text('手机:')
-      //     .fontSize(16)
-      //     .width(80)
-      //   Text(this.userPhone)
-      //     .fontSize(16)
-      //     .fontColor(Color.Gray)
-      // }
-      // .id('phoneRow')
-      // .alignRules({
-      //   top: { anchor: 'emailRow', align: VerticalAlign.Bottom, offset: 20 },
-      //   left: { anchor: '__container__', align: HorizontalAlign.Start, offset: 20 }
-      // })
+      //
+
       // 消息通知开关
       Row() {
         Text($r("app.string.text_profileSetting_MessageNotify"))
@@ -96,3 +102,5 @@ struct ProfileSetting {
     .backgroundColor(this.darkMode ? Color.Black : Color.White)
   }
 }
+
+export { ProfileSetting }
