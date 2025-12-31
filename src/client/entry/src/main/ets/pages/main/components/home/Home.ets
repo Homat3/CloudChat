@@ -5,6 +5,8 @@ import { CloudChat } from '../../../../CloudChat';
 import { EventBus } from '../../../../core/service/event/EventBus';
 import { Event } from '../../../../core/tag/Event';
 import { ContactList } from './ContactList';
+import { LoadContactsPayload, LoadMessagesPayload } from '../../../../core/protocol/http/client.http.protocol';
+import { ContactsLoadedFailedPayload } from '../../../../core/protocol/http/service.http.protocol';
 
 @Component
 export struct Home {
@@ -12,13 +14,10 @@ export struct Home {
   @State selectedContact: Contact | null = null;
   @State selectedMessage: Message | null = null;
   @State searchKeyword: string = '';
-  @State curUser:User | null = null ;
-  @State showAddContact: boolean = false;
-  @State messagesMap: Map<number, Message[]> | null = null;
-  @State currentIndex : number = 0;
+  @State currentUser: User | null = null;
+  @State contacts: Contact[] = CloudChat.contacts;
+  @State messagesMap: Map<number, Message[]> | null = CloudChat.messageMap;
 
-  @State contacts: Contact[] = [];
-  @State filteredContacts: Array<Contact> = [];
   @State isLoading: boolean = true;
 
   // 上下文
@@ -29,20 +28,19 @@ export struct Home {
   aboutToAppear() {
     console.log('ContactList 页面加载了');
 
-    //获取当前用户
-    this.curUser = CloudChat.currentUser;
-    this.messagesMap = CloudChat.messageMap;
-
     //注册监听
     try {
-      EventBus.on(Event.CONTACT_LIST_LOADED, this.catchContacts);
-      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
+      EventBus.on(Event.CONTACT_LIST_LOADED, (): void => this.catchContacts());
+      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
 
-      EventBus.on(Event.REFRESH_CONTACT_LIST, this.loadContacts);
+      EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
+      EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
 
-      EventBus.on(Event.SEND_MESSAGE, this.sendMessage);
+      EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
 
-      EventBus.on(Event.CONTACT_CHANGED, this.contactChanged);
+      EventBus.on(Event.SEND_MESSAGE, (message: string): void => this.sendMessage(message));
+
+      EventBus.on(Event.CONTACT_CHANGED, (contact: Contact): void => this.contactChanged(contact));
     } catch (error) {
       console.error(error);
     }
@@ -53,7 +51,6 @@ export struct Home {
 
   catchContacts(){
     this.contacts = CloudChat.contacts;
-    this.isLoading = false;
     try {
       this.uiContext.getPromptAction().showToast({
         message: $r("app.string.text_contactList_ContactListPageLoaded"),
@@ -62,12 +59,13 @@ export struct Home {
     } catch (error) {
       console.error(error);
     }
+    this.loadMessages();
     this.isLoading = false;
   }
 
-  loadContactsFailed(){
+  loadContactsFailed(payload: ContactsLoadedFailedPayload){
     try {
-      this.uiContext.getPromptAction().showToast({ message: $r("app.string.error_contactList_ContactListLoadFailed") });
+      this.uiContext.getPromptAction().showToast({ message: $r("app.string.error_contactList_ContactListLoadFailed") + ": " + payload.error });
     } catch (error) {
       console.error(error);
     }
@@ -75,8 +73,28 @@ export struct Home {
 
   loadContacts() {
     this.isLoading = true;
-    EventBus.emit(Event.LOAD_CONTACT_LIST);
-    EventBus.emit(Event.LOAD_MESSAGES);
+    EventBus.emit(Event.LOAD_CONTACT_LIST, { userId: this.currentUser?.userId } as LoadContactsPayload);
+  }
+
+  loadMessages() {
+    CloudChat.startLoadMessage();
+    EventBus.emit(Event.LOAD_MESSAGES_START, { userId: this.currentUser?.userId, targetId: this.contacts[0].contactId } as LoadMessagesPayload);
+    for (let i = 0; i < this.contacts.length - 1; i++){
+      EventBus.emit(Event.LOAD_MESSAGES, { userId: this.currentUser?.userId, targetId: this.contacts[i].contactId } as LoadMessagesPayload);
+    }
+    EventBus.emit(Event.LOAD_MESSAGES_END, { userId: this.currentUser?.userId, targetId: this.contacts[this.contacts.length - 1].contactId } as LoadMessagesPayload);
+  }
+
+  catchMessages(){
+    this.messagesMap = CloudChat.messageMap;
+  }
+
+  loadMessagesFailed(msg: string){
+    try {
+      this.uiContext.getPromptAction().showToast({ message: $r("app.string.error_contactList_ContactListLoadFailed") + ": " + msg });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   sendMessage(message: string){
