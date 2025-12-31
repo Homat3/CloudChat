@@ -8,14 +8,15 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { JSON } from '@kit.ArkTS';
-import { Page } from '../core/manager/page-manager/Page';
+import { Page } from '../core/tag/Page';
 import { PermissionManager } from '../core/manager/permission-manager/PermissionManager';
 import { EventBus } from '../core/service/event/EventBus';
-import { Event } from '../core/service/event/Event';
+import { Event } from '../core/tag/Event';
 import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
 import { handleLoadMessages } from './server/message-server';
+import { handleRegister } from './server/register-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -32,6 +33,7 @@ export default class MainUIAbility extends UIAbility {
 
     EventBus.on(Event.LOGIN, handleLogin);
     EventBus.on(Event.LOGIN_BY_TOKEN, handleLoginByToken);
+    EventBus.on(Event.REGISTER,handleRegister);
     EventBus.on(Event.LOAD_CONTACT_LIST, handleLoadContacts);
     EventBus.on(Event.LOAD_MESSAGES, handleLoadMessages);
 

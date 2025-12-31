@@ -1,12 +1,11 @@
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
-import { Event } from '../../core/service/event/Event';
-import { Page } from '../../core/manager/page-manager/Page';
-import { UserManager } from './user-manager';
+import { Event } from '../../core/tag/Event';
+import { Page } from '../../core/tag/Page';
+import { UserManager } from '../../core/manager/user-manager/user-manager';
 import { LoginFailurePayload, LoginSuccessPayload } from '../../core/protocol/websocket/service.websocket.protocol';
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
-import { PageManager } from '../../core/manager/page-manager/PageManager';
 import { EventBus } from '../../core/service/event/EventBus';
 import { LoginPayload } from '../../core/protocol/http/client.http.protocol';
 
@@ -17,14 +16,12 @@ struct LoginPage {
   // 状态
   @State username: string = '';
   @State password: string = '';
-  @State errorMessage: string | null = null;
+  @State errorMessage: string = "";
   @State isLoading: boolean = false;
   @State rememberMe: boolean = false;
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-  // 页面切换器
-  private pageManager: PageManager = new PageManager(this.uiContext.getRouter());
 
   //尝试读取保存的用户名
   aboutToAppear(): void {
@@ -39,7 +36,10 @@ struct LoginPage {
       // 监听登录失败事件
       EventBus.on(Event.LOGIN_FAILED, (payload: LoginFailurePayload) => {
         this.isLoading = false;
-        this.errorMessage = payload.error + loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
+        this.uiContext.getPromptAction().showToast({
+          message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' + payload.error,
+          duration: 2000
+        });
       });
 
       // 监听登录成功事件
@@ -94,7 +94,7 @@ struct LoginPage {
           .margin({ top: 30 })
           .onChange((value: string) => {
             this.username = value;
-            this.errorMessage = null;
+            this.errorMessage = "";
           })
 
         // 密码输入框
@@ -117,7 +117,7 @@ struct LoginPage {
           })
           .onChange((value: string) => {
             this.password = value;
-            this.errorMessage = null;
+            this.errorMessage = "";
           })
 
         Row() {
@@ -185,7 +185,7 @@ struct LoginPage {
           })
           .margin({ top: 10 })
           .onClick(() => {
-            this.pageManager.switchPage(Page.REGISTER_PAGE).catch((error: Error) => {
+            this.uiContext.getRouter().pushUrl({ url: Page.REGISTER_PAGE }).catch((error: Error) => {
               console.error('Route failed:', error);
               try {
                 this.uiContext.getPromptAction().showToast({
@@ -209,6 +209,12 @@ struct LoginPage {
             })
             .margin({ top: 10 })
             .padding(8)
+
+          // 版本信息
+          Text($r("app.string.app_version"))
+            .fontSize(12)
+            .fontColor($r("app.color.register_test_version_font"))
+            .margin({ top: 40 })
         }
       }
     }
@@ -235,7 +241,7 @@ struct LoginPage {
     }
 
     this.isLoading = true;
-    this.errorMessage = null;
+    this.errorMessage = "";
 
     EventBus.emit(Event.LOGIN, {username: this.username, password: this.password} as LoginPayload);
   }
@@ -255,7 +261,7 @@ struct LoginPage {
       return false;
     }
 
-    this.errorMessage = null;
+    this.errorMessage = "";
     return true;
   }
 }

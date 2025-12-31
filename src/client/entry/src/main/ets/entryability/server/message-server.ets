@@ -6,7 +6,7 @@ import { HttpClientMessage,
   LoadMessagesPayload } from "../../core/protocol/http/client.http.protocol";
 import { HttpServiceMessage, HttpServiceMessageType,
   MessagesLoadedPayload } from "../../core/protocol/http/service.http.protocol";
-import { Event } from "../../core/service/event/Event";
+import { Event } from "../../core/tag/Event";
 import { EventBus } from "../../core/service/event/EventBus";
 import { HttpService } from "../../core/service/network/http/server.http";
 import { http } from "@kit.NetworkKit";

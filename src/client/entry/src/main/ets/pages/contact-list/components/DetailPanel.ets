@@ -2,7 +2,7 @@ import { common } from "@kit.AbilityKit";
 import { CloudChat } from "../../../CloudChat";
 import { Message } from "../../../core/models/message";
 import { Contact } from "../../../core/models/models";
-import { Event } from "../../../core/service/event/Event";
+import { Event } from "../../../core/tag/Event";
 import { EventBus } from "../../../core/service/event/EventBus";
 
 @Component
