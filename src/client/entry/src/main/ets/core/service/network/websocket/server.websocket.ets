@@ -109,7 +109,7 @@ export class WebsocketService {
       } else {
         const msg = JSON.stringify(err);
         console.error(msg);
-        throw new SendError(msg);
+        setTimeout((): void => this.send(message), 2000);
       }
     });
   }

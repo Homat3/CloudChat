@@ -3,7 +3,7 @@ import { Contact, User } from '../../../core/models/models';
 import { common } from '@kit.AbilityKit';
 import { CloudChat } from '../../../CloudChat';
 import { EventBus } from '../../../core/service/event/EventBus';
-import { Event } from '../../../core/service/event/Event';
+import { Event } from '../../../core/tag/Event';
 import { ContactSidebar } from './ContactSidebar';
 
 @Component
@@ -13,7 +13,6 @@ export struct MessagePage{
   @State selectedMessage: Message | null = null;
   @State searchKeyword: string = '';
   @State curUser:User | null = null ;
-  @State isPanelFolded : boolean = false//是否选择折叠
   @State showAddContact: boolean = false;
   @State messagesMap: Map<number, Message[]> | null = null;
   @State currentIndex : number = 0;
@@ -40,7 +39,7 @@ export struct MessagePage{
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, this.loadContactsFailed);
       EventBus.on(Event.REFRESH_CONTACT_LIST, this.loadContacts);
       EventBus.on(Event.SEND_MESSAGE, this.sendMessage);
-      EventBus.on(Event.FOLD_PANEL, this.foldPanel);
+      EventBus.on(Event.OPEN_PANEL, this.openPanel);
       EventBus.on(Event.CONTACT_CHANGED, this.contactChanged);
     } catch (error) {
       console.error(error);
@@ -82,8 +81,8 @@ export struct MessagePage{
     // TODO
   }
 
-  foldPanel(){
-    this.isPanelFolded = !this.isPanelFolded
+  openPanel(){
+    // TODO
   }
 
   contactChanged(contact: Contact){
