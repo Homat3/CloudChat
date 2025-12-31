@@ -98,7 +98,14 @@ std::string Register(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, R
 		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, register_failure_msg);
 		return register_failure_msg->to_JSON();
 	}
-	// 用户不存在，注册成功
+	// 检查邮箱地址是否存在
+	user = CloudChatDatabase::GetInstance()->GetUserByEmail(email);
+	if (user != nullptr) {		// 邮箱地址已存在
+		RegisterFailureMsg* register_failure_msg = new RegisterFailureMsg("邮箱已存在");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, register_failure_msg);
+		return register_failure_msg->to_JSON();
+	}
+	// 用户名和邮箱地址都不存在，注册成功
 	user = new CloudChatUser(0, username, password, DEFAULT_AVATAR_URL, generate_token(), email,
 							 true);
 	CloudChatDatabase::GetInstance()->AddUser(*user);
