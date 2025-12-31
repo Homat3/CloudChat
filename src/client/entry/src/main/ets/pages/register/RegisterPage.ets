@@ -1,11 +1,10 @@
 
-import { Page } from '../../core/manager/page-manager/Page';
+import { Page } from '../../core/tag/Page';
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
-import { PageManager } from '../../core/manager/page-manager/PageManager';
 import { EventBus } from '../../core/service/event/EventBus';
-import { Event} from '../../core/service/event/Event';
-import { RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';
+import { Event} from '../../core/tag/Event';
+import { RegisterFailurePayload, RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
 import { RegisterPayload } from '../../core/protocol/http/client.http.protocol';
@@ -31,19 +30,21 @@ struct Register {
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-  private pageManager:PageManager = new PageManager(this.uiContext.getRouter());
 
   aboutToAppear(): void {
     try{
-      EventBus.on(Event.REGISTER_FAILED,(payload:RegisterSuccessPayload)=>{
+      //注册失败事件
+      EventBus.on(Event.REGISTER_FAILED,(payload: RegisterFailurePayload)=>{
         this.isLoading = false;
-        this.errorMessage = payload.error + loadStringResource(this.uiAbilityContext,$r('app.string.error_register_RegisterFailed'));
+        this.uiContext.getPromptAction().showToast({
+          message: loadStringResource(this.uiAbilityContext, $r("app.string.error_register_RegisterFailed")) + ": " + payload.error,
+          duration: 2000
+        });
       });
 
       //注册成功事件
-      EventBus.on(Event.REGISTER_SUCCESS,(successInfo:RegisterSuccessPayload)=>{
-        CloudChat.currentUser = new User(successInfo.userId,successInfo.username,
-        successInfo.email,successInfo.avatar,successInfo.token);
+      EventBus.on(Event.REGISTER_SUCCESS,(payload: RegisterSuccessPayload)=>{
+        CloudChat.currentUser = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
         this.uiContext.getRouter().replaceUrl({url:Page.CONTACT_LIST_PAGE}).catch((err:Error)=>{
           console.error(err.message);
         })
@@ -197,11 +198,7 @@ struct Register {
           })
           .margin({ top: 10 })
           .onClick(() => {
-            this.uiContext.getRouter().pushUrl({
-              url: Page.LOGIN_PAGE
-            }).catch((e: Error) => {
-              console.error(e.message);
-            });
+            this.uiContext.getRouter().back();
           });
 
         // 系统错误提示
