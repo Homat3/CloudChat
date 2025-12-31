@@ -22,7 +22,7 @@ export function handleLoadContacts(data: LoadContactsPayload) {
   //发送http请求
   httpService.post('/load/contacts', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
     if(err){
-      EventBus.emit(Event.CONTACT_LIST_LOAD_FAILED, err.message);
+      EventBus.emit(Event.CONTACT_LIST_LOAD_FAILED, { error: err.message } as ContactsLoadedFailedPayload);
       return;
     }
     //解析数据

@@ -16,7 +16,7 @@ struct LoginPage {
   // 状态
   @State username: string = '';
   @State password: string = '';
-  @State errorMessage: string | null = null;
+  @State errorMessage: string = "";
   @State isLoading: boolean = false;
   @State rememberMe: boolean = false;
   // 上下文
@@ -36,7 +36,10 @@ struct LoginPage {
       // 监听登录失败事件
       EventBus.on(Event.LOGIN_FAILED, (payload: LoginFailurePayload) => {
         this.isLoading = false;
-        this.errorMessage = payload.error + loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed"));
+        this.uiContext.getPromptAction().showToast({
+          message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' + payload.error,
+          duration: 2000
+        });
       });
 
       // 监听登录成功事件
@@ -91,7 +94,7 @@ struct LoginPage {
           .margin({ top: 30 })
           .onChange((value: string) => {
             this.username = value;
-            this.errorMessage = null;
+            this.errorMessage = "";
           })
 
         // 密码输入框
@@ -114,7 +117,7 @@ struct LoginPage {
           })
           .onChange((value: string) => {
             this.password = value;
-            this.errorMessage = null;
+            this.errorMessage = "";
           })
 
         Row() {
@@ -206,6 +209,12 @@ struct LoginPage {
             })
             .margin({ top: 10 })
             .padding(8)
+
+          // 版本信息
+          Text($r("app.string.app_version"))
+            .fontSize(12)
+            .fontColor($r("app.color.register_test_version_font"))
+            .margin({ top: 40 })
         }
       }
     }
@@ -232,7 +241,7 @@ struct LoginPage {
     }
 
     this.isLoading = true;
-    this.errorMessage = null;
+    this.errorMessage = "";
 
     EventBus.emit(Event.LOGIN, {username: this.username, password: this.password} as LoginPayload);
   }
@@ -252,7 +261,7 @@ struct LoginPage {
       return false;
     }
 
-    this.errorMessage = null;
+    this.errorMessage = "";
     return true;
   }
 }

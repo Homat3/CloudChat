@@ -13,7 +13,7 @@ export class EventBus{
     }
   }
 
-  public static emit(event: Event, ...arg: (object | string)[]) {
+  public static emit(event: Event, arg: (object | string | void)) {
     const listeners = EventBus.eventBus.get(event);
     if (listeners) {
       listeners.forEach((listener) => {
