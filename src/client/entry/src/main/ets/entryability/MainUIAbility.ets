@@ -36,6 +36,25 @@ export default class MainUIAbility extends UIAbility {
     EventBus.on(Event.REGISTER,handleRegister);
     EventBus.on(Event.LOAD_CONTACT_LIST, handleLoadContacts);
     EventBus.on(Event.LOAD_MESSAGES, handleLoadMessages);
+    EventBus.on(Event.COLOR_MODE, (colorMode: string) => {
+      try {
+        switch (colorMode){
+          case 'dark':
+            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
+            break;
+          case 'light':
+            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
+            break;
+          case 'not_set':
+            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+            break;
+          default :
+            break;
+        }
+      } catch (e){
+        console.error(e);
+      }
+    })
 
     try {
       //颜色跟随系统
