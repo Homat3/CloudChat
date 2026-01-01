@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { Message, TextMessage } from './core/models/message';
 import { Contact, User } from './core/models/models';
-
+import { WebsocketService } from './core/service/network/websocket/server.websocket';
 /**
  * @description CloudChat 全局属性
  */
@@ -10,6 +10,7 @@ export class CloudChat{
   private static _messageMap: Map<number, Message[]>;
   private static _messageMapBuilder: Map<number, Message[]> | null = null;
   private static _contactList: Contact[];
+  // private static _allUsers: User[] = [];
 
   public static get currentUser(){
     return CloudChat._currentUser;
@@ -22,6 +23,19 @@ export class CloudChat{
   public static get messageMap(){
     return CloudChat._messageMap;
   }
+  // /**
+  //  *  获取所有用户列表（用于搜索）
+  //  */
+  // public static get allUsers(): User[] {
+  //   return CloudChat._allUsers;
+  // }
+  //
+  // /**
+  //  *  设置或更新用户池
+  //  */
+  // public static set allUsers(users: User[]) {
+  //   CloudChat._allUsers = users;
+  // }
 
   public static get contacts() {
     return CloudChat._contactList;

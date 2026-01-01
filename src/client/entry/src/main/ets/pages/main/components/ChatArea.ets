@@ -39,7 +39,7 @@ export struct ChatArea{
 
   build(){
     Column() {
-      //顶部标题
+      //头部
       this.buildHeader()
 
       //消息区

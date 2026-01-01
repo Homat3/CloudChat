@@ -1,16 +1,11 @@
-import { common } from "@kit.AbilityKit";
-import { CloudChat } from "../../../CloudChat";
-import { Message } from "../../../core/models/message";
-import { Contact } from "../../../core/models/models";
-import { Event } from "../../../core/tag/Event";
-import { EventBus } from "../../../core/service/event/EventBus";
+import { common } from '@kit.AbilityKit';
+import { Message } from '../../../core/models/message';
+import { Contact } from '../../../core/models/models';
 
 @Component
   /**
-   * 右侧：此组件为详情面板
+   * 此组件为联系人详情面板
    * ===============
-   * 加上此组件就是把页面设计成： 联系人|消息页面|详情组件
-   * 也可以不要这个组件，就是左右布局的两个组件
    */
 export struct DetailPanel{
   // 状态变量
