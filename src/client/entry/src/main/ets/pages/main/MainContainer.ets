@@ -1,6 +1,6 @@
 import { Home } from './components/home/Home';
-import { ProfileSetting } from './components/profile-setting/ProfileSetting'
 import { ContactRequest } from './components/contact-request/ContactRequest';
+import { OwnPage } from './components/Own/OwnPage';
 
 @Entry
 @Component
@@ -18,7 +18,7 @@ struct MainContainer {
       }.tabBar('添加联系人');
 
       TabContent() {
-        ProfileSetting()
+        OwnPage()
       }.tabBar('个人主页');
     }
     .width('100%')

@@ -255,6 +255,38 @@
     {
       "name": "text_DetailPanel_PersonalInfo",
       "value": "个人资料"
+    },
+    {
+      "name": "text_OwnPage_userId",
+      "value": "用户ID"
+    },
+    {
+      "name": "text_OwnPage_username",
+      "value": "用户名"
+    },
+    {
+      "name": "text_OwnPage_Email",
+      "value": "邮箱"
+    },
+    {
+      "name": "text_OwnPage_MessageNotify",
+      "value": "消息通知"
+    },
+    {
+      "name": "text_OwnPage_colorMode",
+      "value": "主题模式"
+    },
+    {
+      "name": "text_OwnPage_AlongSystem",
+      "value": "伴随系统"
+    },
+    {
+      "name": "text_OwnPage_dark",
+      "value": "深色"
+    },
+    {
+      "name": "text_OwnPage_light",
+      "value": "浅色"
     }
   ]
 }

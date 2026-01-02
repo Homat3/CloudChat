@@ -4,6 +4,7 @@ import { Contact, User } from "../../../core/models/models";
 import { Message, TextMessage } from "../../../core/models/message";
 import { Event } from "../../../core/tag/Event";
 import { EventBus } from "../../../core/service/event/EventBus";
+import { Home } from "./home/Home";
 
 /**
  * 预览界面
@@ -84,17 +85,15 @@ struct ChatAreaInstance{
       .height('100%')
 
       //详情栏
-      Row(){
         Image($r('app.media.startIcon'))
           .width(24)
           .height(24)
-      }
       .backgroundColor(Color.Transparent)
       .width(40)
       .height(40)
       .padding(0)
       .onClick(()=>{
-        //跳转到详情页
+        this.uiContext.getRouter().replaceUrl({url:'../components/DetailPanel'})
       })
     }
     .width('100%')
@@ -327,7 +326,7 @@ export struct ChatArea{
         .height(40)
         .padding(0)
         .onClick(()=>{
-          //跳转到详情页
+          
         })
       }
       .width('100%')
