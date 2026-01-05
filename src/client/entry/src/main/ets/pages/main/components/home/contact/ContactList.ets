@@ -13,25 +13,21 @@ export struct ContactList {
   @Link selectedContact: Contact | null;
   @Link searchKeyword: string
 
-  @State filteredContacts: Array<Contact> = []
   @State refreshing: boolean = false
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  //初始化联系人数据
   aboutToAppear() {
-    // 加载真实数据
-    this.filterContacts();
   }
 
   //过滤联系人
-  private filterContacts() {
-    if(this.searchKeyword.trim() === '') {
-      this.filteredContacts = [...this.contacts];
+  private filterContacts(key: string): Contact[] {
+    if(key.trim() === '') {
+      return [...this.contacts];
     } else {
-      this.filteredContacts = this.contacts.filter(contact =>
-        contact.username.toLowerCase().includes(this.searchKeyword.toLowerCase())
+      return this.contacts.filter(contact =>
+        contact.username.toLowerCase().includes(key.toLowerCase())
       );
     }
   }
@@ -45,12 +41,11 @@ export struct ContactList {
         .onChange((value: string) => {
           //处理搜索逻辑
           this.searchKeyword = value;
-          this.filterContacts();
         })
 
       //联系人列表
       List({ space: 20, initialIndex: 0 }) {
-        ForEach(this.filteredContacts, (contact: Contact) => {
+        ForEach(this.filterContacts(this.searchKeyword), (contact: Contact) => {
           ListItem() {
             ContactItem({
               contact: contact,

@@ -176,28 +176,16 @@ struct ChatAreaInstance{
   }
 }
 
-
-
-
-
-
-
-
-
-
-
 @Component
   /**
    * 中间的聊天界面
    */
 export struct ChatArea{
   // 状态变量
-  @Prop currentUser: User ;//当前用户
-  @Prop selectedContact: Contact | null;
-  //@Link messagesMap: Map<number, Message[]>;
-  @Link selectedMessage: Message | null;
+  @Prop currentUser: User;  //当前用户
+  @Prop selectedContact: Contact;
+  @Link messages: Message[];
 
-  //@State messages: Message[] | null = null;
   @State newMessage: string = '';
   @State showEmojiPicker: boolean = false;
   @State showAttachmentMenu: boolean = false;

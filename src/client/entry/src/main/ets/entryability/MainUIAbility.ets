@@ -39,15 +39,11 @@ export default class MainUIAbility extends UIAbility {
     EventBus.on(Event.LOGIN_BY_TOKEN, (data: LoginByTokenPayload): void => handleLoginByToken(data));
     EventBus.on(Event.REGISTER, (data: RegisterPayload): void => handleRegister(data));
     EventBus.on(Event.LOAD_CONTACT_LIST, (data: LoadContactsPayload): void => handleLoadContacts(data));
-    EventBus.on(Event.LOAD_MESSAGES_START, (data: LoadMessagesPayload): void => {
-      CloudChat.startLoadMessage();
-      handleLoadMessages(data);
+    EventBus.on(Event.LOAD_MESSAGES_START, (count: number): void => {
+      CloudChat.startLoadMessage(count);
     });
-    EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => handleLoadMessages(data));
-    EventBus.on(Event.LOAD_MESSAGES_END, (data: LoadMessagesPayload): void => {
+    EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => {
       handleLoadMessages(data);
-      CloudChat.endLoadMessage();
-      this.context.eventHub.emit(Event.MESSAGES_LOADED);
     });
     EventBus.on(Event.COLOR_MODE, (colorMode: string) => {
       try {

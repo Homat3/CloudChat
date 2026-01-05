@@ -7,22 +7,29 @@ import { Event } from '../../../../core/tag/Event';
 import { ContactList } from './contact/ContactList';
 import { LoadContactsPayload, LoadMessagesPayload } from '../../../../core/protocol/http/client.http.protocol';
 import { ContactsLoadedFailedPayload } from '../../../../core/protocol/http/service.http.protocol';
+import { Page } from '../../../../core/tag/Page';
+import { ChatArea } from '../chat/ChatArea';
 
 @Component
 export struct Home {
   // 状态变量
-  @State selectedContact: Contact | null = null;
-  @State selectedMessage: Message | null = null;
+  @State @Watch("onSwitchToChatArea") selectedContact: Contact | null = null;
+  @State selectedMessages: Message[] | null = null;
   @State searchKeyword: string = '';
-  @State currentUser: User | null = null;
-  @State contacts: Contact[] = CloudChat.contacts;
-  @State messagesMap: Map<number, Message[]> | null = CloudChat.messageMap;
+  @State currentUser: User | null = CloudChat.currentUser;
+  @State contacts: Contact[] | null = null;
+  @State messagesMap: Map<number, Message[]> | null = null;
 
   @State isLoading: boolean = true;
+  @State isChatAreaOpen: boolean = false;
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+
+  onSwitchToChatArea(){
+    EventBus.emit(Event.OPEN_CHAT_AREA);
+  }
 
   // 添加页面生命周期
   aboutToAppear() {
@@ -36,11 +43,19 @@ export struct Home {
       EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
       EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
 
+      EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
+        if (this.selectedContact){
+          const messageList = this.messagesMap?.get(this.selectedContact?.contactId);
+          if (messageList) {
+            this.selectedMessages = messageList;
+          }
+        }
+        this.isChatAreaOpen = true
+      });
+
       EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
 
       EventBus.on(Event.SEND_MESSAGE, (message: string): void => this.sendMessage(message));
-
-      EventBus.on(Event.CONTACT_CHANGED, (contact: Contact): void => this.contactChanged(contact));
     } catch (error) {
       console.error(error);
     }
@@ -77,12 +92,12 @@ export struct Home {
   }
 
   loadMessages() {
-    CloudChat.startLoadMessage();
-    EventBus.emit(Event.LOAD_MESSAGES_START, { userId: this.currentUser?.userId, targetId: this.contacts[0].contactId } as LoadMessagesPayload);
-    for (let i = 0; i < this.contacts.length - 1; i++){
-      EventBus.emit(Event.LOAD_MESSAGES, { userId: this.currentUser?.userId, targetId: this.contacts[i].contactId } as LoadMessagesPayload);
+    if(this.contacts){
+      EventBus.emit(Event.LOAD_MESSAGES_START, this.contacts.length);
+      for (const contact of this.contacts){
+        EventBus.emit(Event.LOAD_MESSAGES, { userId: this.currentUser?.userId, targetId: contact.contactId } as LoadMessagesPayload);
+      }
     }
-    EventBus.emit(Event.LOAD_MESSAGES_END, { userId: this.currentUser?.userId, targetId: this.contacts[this.contacts.length - 1].contactId } as LoadMessagesPayload);
   }
 
   catchMessages(){
@@ -101,18 +116,23 @@ export struct Home {
     // TODO
   }
 
-  contactChanged(contact: Contact){
-    this.selectedContact = contact;
-  }
-
   build(){
-    ContactList({
-      contacts: this.contacts,
-      selectedContact: this.selectedContact,
-      searchKeyword: this.searchKeyword
-    })
-      .width('100%')
-      .height('100%')
-      .border({ width: { right: 1 }, color: $r('app.color.list_divider') })
+    if (this.isChatAreaOpen && this.currentUser && this.selectedContact && this.selectedMessages){
+      ChatArea({
+        currentUser: this.currentUser,
+        selectedContact: this.selectedContact,
+        messages: this.selectedMessages
+      })
+    }
+    else {
+      ContactList({
+        contacts: this.contacts ? this.contacts : [],
+        selectedContact: this.selectedContact,
+        searchKeyword: this.searchKeyword
+      })
+        .width('100%')
+        .height('100%')
+        .border({ width: { right: 1 }, color: $r('app.color.list_divider') })
+    }
   }
 }
