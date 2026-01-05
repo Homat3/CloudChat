@@ -155,7 +155,3 @@ struct ProfileSetting{
     .alignItems(HorizontalAlign.Start) // 确保列内容从左侧开始
   }
 }
-
-
-
-export {ProfileSetting}

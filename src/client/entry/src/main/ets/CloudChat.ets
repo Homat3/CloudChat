@@ -9,8 +9,8 @@ export class CloudChat{
   private static _currentUser: User | null = null;
   private static _messageMap: Map<number, Message[]>;
   private static _messageMapBuilder: Map<number, Message[]> | null = null;
+  private static _contactCount: number = 0;
   private static _contactList: Contact[];
-  // private static _allUsers: User[] = [];
 
   public static get currentUser(){
     return CloudChat._currentUser;
@@ -23,19 +23,6 @@ export class CloudChat{
   public static get messageMap(){
     return CloudChat._messageMap;
   }
-  // /**
-  //  *  获取所有用户列表（用于搜索）
-  //  */
-  // public static get allUsers(): User[] {
-  //   return CloudChat._allUsers;
-  // }
-  //
-  // /**
-  //  *  设置或更新用户池
-  //  */
-  // public static set allUsers(users: User[]) {
-  //   CloudChat._allUsers = users;
-  // }
 
   public static get contacts() {
     return CloudChat._contactList;
@@ -45,11 +32,16 @@ export class CloudChat{
     CloudChat._contactList = contacts;
   }
 
-  public static startLoadMessage(){
+  public static get messageLoadEnd(){
+    return CloudChat._messageMapBuilder === null;
+  }
+
+  public static startLoadMessage(count: number){
     if (CloudChat._messageMapBuilder){
-      throw new Error("Not start loading, call endLoadMessage first");
+      throw new Error("Not end loading, call endLoadMessage first");
     }
     else {
+      CloudChat._contactCount = count;
       CloudChat._messageMapBuilder = new Map();
     }
   }
@@ -72,6 +64,9 @@ export class CloudChat{
             throw new Error("Multiple contact id");
           }
         }
+        if (CloudChat._messageMapBuilder.size >= CloudChat._contactCount){
+          CloudChat.endLoadMessage();
+        }
       }
       else {
         throw new Error("No user");
@@ -82,7 +77,7 @@ export class CloudChat{
     }
   }
 
-  public static endLoadMessage(){
+  private static endLoadMessage(){
     if (CloudChat._messageMapBuilder){
       CloudChat._messageMap = CloudChat._messageMapBuilder;
       CloudChat._messageMapBuilder = null;

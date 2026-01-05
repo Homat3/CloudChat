@@ -1,5 +1,5 @@
 import { common } from "@kit.AbilityKit";
-import { Contact } from "../../../../core/models/models";
+import { Contact } from "../../../../../core/models/models";
 
 
 @Component

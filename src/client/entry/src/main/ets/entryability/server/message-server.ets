@@ -32,12 +32,13 @@ export function handleLoadMessages(data: LoadMessagesPayload) {
 
       if (res.responseCode === 200) {
         switch (resultData.type){
-          case HttpServiceMessageType.CONTACTS_LOADED:
+          case HttpServiceMessageType.MESSAGES_LOADED:
             const result = resultData.payload as MessagesLoadedPayload
             CloudChat.addMessagesOfContact(result.messages);
-            EventBus.emit(Event.MESSAGES_LOADED_FAILED, result);
+            if (CloudChat.messageLoadEnd) EventBus.emit(Event.MESSAGES_LOADED);
             break;
           default:
+            EventBus.emit(Event.MESSAGES_LOADED_FAILED, "Unknown error");
             throw new Error("Unknown error");
         }
       }

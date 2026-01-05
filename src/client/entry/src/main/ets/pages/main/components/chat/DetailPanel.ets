@@ -1,6 +1,6 @@
 
 import { common } from "@kit.AbilityKit";
-import { User } from "../../../core/models/models";
+import { User } from "../../../../core/models/models";
 
 @Entry
 @Component
@@ -168,5 +168,3 @@ struct DetailPanel{
     // 删除好友的逻辑
   }
 }
-
-export { DetailPanel }
