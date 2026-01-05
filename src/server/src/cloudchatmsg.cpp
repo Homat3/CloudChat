@@ -1334,3 +1334,11 @@ std::string HdlGotMsg::to_JSON() {
 HdlGotMsg::HdlGotMsg(int user_id) : ServerMsg(HDL_GOT) {
 	user_id_ = user_id;
 }
+
+int DeleteContactMsg::get_user_id() {
+	return user_id_;
+}
+
+int DeleteContactMsg::get_target_id() {
+	return target_id_;
+}
