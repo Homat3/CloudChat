@@ -255,13 +255,17 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 	} else if (type == SEARCH_FOR_USER_BY_ID) {
 		response_body = SearchForUserById(g_cloudchat_srv, hdl, (SearchForUserByIdMsg*)client_msg);
 	} else if (type == SEARCH_FOR_UESR_BY_NAME) {
-		response_body = SearchForUserByName(g_cloudchat_srv, hdl, (SearchForUserByNameMsg*)client_msg);
+		response_body = SearchForUserByName(g_cloudchat_srv, hdl,
+											(SearchForUserByNameMsg*)client_msg);
 	} else if (type == LOAD_FRIEND_REQUEST) {
 		response_body = LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
 	} else if (type == DELETE_CONTACT) {
 		response_body = DeleteContact(g_cloudchat_srv, hdl, (DeleteContactMsg*)client_msg);
 	} else if (type == ILLEGAL_MSG) {
 		response_body = "Illegal message received.";
+	} else if (type == ADD_FRIEND_REQUEST) {
+		response_body = AddFriendRequest(g_cloudchat_srv, hdl,
+										 (AddFriendRequestClientMsg*)client_msg);
 	}
 
 	if (type != ILLEGAL_MSG) con->set_status(websocketpp::http::status_code::ok);
