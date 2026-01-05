@@ -492,7 +492,7 @@ void GetHdlInfo(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, HdlInf
 	SendMsgToClient(cloudchat_srv, hdl, new HdlGotMsg(user_id)); // 回复客户端
 }
 
-std::string DeleteContact(server_t cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string DeleteContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						  DeleteContactMsg* delete_contact_msg) {
 	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
 
@@ -503,5 +503,5 @@ std::string DeleteContact(server_t cloudchat_srv, websocketpp::connection_hdl hd
 	std::cout << "userId: " << user_id << std::endl;
 	std::cout << "targetId: " << target_id << std::endl;
 
-	
+	return "";
 }
