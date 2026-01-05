@@ -1,13 +1,13 @@
 import { ContactItem } from "./ContactItem";
 import { common } from "@kit.AbilityKit";
-import { Contact } from "../../../core/models/models";
-import { Message } from "../../../core/models/message";
+import { Contact } from "../../../../core/models/models";
+import { Message } from "../../../../core/models/message";
 
 @Component
 /**
- * 左侧联系人栏
+ * 联系人栏
  */
-export struct ContactSidebar{
+export struct ContactList {
   // 状态变量
   @Prop contacts: Array<Contact> = [];
   @Link selectedContact: Contact | null;
@@ -54,7 +54,7 @@ export struct ContactSidebar{
           ListItem() {
             ContactItem({
               contact: contact,
-              selected: contact.contactId === this.selectedContact?.contactId,
+              selectedContact: this.selectedContact,
             })
           }
         }, (contact: Contact) => contact.contactId.toString())

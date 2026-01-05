@@ -102,14 +102,14 @@ export class WebsocketService {
     });
   }
 
-  public send(message: object){
+  public send(message: object) {
     this.websocketBase.send(JSON.stringify(message), (err: BusinessError, value: boolean) => {
       if (!err) {
         console.log("send success");
       } else {
         const msg = JSON.stringify(err);
         console.error(msg);
-        throw new SendError(msg);
+        setTimeout((): void => this.send(message), 2000);
       }
     });
   }

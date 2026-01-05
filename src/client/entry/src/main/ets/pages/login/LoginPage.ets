@@ -36,16 +36,21 @@ struct LoginPage {
       // 监听登录失败事件
       EventBus.on(Event.LOGIN_FAILED, (payload: LoginFailurePayload) => {
         this.isLoading = false;
-        this.uiContext.getPromptAction().showToast({
-          message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' + payload.error,
-          duration: 2000
-        });
+        try {
+          this.uiContext.getPromptAction().showToast({
+            message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' + payload.error,
+            duration: 2000
+          });
+        }
+        catch (e) {
+          console.error(e);
+        }
       });
 
       // 监听登录成功事件
-      EventBus.on(Event.LOGIN_SUCCESS, (successInfo: LoginSuccessPayload) => {
-        CloudChat.currentUser = new User(successInfo.userId, successInfo.username, successInfo.email, successInfo.avatar, successInfo.token);
-        this.uiContext.getRouter().replaceUrl({ url: Page.CONTACT_LIST_PAGE }).catch((err: Error) => {
+      EventBus.on(Event.LOGIN_SUCCESS, (payload: LoginSuccessPayload) => {
+        CloudChat.currentUser = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
+        this.uiContext.getRouter().replaceUrl({ url: Page.MAIN }).catch((err: Error) => {
           console.error(err.message);
         });
       });

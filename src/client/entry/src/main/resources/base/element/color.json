@@ -89,6 +89,10 @@
       "value": "#F5F7FA"
     },
     {
+      "name": "profileSetting_relativeContainer_background",
+      "value": "#FFFFFFFF"
+    },
+    {
       "name": "list_divider",
       "value": "#606266"
     },
@@ -159,6 +163,26 @@
     {
       "name": "ic_close",
       "value": "#18181A"
+    },
+    {
+      "name": "chatArea_backButton",
+      "value": "#F1F3F5"
+    },
+    {
+      "name": "DetailPanel_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "DetailPanel_border",
+      "value": "#E0E0E0"
+    },
+    {
+      "name": "DetailPanel_deleteBackground",
+      "value": "#FF3B30"
+    },
+    {
+      "name": "DetailPanel_wholeBackground",
+      "value": "#F5F5F5"
     }
   ]
 }

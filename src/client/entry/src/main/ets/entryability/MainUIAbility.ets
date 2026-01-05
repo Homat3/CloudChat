@@ -12,11 +12,15 @@ import { Page } from '../core/tag/Page';
 import { PermissionManager } from '../core/manager/permission-manager/PermissionManager';
 import { EventBus } from '../core/service/event/EventBus';
 import { Event } from '../core/tag/Event';
-import { LoadContactsPayload, LoginByTokenPayload, LoginPayload } from '../core/protocol/http/client.http.protocol';
+import {
+  LoadContactsPayload,
+  LoadMessagesPayload,
+  LoginByTokenPayload, LoginPayload, RegisterPayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
 import { handleLoadMessages } from './server/message-server';
 import { handleRegister } from './server/register-server';
+import { CloudChat } from '../CloudChat';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -31,11 +35,39 @@ export default class MainUIAbility extends UIAbility {
       console.error(error.name + ": " + error.message);
     });   // 权限集申请
 
-    EventBus.on(Event.LOGIN, handleLogin);
-    EventBus.on(Event.LOGIN_BY_TOKEN, handleLoginByToken);
-    EventBus.on(Event.REGISTER,handleRegister);
-    EventBus.on(Event.LOAD_CONTACT_LIST, handleLoadContacts);
-    EventBus.on(Event.LOAD_MESSAGES, handleLoadMessages);
+    EventBus.on(Event.LOGIN, (data: LoginPayload): void => handleLogin(data));
+    EventBus.on(Event.LOGIN_BY_TOKEN, (data: LoginByTokenPayload): void => handleLoginByToken(data));
+    EventBus.on(Event.REGISTER, (data: RegisterPayload): void => handleRegister(data));
+    EventBus.on(Event.LOAD_CONTACT_LIST, (data: LoadContactsPayload): void => handleLoadContacts(data));
+    EventBus.on(Event.LOAD_MESSAGES_START, (data: LoadMessagesPayload): void => {
+      CloudChat.startLoadMessage();
+      handleLoadMessages(data);
+    });
+    EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => handleLoadMessages(data));
+    EventBus.on(Event.LOAD_MESSAGES_END, (data: LoadMessagesPayload): void => {
+      handleLoadMessages(data);
+      CloudChat.endLoadMessage();
+      this.context.eventHub.emit(Event.MESSAGES_LOADED);
+    });
+    EventBus.on(Event.COLOR_MODE, (colorMode: string) => {
+      try {
+        switch (colorMode){
+          case 'dark':
+            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
+            break;
+          case 'light':
+            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
+            break;
+          case 'not_set':
+            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+            break;
+          default :
+            break;
+        }
+      } catch (e){
+        console.error(e);
+      }
+    })
 
     try {
       //颜色跟随系统

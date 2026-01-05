@@ -1,14 +1,16 @@
 import { common } from '@kit.AbilityKit';
 import { Message, TextMessage } from './core/models/message';
 import { Contact, User } from './core/models/models';
-
+import { WebsocketService } from './core/service/network/websocket/server.websocket';
 /**
  * @description CloudChat 全局属性
  */
 export class CloudChat{
   private static _currentUser: User | null = null;
   private static _messageMap: Map<number, Message[]>;
+  private static _messageMapBuilder: Map<number, Message[]> | null = null;
   private static _contactList: Contact[];
+  // private static _allUsers: User[] = [];
 
   public static get currentUser(){
     return CloudChat._currentUser;
@@ -21,10 +23,19 @@ export class CloudChat{
   public static get messageMap(){
     return CloudChat._messageMap;
   }
-
-  public static set messageMap(messageMap: Map<number, Message[]>){
-    CloudChat._messageMap = messageMap;
-  }
+  // /**
+  //  *  获取所有用户列表（用于搜索）
+  //  */
+  // public static get allUsers(): User[] {
+  //   return CloudChat._allUsers;
+  // }
+  //
+  // /**
+  //  *  设置或更新用户池
+  //  */
+  // public static set allUsers(users: User[]) {
+  //   CloudChat._allUsers = users;
+  // }
 
   public static get contacts() {
     return CloudChat._contactList;
@@ -32,5 +43,52 @@ export class CloudChat{
 
   public static set contacts(contacts: Contact[]){
     CloudChat._contactList = contacts;
+  }
+
+  public static startLoadMessage(){
+    if (CloudChat._messageMapBuilder){
+      throw new Error("Not start loading, call endLoadMessage first");
+    }
+    else {
+      CloudChat._messageMapBuilder = new Map();
+    }
+  }
+
+  public static addMessagesOfContact(messages: Message[]){
+    if (CloudChat._messageMapBuilder){
+      if (CloudChat.currentUser){
+        const contactId = messages[0].senderId === CloudChat.currentUser.userId ? messages[0].receiverId : messages[0].senderId;
+        for (const message of messages) {
+          if (message.senderId === contactId || message.receiverId === contactId){
+            const contactMessages = CloudChat._messageMapBuilder.get(contactId);
+            if (contactMessages) {
+              contactMessages.push(message);
+            }
+            else {
+              CloudChat._messageMapBuilder.set(contactId, [message]);
+            }
+          }
+          else {
+            throw new Error("Multiple contact id");
+          }
+        }
+      }
+      else {
+        throw new Error("No user");
+      }
+    }
+    else {
+      throw new Error("Not start loading, call startLoadMessage first");
+    }
+  }
+
+  public static endLoadMessage(){
+    if (CloudChat._messageMapBuilder){
+      CloudChat._messageMap = CloudChat._messageMapBuilder;
+      CloudChat._messageMapBuilder = null;
+    }
+    else {
+      throw new Error("Not start loading, call startLoadMessage first");
+    }
   }
 }

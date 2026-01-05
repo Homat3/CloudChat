@@ -1,14 +1,6 @@
 import { common } from "@kit.AbilityKit";
-import { Contact } from "../../../core/models/models";
-import { Event } from "../../../core/tag/Event";
-import { EventBus } from "../../../core/service/event/EventBus";
+import { Contact } from "../../../../core/models/models";
 
-@Preview
-struct ContactItemPreview{
-    build() {
-        ContactItem()
-    }
-}
 
 @Component
 /**
@@ -22,7 +14,7 @@ export struct ContactItem{
     private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
     @Prop contact: Contact;
-    @Prop selected: boolean = false;
+    @Link selectedContact: Contact | null;
 
     build(){
         Row() {
@@ -54,10 +46,10 @@ export struct ContactItem{
         }
         .width('100%')
         .padding(8)
-        .backgroundColor(this.selected ? $r('app.color.item_selected_bg') : Color.Transparent)
+        .backgroundColor(this.selectedContact === this.contact ? $r('app.color.item_selected_bg') : Color.Transparent)
         .borderRadius(8)
         .onClick(() => {
-            EventBus.emit(Event.CONTACT_CHANGED, this.contact);
+            this.selectedContact = this.contact;
         })
     }
 }

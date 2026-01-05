@@ -211,6 +211,82 @@
     {
       "name": "text_profileList_username",
       "value": "用户名"
+    },
+    {
+      "name": "text_profileSetting_userId",
+      "value": "用户ID"
+    },
+    {
+      "name": "text_chatArea_backButton",
+      "value": "◀"
+    },
+    {
+      "name": "text_DetailPanel_userId",
+      "value": "用户ID"
+    },
+    {
+      "name": "text_DetailPanel_username",
+      "value": "用户名"
+    },
+    {
+      "name": "text_DetailPanel_unknownUser",
+      "value": "未知用户"
+    },
+    {
+      "name": "text_DetailPanel_email",
+      "value": "邮箱"
+    },
+    {
+      "name": "text_DetailPanel_unSet",
+      "value": "未设置"
+    },
+    {
+      "name": "text_DetailPanel_messageNotice",
+      "value": "消息通知"
+    },
+    {
+      "name": "text_DetailPanel_deleteContact",
+      "value": "删除好友"
+    },
+    {
+      "name": "text_DetailPanel_backPage",
+      "value": "◀"
+    },
+    {
+      "name": "text_DetailPanel_PersonalInfo",
+      "value": "个人资料"
+    },
+    {
+      "name": "text_OwnPage_userId",
+      "value": "用户ID"
+    },
+    {
+      "name": "text_OwnPage_username",
+      "value": "用户名"
+    },
+    {
+      "name": "text_OwnPage_Email",
+      "value": "邮箱"
+    },
+    {
+      "name": "text_OwnPage_MessageNotify",
+      "value": "消息通知"
+    },
+    {
+      "name": "text_OwnPage_colorMode",
+      "value": "主题模式"
+    },
+    {
+      "name": "text_OwnPage_AlongSystem",
+      "value": "伴随系统"
+    },
+    {
+      "name": "text_OwnPage_dark",
+      "value": "深色"
+    },
+    {
+      "name": "text_OwnPage_light",
+      "value": "浅色"
     }
   ]
 }

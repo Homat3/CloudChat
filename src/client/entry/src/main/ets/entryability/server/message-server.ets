@@ -22,7 +22,7 @@ export function handleLoadMessages(data: LoadMessagesPayload) {
   //发送http请求
   httpService.post('/load/contacts', loginRequest, (err: BusinessError, res: http.HttpResponse)=>{
     if(err){
-      EventBus.emit(Event.LOAD_MESSAGES, err.message);
+      EventBus.emit(Event.MESSAGES_LOADED_FAILED, err.message);
       return;
     }
     //解析数据
@@ -34,19 +34,15 @@ export function handleLoadMessages(data: LoadMessagesPayload) {
         switch (resultData.type){
           case HttpServiceMessageType.CONTACTS_LOADED:
             const result = resultData.payload as MessagesLoadedPayload
-            CloudChat.messageMap = resolveMessages(result.messages);
-            EventBus.emit(Event.CONTACT_LIST_LOADED, result);
+            CloudChat.addMessagesOfContact(result.messages);
+            EventBus.emit(Event.MESSAGES_LOADED_FAILED, result);
             break;
           default:
             throw new Error("Unknown error");
         }
       }
     } catch (e) {
-      EventBus.emit(Event.CONTACT_LIST_LOAD_FAILED, e);
+      EventBus.emit(Event.MESSAGES_LOADED_FAILED, e);
     }
   });
-}
-
-function resolveMessages(messages: Message[]): Map<number, Message[]>{
-  return new Map();
 }
