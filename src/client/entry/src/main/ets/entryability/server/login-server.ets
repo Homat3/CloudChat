@@ -27,9 +27,10 @@ import {
 } from '../../core/protocol/websocket/client.websocket.protocol';
 import { Event } from '../../core/tag/Event';
 import { EventBus } from '../../core/service/event/EventBus';
+import { CloudChat } from '../../CloudChat';
 
 export function handleLogin(data: LoginPayload) {
-  const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
+  const httpService = CloudChat.httpServer;
   const loginRequest: HttpClientMessage = {
     type: HttpClientMessageType.LOGIN,
     payload: data
@@ -69,9 +70,8 @@ export function handleLogin(data: LoginPayload) {
 }
 
 function websocketNormalVerify(data: HdlInfoPayload, verifyData: LoginSuccessPayload) {
-  const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
+  const ws = CloudChat.websocketServer;
   try {
-    ws.connect();
     ws.addNewMessageObserver((msg) => {
       //控制台响应
       console.log("Received: " + msg);
@@ -98,7 +98,7 @@ function websocketNormalVerify(data: HdlInfoPayload, verifyData: LoginSuccessPay
 
 //执行令牌登录
 export function handleLoginByToken(data: hLoginByTokenPayload): void {
-  const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
+  const httpService = CloudChat.httpServer;
   const loginRequest: HttpClientMessage = {
     type: HttpClientMessageType.LOGIN_BY_TOKEN,
     payload: data
@@ -136,18 +136,19 @@ export function handleLoginByToken(data: hLoginByTokenPayload): void {
 }
 
 function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPayload) {
-  const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
+  const ws = CloudChat.websocketServer;
   try {
-    ws.connect();
     ws.addNewMessageObserver((msg) => {
       //控制台响应
       console.log("Received: " + msg);
       let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
       //处理登录相应
-      if ((receivedObject.payload as HdlGotPayload).userId === verifyData.userId) {
-        EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
-      } else {
-        EventBus.emit(Event.LOGIN_FAILED, { error: "Multiple Id" } as LoginFailurePayload);
+      if (receivedObject.type === WebsocketServiceMessageType.HDL_GOT) {
+        if ((receivedObject.payload as HdlGotPayload).userId === verifyData.userId) {
+          EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
+        } else {
+          EventBus.emit(Event.LOGIN_FAILED, { error: "Multiple Id" } as LoginFailurePayload);
+        }
       }
     });
 

@@ -12,7 +12,7 @@ import { HttpService } from "../../core/service/network/http/server.http";
 import { http } from "@kit.NetworkKit";
 
 export function handleLoadMessages(data: LoadMessagesPayload) {
-  const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
+  const httpService = CloudChat.httpServer;
   const loginRequest: HttpClientMessage ={
     type : HttpClientMessageType.LOAD_MESSAGES,
     payload : data

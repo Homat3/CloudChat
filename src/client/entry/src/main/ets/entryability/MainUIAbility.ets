@@ -13,14 +13,25 @@ import { PermissionManager } from '../core/manager/permission-manager/Permission
 import { EventBus } from '../core/service/event/EventBus';
 import { Event } from '../core/tag/Event';
 import {
+  AcceptFriendRequestPayload,
+  AddFriendRequestPayload,
   LoadContactsPayload,
   LoadMessagesPayload,
-  LoginByTokenPayload, LoginPayload, RegisterPayload } from '../core/protocol/http/client.http.protocol';
+  LoginByTokenPayload, LoginPayload,
+  RefuseFriendRequestPayload,
+  RegisterPayload,
+  SearchForUserByIdPayload,
+  SearchForUserByUserNamePayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
 import { handleLoadMessages } from './server/message-server';
 import { handleRegister } from './server/register-server';
 import { CloudChat } from '../CloudChat';
+import {
+  handleAcceptRequest,
+  handlePostFriendRequest,
+  handleRefuseRequest,
+  handleSearchForUsersById, handleSearchForUsersByName } from './server/friend_request-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -35,16 +46,23 @@ export default class MainUIAbility extends UIAbility {
       console.error(error.name + ": " + error.message);
     });   // 权限集申请
 
+    CloudChat.websocketServer.connect();  // 建立长连接
+
     EventBus.on(Event.LOGIN, (data: LoginPayload): void => handleLogin(data));
     EventBus.on(Event.LOGIN_BY_TOKEN, (data: LoginByTokenPayload): void => handleLoginByToken(data));
     EventBus.on(Event.REGISTER, (data: RegisterPayload): void => handleRegister(data));
+
     EventBus.on(Event.LOAD_CONTACT_LIST, (data: LoadContactsPayload): void => handleLoadContacts(data));
-    EventBus.on(Event.LOAD_MESSAGES_START, (count: number): void => {
-      CloudChat.startLoadMessage(count);
-    });
-    EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => {
-      handleLoadMessages(data);
-    });
+    EventBus.on(Event.LOAD_MESSAGES_START, (count: number): void => CloudChat.startLoadMessage(count));
+    EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => handleLoadMessages(data));
+
+    EventBus.on(Event.SEARCH_FOR_USERS_BY_NAME, (data: SearchForUserByUserNamePayload): void => handleSearchForUsersByName(data));
+    EventBus.on(Event.SEARCH_FOR_USERS_BY_ID, (data: SearchForUserByIdPayload): void => handleSearchForUsersById(data));
+
+    EventBus.on(Event.ACCEPT_REQUEST, (data: AcceptFriendRequestPayload): void => handleAcceptRequest(data));
+    EventBus.on(Event.REFUSE_REQUEST, (data: RefuseFriendRequestPayload): void => handleRefuseRequest(data));
+    EventBus.on(Event.ADD_FRIEND_REQUEST, (data: AddFriendRequestPayload): void => handlePostFriendRequest(data));
+
     EventBus.on(Event.COLOR_MODE, (colorMode: string) => {
       try {
         switch (colorMode){
@@ -105,5 +123,9 @@ export default class MainUIAbility extends UIAbility {
   onBackground(): void {
     //回到应用后台
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+  }
+
+  onDestroy(): void | Promise<void> {
+    CloudChat.websocketServer.disconnect();
   }
 }

@@ -24,10 +24,10 @@ import {
   RegisterSuccessPayload as wRegisterSuccessPayload,
   WebsocketServiceMessage,
   WebsocketServiceMessageType } from "../../core/protocol/websocket/service.websocket.protocol";
+import { CloudChat } from "../../CloudChat";
 
 export function handleRegister(data: hRegisterPayload){
-  const uri = 'cloudchat.infinomat.com';
-  const httpService  = new HttpService(uri,"14514",false);
+  const httpService = CloudChat.httpServer;
   const registerRequest: HttpClientMessage = {
     type : HttpClientMessageType.REGISTER,
     payload : data
@@ -66,9 +66,8 @@ export function handleRegister(data: hRegisterPayload){
 
 
 function WebSocketVerify (data: HdlInfoPayload, verifyData: hRegisterSuccessPayload){
-  const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
+  const ws = CloudChat.websocketServer;
   try{
-    ws.connect();
     ws.addNewMessageObserver((msg)=>{
       //控制台响应
       console.log("Received: "+ msg);
