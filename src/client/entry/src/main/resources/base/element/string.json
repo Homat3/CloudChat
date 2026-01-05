@@ -161,8 +161,8 @@
       "value": "两次密码不一致"
     },
     {
-      "name": "text_contactList_ContactListPageLoaded",
-      "value": "ContactList 页面加载成功"
+      "name": "text_mainContainer_Loaded",
+      "value": "Welcome back"
     },
     {
       "name": "text_contactList_chatArea_Send",
@@ -201,7 +201,7 @@
       "value": "没有选择联系人"
     },
     {
-      "name": "error_contactList_ContactListLoadFailed",
+      "name": "error_mainContainer_LoadFailed",
       "value": "联系人列表加载失败"
     },
     {

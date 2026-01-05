@@ -18,29 +18,31 @@ export struct MessageItem{
 
   build() {
     Column() {
-      Row() {
-        Column() {
-          Text(this.message.content)
-            .padding(12)
-            .backgroundColor(
-              this.isCurrentUser
-                ? $r('app.color.my_message_bg')
-                : $r('app.color.other_message_bg')
-            )
-            .borderRadius(12)
-            .fontColor(
-              this.isCurrentUser
-                ? $r('app.color.my_message_text')
-                : $r('app.color.other_message_text')
-            )
-          Text(this.message.timestamp)
-        }
+      Row(){
+        Text(this.message.content)
+          .padding(12)
+          .backgroundColor(
+            this.isCurrentUser
+              ? $r('app.color.my_message_bg')
+              : $r('app.color.other_message_bg')
+          )
+          .borderRadius(12)
+          .fontColor(
+            this.isCurrentUser
+              ? $r('app.color.my_message_text')
+              : $r('app.color.other_message_text')
+          )
       }
       .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
-      .width('80%')
-
+      .width('100%')
+      Row() {
+        Text(this.message.timestamp)
+      }
+      .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
+      .width('100%')
     }
-    .margin({ top: 8, bottom: 8 })
+    .justifyContent(FlexAlign.Center)
     .width('100%')
+    .margin({ left:10, top: 8 })
   }
 }

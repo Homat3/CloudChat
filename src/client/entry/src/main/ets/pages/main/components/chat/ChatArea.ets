@@ -5,6 +5,8 @@ import { Message, TextMessage } from "../../../../core/models/message";
 import { Event } from "../../../../core/tag/Event";
 import { EventBus } from "../../../../core/service/event/EventBus";
 import { Home } from "../home/Home";
+import { getAvatar } from "../../../../core/util";
+import { MessageItem } from "./MessageItem";
 
 /**
  * 预览界面
@@ -207,18 +209,23 @@ export struct ChatArea{
         //返回键
         Button($r('app.media.backIcon'))
           .backgroundColor($r('app.color.chatArea_backButton'))
-          .fontColor($r('app.color.primary_text'))
-          .type(ButtonType.Normal)
+          .type(ButtonType.Circle)
           .height(40)
           .width(40)
           .padding(0)
           .margin({ right: 4 })
           .onClick(()=>{
-            this.uiContext.getRouter().back();
+            EventBus.emit(Event.CLOSE_CHAT_AREA);
           })
 
+        Image(getAvatar(this.selectedContact.avatar))
+          .width(48)
+          .height(48)
+          .margin(8)
+          .borderRadius(24)
+
         //用户名
-        Text(this.currentUser.username)
+        Text(this.selectedContact.username)
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.primary_text'))
@@ -251,7 +258,21 @@ export struct ChatArea{
 
   @Builder
   buildMessageList() {
-
+    //消息列表
+    List({ space: 10, initialIndex: this.messages.length - 1 }) {
+      ForEach(this.messages, (message: Message) => {
+        ListItem() {
+          MessageItem({
+            message: message,
+            isCurrentUser: this.currentUser.userId === this.selectedContact.contactId
+          })
+        }
+      }, (message: Message) => message.id.toString())
+    }
+    .height('100%')
+    .width('100%')
+    .layoutWeight(1)
+    .scrollBar(BarState.Auto)
   }
 
   @Builder

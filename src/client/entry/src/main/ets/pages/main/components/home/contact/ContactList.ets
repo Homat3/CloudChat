@@ -44,7 +44,7 @@ export struct ContactList {
         })
 
       //联系人列表
-      List({ space: 20, initialIndex: 0 }) {
+      List({ space: 15, initialIndex: 0 }) {
         ForEach(this.filterContacts(this.searchKeyword), (contact: Contact) => {
           ListItem() {
             ContactItem({

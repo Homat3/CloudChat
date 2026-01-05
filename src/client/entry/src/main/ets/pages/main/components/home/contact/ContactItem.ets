@@ -1,5 +1,6 @@
 import { common } from "@kit.AbilityKit";
 import { Contact } from "../../../../../core/models/models";
+import { getAvatar } from "../../../../../core/util";
 
 
 @Component
@@ -18,7 +19,7 @@ export struct ContactItem{
 
     build(){
         Row() {
-            Image(this.contact?.avatar ? this.contact.avatar : $r('app.media.default'))
+            Image(getAvatar(this.contact.avatar))
                 .width(48)
                 .height(48)
                 .margin(8)
@@ -35,6 +36,7 @@ export struct ContactItem{
             }
             .layoutWeight(1)
             .margin({ right: 8})
+            .alignItems(HorizontalAlign.Start)
 
             // if(this.contact.unreadCount > 0) {
             //     Badge({
