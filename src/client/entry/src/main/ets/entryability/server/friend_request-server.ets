@@ -2,6 +2,7 @@ import {
   AddFriendRequestPayload,
   HttpClientMessage,
   HttpClientMessageType,
+  LoadFriendRequestPayload,
   RefuseFriendRequestPayload,
   SearchForUserByIdPayload,
   SearchForUserByUserNamePayload } from "../../core/protocol/http/client.http.protocol";
@@ -14,11 +15,50 @@ import {
   FriendRequestAcceptedPayload,
   FriendRequestAddedFailedPayload,
   FriendRequestAddedPayload,
+  FriendRequestLoadedFailedPayload,
+  FriendRequestLoadedPayload,
   FriendRequestRefusedFailedPayload,
   FriendRequestRefusedPayload,
   HttpServiceMessage, HttpServiceMessageType } from "../../core/protocol/http/service.http.protocol";
 import { AcceptFriendRequestPayload } from "../../core/protocol/http/client.http.protocol";
 import { CloudChat } from "../../CloudChat";
+
+export function handleLoadFriendRequest(data: LoadFriendRequestPayload){
+  const refuseRequest: HttpClientMessage = {
+    type: HttpClientMessageType.LOAD_FRIEND_REQUEST,
+    payload: data
+  };
+  const httpService = CloudChat.httpServer;
+  console.log('Send Request:', refuseRequest);
+  //发送http请求
+  httpService.post('/friend/request/load', refuseRequest, (err: BusinessError, res: http.HttpResponse) => {
+    if (err) {
+      EventBus.emit(Event.FRIEND_REQUEST_LOADED_FAILED, err.message);
+      return;
+    }
+    //解析数据
+    try {
+      const resultData = res.result as HttpServiceMessage;
+
+      if (res.responseCode === 200){
+        switch (resultData.type){
+          case HttpServiceMessageType.FRIEND_REQUEST_LOADED:
+            EventBus.emit(Event.FRIEND_REQUEST_LOADED, resultData.payload as FriendRequestLoadedPayload);
+            break;
+          case HttpServiceMessageType.FRIEND_REQUEST_LOADED_FAILED:
+            EventBus.emit(Event.FRIEND_REQUEST_LOADED_FAILED, (resultData.payload as FriendRequestLoadedFailedPayload).error);
+            break;
+          default :
+            throw new Error("Unknown error");
+        }
+      } else {
+        EventBus.emit(Event.FRIEND_REQUEST_LOADED_FAILED, "Http error code: " + res.responseCode);
+      }
+    } catch (e) {
+      EventBus.emit(Event.FRIEND_REQUEST_LOADED_FAILED, e);
+    }
+  });
+}
 
 export function handleSearchForUsersByName(data: SearchForUserByUserNamePayload) {
   const searchRequest: HttpClientMessage = {

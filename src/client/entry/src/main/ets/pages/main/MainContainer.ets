@@ -143,7 +143,9 @@ struct MainContainer {
         }.tabBar('主页');
 
         TabContent() {
-          ContactRequest()
+          ContactRequest({
+            currentUser: this.currentUser
+          })
         }.tabBar('添加联系人');
 
         TabContent() {

@@ -16,6 +16,7 @@ import {
   AcceptFriendRequestPayload,
   AddFriendRequestPayload,
   LoadContactsPayload,
+  LoadFriendRequestPayload,
   LoadMessagesPayload,
   LoginByTokenPayload, LoginPayload,
   RefuseFriendRequestPayload,
@@ -29,6 +30,7 @@ import { handleRegister } from './server/register-server';
 import { CloudChat } from '../CloudChat';
 import {
   handleAcceptRequest,
+  handleLoadFriendRequest,
   handlePostFriendRequest,
   handleRefuseRequest,
   handleSearchForUsersById, handleSearchForUsersByName } from './server/friend_request-server';
@@ -59,6 +61,7 @@ export default class MainUIAbility extends UIAbility {
     EventBus.on(Event.SEARCH_FOR_USERS_BY_NAME, (data: SearchForUserByUserNamePayload): void => handleSearchForUsersByName(data));
     EventBus.on(Event.SEARCH_FOR_USERS_BY_ID, (data: SearchForUserByIdPayload): void => handleSearchForUsersById(data));
 
+    EventBus.on(Event.LOAD_FRIEND_REQUEST, (data: LoadFriendRequestPayload): void => handleLoadFriendRequest(data));
     EventBus.on(Event.ACCEPT_REQUEST, (data: AcceptFriendRequestPayload): void => handleAcceptRequest(data));
     EventBus.on(Event.REFUSE_REQUEST, (data: RefuseFriendRequestPayload): void => handleRefuseRequest(data));
     EventBus.on(Event.ADD_FRIEND_REQUEST, (data: AddFriendRequestPayload): void => handlePostFriendRequest(data));

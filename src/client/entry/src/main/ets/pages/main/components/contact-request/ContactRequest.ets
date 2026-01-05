@@ -6,12 +6,15 @@ import { Event } from '../../../../core/tag/Event';
 import {
   AcceptFriendRequestPayload,
   AddFriendRequestPayload,
+  LoadFriendRequestPayload,
   RefuseFriendRequestPayload,
   SearchForUserByIdPayload,
   SearchForUserByUserNamePayload } from '../../../../core/protocol/http/client.http.protocol';
 import {
   FriendRequestAcceptedPayload,
   FriendRequestAddedPayload,
+  FriendRequestLoadedFailedPayload,
+  FriendRequestLoadedPayload,
   FriendRequestRefusedPayload,
   SearchForUserResultPayload } from '../../../../core/protocol/http/service.http.protocol';
 import { getAvatar } from '../../../../core/util';
@@ -34,8 +37,9 @@ export struct ContactRequest {
   @State sentRequests: FriendRequest[] = [];
   @State receivedRequests: FriendRequest[] = [];
   @State isSearchByName: boolean = false;
-
   @State activeTab: number = 0; // 当前激活的标签页
+
+  @Prop currentUser: User | null;
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
@@ -51,8 +55,46 @@ export struct ContactRequest {
   }
 
   aboutToAppear(): void {
+    EventBus.on(Event.FRIEND_REQUEST_LOADED, (payload: FriendRequestLoadedPayload) => {
+      for (const friendRequest of payload.requests){
+        const newFriendRequest = new FriendRequest(
+          friendRequest.id,
+          friendRequest.requesterId, friendRequest.targetId,
+          friendRequest.requesterUsername, friendRequest.targetUsername,
+          friendRequest.requesterAvatar, friendRequest.targetAvatar,
+          friendRequest.status
+        );
+        if (friendRequest.requesterId === this.currentUser?.userId){
+          this.sentRequests.push(newFriendRequest);
+        }
+        else if (friendRequest.targetId === this.currentUser?.userId){
+          this.receivedRequests.push(newFriendRequest);
+        }
+        else {
+          try {
+            this.uiContext.getPromptAction().showToast({
+              message: "一个加载失败的好友请求：{" + newFriendRequest.requesterId + " -> " + newFriendRequest.targetId + '}',
+              duration: 2000
+            });
+          } catch (error) {
+            console.error(error)
+          }
+        }
+      }
+    })
+    EventBus.on(Event.FRIEND_REQUEST_LOADED_FAILED, (payload: FriendRequestLoadedFailedPayload) => {
+      try {
+        this.uiContext.getPromptAction().showToast({
+          message: "好友请求列表加载失败" + payload.error,
+          duration: 2000
+        });
+      } catch (error) {
+        console.error(error)
+      }
+    })
+
     EventBus.on(Event.SEARCH_FOR_USERS_RESULT, (payload: SearchForUserResultPayload) => {
-      this.searchedContacts = payload.users.filter((contact: Contact) => !(contact.contactId === CloudChat.currentUser?.userId));
+      this.searchedContacts = payload.users.filter((contact: Contact) => !(contact.contactId === this.currentUser?.userId));
     })
     EventBus.on(Event.SEARCH_FOR_USERS_FAILED, (err: string) => {
       try {
@@ -141,6 +183,15 @@ export struct ContactRequest {
         }
       }
     })
+
+    this.loadFriendRequest();
+  }
+
+  private loadFriendRequest(){
+    this.isLoading = true;
+    if (this.currentUser){
+      EventBus.emit(Event.LOAD_FRIEND_REQUEST, { userId: this.currentUser?.userId } as LoadFriendRequestPayload);
+    }
   }
 
   build() {
@@ -322,14 +373,14 @@ export struct ContactRequest {
               .backgroundColor($r('app.color.primary'))
               .borderRadius(18)
               .onClick(() => {
-                if (CloudChat.currentUser){
+                if (this.currentUser){
                   EventBus.emit(Event.ADD_FRIEND_REQUEST, {
                     id: 0,
-                    requesterId: CloudChat.currentUser.userId,
+                    requesterId: this.currentUser.userId,
                     targetId: user.contactId,
-                    requesterUsername: CloudChat.currentUser.username,
+                    requesterUsername: this.currentUser.username,
                     targetUsername: user.username,
-                    requesterAvatar: CloudChat.currentUser.avatar,
+                    requesterAvatar: this.currentUser.avatar,
                     targetAvatar: user.avatar,
                     status: 'pending'
                   } as AddFriendRequestPayload)
@@ -436,7 +487,7 @@ export struct ContactRequest {
     Column() {
       Row() {
         // 头像
-        Image(request.requesterUsername)
+        Image(getAvatar(request.requesterUsername))
           .width(48)
           .height(48)
           .borderRadius(24)
