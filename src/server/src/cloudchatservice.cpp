@@ -3,6 +3,7 @@
 #include "cloudchatmsg.h"
 #include "cloudchatsys.h"
 #include "cloudchatuser.h"
+#include <websocketpp/common/connection_hdl.hpp>
 
 std::map<websocketpp::connection_hdl, int,
 	std::owner_less<websocketpp::connection_hdl>> g_online_users;
@@ -489,4 +490,18 @@ void GetHdlInfo(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, HdlInf
 	g_online_users[hdl] = user_id; // 保存 hdl 信息
 
 	SendMsgToClient(cloudchat_srv, hdl, new HdlGotMsg(user_id)); // 回复客户端
+}
+
+std::string DeleteContact(server_t cloudchat_srv, websocketpp::connection_hdl hdl,
+						  DeleteContactMsg* delete_contact_msg) {
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+
+	int user_id = delete_contact_msg->get_user_id();
+	int target_id = delete_contact_msg->get_target_id();
+
+	std::cout << "删除联系人：" << std::endl;
+	std::cout << "userId: " << user_id << std::endl;
+	std::cout << "targetId: " << target_id << std::endl;
+
+	
 }

@@ -247,6 +247,8 @@ private:
 public:
 	DeleteContactMsg(int requester_user_id, int target_uesr_id);
 	static DeleteContactMsg* parse_from_JSON(std::string JSON, int payload_pos);
+	int get_user_id();
+	int get_target_id();
 };
 
 class SendMessageMsg : public ClientMsg { // 发送聊天消息消息

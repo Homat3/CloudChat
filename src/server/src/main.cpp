@@ -184,6 +184,8 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 		LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
 	} else if (type == HDL_INFO) {
 		GetHdlInfo(g_cloudchat_srv, hdl, (HdlInfoMsg*)client_msg);
+	} else if (type == DELETE_CONTACT) {
+		DeleteContact(g_cloudchat_srv, hdl, (DeleteContactMsg*)client_msg);
 	}
 }
 
@@ -255,6 +257,8 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 		response_body = SearchForUserByName(g_cloudchat_srv, hdl, (SearchForUserByNameMsg*)client_msg);
 	} else if (type == LOAD_FRIEND_REQUEST) {
 		response_body = LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
+	} else if (type == DELETE_CONTACT) {
+		response_body = DeleteContact(g_cloudchat_srv, hdl, (DeleteContactMsg*)client_msg);
 	}
 
 	con->set_status(websocketpp::http::status_code::ok);

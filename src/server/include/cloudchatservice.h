@@ -1,6 +1,7 @@
 #ifndef CLOUDCHAT_SERVICE
 #define CLOUDCHAT_SERVICE
 
+#include <websocketpp/common/connection_hdl.hpp>
 #define DEFAULT_AVATAR_URL "default.png"	// 默认用户头像 URL
 
 #include "cloudchatdat.h"
@@ -48,5 +49,7 @@ std::string UploadFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 */
 void        GetHdlInfo(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					   HdlInfoMsg* hdl_info_msg);
+std::string DeleteContact(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+						  DeleteContactMsg* delete_contact_msg);
 
 #endif // CLOUDCHAT_SERVICE
