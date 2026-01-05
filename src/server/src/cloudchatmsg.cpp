@@ -202,7 +202,7 @@ std::string LoginSuccessMsg::to_JSON() {
 			"{\"type\":\"%s\",\"payload\":{\"userId\":%d,\"username\":\"%s\",\"email\":\"%s\",\"avatar\":\"%s\",\"token\":\"%s\"}}",
 			to_JSON_string(type_).c_str(), user_id_, to_JSON_string(username_).c_str(),
 			to_JSON_string(email_).c_str(), to_JSON_string(avatar_).c_str(),
-			token_.c_str());
+			to_JSON_string(token_).c_str());
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
