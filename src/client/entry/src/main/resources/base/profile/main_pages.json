@@ -1,7 +1,6 @@
 {
   "src": [
     "pages/main/MainContainer",
-    "pages/main/components/profile-setting/ProfileSetting",
     "pages/login/LoginPage",
     "pages/register/RegisterPage"
   ]
