@@ -6,26 +6,32 @@ export interface HttpServiceMessage {
 export enum HttpServiceMessageType {
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGIN_FAILURE = 'LOGIN_FAILURE',
+
   REGISTER_SUCCESS = 'REGISTER_SUCCESS',
   REGISTER_FAILURE = 'REGISTER_FAILURE',
+
   PROFILE_UPDATED_SUCCESS = 'PROFILE_UPDATED_SUCCESS',
   PROFILE_UPDATED_FAILED = 'PROFILE_UPDATED_FAILED',
+
   CONTACT_ADDED = 'CONTACT_ADDED',
   CONTACTS_LOADED = 'CONTACTS_LOADED',
   CONTACTS_LOADED_FAILED = 'CONTACTS_LOADED_FAILED',
+
   SEARCH_FOR_USER_RESULT = 'SEARCH_FOR_USER_RESULT',
+
   FRIEND_REQUEST_LOADED = 'FRIEND_REQUEST_LOADED',
   FRIEND_REQUEST_LOADED_FAILED = 'FRIEND_REQUEST_LOADED_FAILED',
+
   FRIEND_REQUEST_ADDED = 'FRIEND_REQUEST_ADDED',
   FRIEND_REQUEST_ADDED_FAILED = 'FRIEND_REQUEST_ADDED_FAILED',
-  ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST',
+
   FRIEND_REQUEST_REFUSED = 'FRIEND_REQUEST_REFUSED',
   FRIEND_REQUEST_ACCEPTED = 'FRIEND_REQUEST_ACCEPTED',
   FRIEND_REQUEST_REFUSED_FAILED = 'FRIEND_REQUEST_REFUSED_FAILED',
   FRIEND_REQUEST_ACCEPTED_FAILED = 'FRIEND_REQUEST_ACCEPTED_FAILED',
-  REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
-  ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
+
   MESSAGES_LOADED = 'MESSAGES_LOADED',
+
   FILE_UPLOADED = 'FILE_UPLOADED',
   FILE_UPLOADED_FAILED = 'FILE_UPLOADED_FAILED'
 }
@@ -33,26 +39,32 @@ export enum HttpServiceMessageType {
 export type ServicePayload =
   LoginSuccessPayload |
   LoginFailurePayload |
+
   RegisterSuccessPayload |
   RegisterFailurePayload |
+
   ProfileUpdatedSuccessPayload |
   ProfileUpdatedFailedPayload |
+
   ContactAddedPayload |
   ContactsLoadedPayload |
   ContactsLoadedFailedPayload |
+
+  SearchForUserResultPayload |
+
   FriendRequestLoadedPayload |
   FriendRequestLoadedFailedPayload |
+
   FriendRequestAddedPayload |
   FriendRequestAddedFailedPayload |
-  AddFriendRequestPayload |
+
   FriendRequestRefusedPayload |
   FriendRequestAcceptedPayload |
   FriendRequestRefusedFailedPayload |
   FriendRequestAcceptedFailedPayload |
-  RefuseFriendRequestPayload |
-  AcceptFriendRequestPayload |
-  SearchForUserResultPayload |
+
   MessagesLoadedPayload |
+
   FileUploadedPayload|
   FileUploadedFailedPayload;
 
@@ -154,17 +166,6 @@ export interface FriendRequestAddedFailedPayload {
   error: string;
 }
 
-export interface AddFriendRequestPayload {
-  id: number;
-  requesterId: number;
-  targetId: number;
-  requesterUsername: string;
-  targetUsername: string;
-  requesterAvatar: string;
-  targetAvatar: string;
-  status: 'pending' | 'accepted' | 'refused';
-}
-
 export interface FriendRequestRefusedPayload {
   id: number;
 }
@@ -179,14 +180,6 @@ export interface FriendRequestRefusedFailedPayload {
 
 export interface FriendRequestAcceptedFailedPayload {
   error: string;
-}
-
-export interface RefuseFriendRequestPayload {
-  id: number;
-}
-
-export interface AcceptFriendRequestPayload {
-  id: number;
 }
 
 export interface MessagesLoadedPayload {

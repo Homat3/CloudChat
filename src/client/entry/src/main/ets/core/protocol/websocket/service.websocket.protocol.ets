@@ -12,6 +12,9 @@ export enum WebsocketServiceMessageType {
   MESSAGE_RECEIVED_SELF = 'MESSAGE_RECEIVED_SELF',
   MESSAGE_SEND_FAILED = 'MESSAGE_SEND_FAILED',
   MESSAGE_RECEIVED_OTHER = 'MESSAGE_RECEIVED_OTHER',
+  ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST',
+  REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
+  ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST'
 }
 
 export type ServicePayload =
@@ -22,7 +25,10 @@ export type ServicePayload =
   RegisterFailurePayload |
   MessageReceivedSelfPayload |
   MessageSendFailedPayload |
-  MessageReceivedOtherPayload;
+  MessageReceivedOtherPayload |
+  AddFriendRequestPayload |
+  RefuseFriendRequestPayload |
+  AcceptFriendRequestPayload;
 
 export interface LoginSuccessPayload {
   userId: number;
@@ -71,4 +77,23 @@ export interface MessageReceivedOtherPayload {
   timestamp: string;
   status: 'sending' | 'sent' | 'read';
   type: 'text' | 'image' | 'file';
+}
+
+export interface AddFriendRequestPayload {
+  id: number;
+  requesterId: number;
+  targetId: number;
+  requesterUsername: string;
+  targetUsername: string;
+  requesterAvatar: string;
+  targetAvatar: string;
+  status: 'pending' | 'accepted' | 'refused';
+}
+
+export interface RefuseFriendRequestPayload {
+  id: number;
+}
+
+export interface AcceptFriendRequestPayload {
+  id: number;
 }
