@@ -1,6 +1,7 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatservice.h"
+#include <websocketpp/http/constants.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
@@ -144,7 +145,7 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 	std::string type = client_msg->get_type();
 	
 	time_t now = time(0);
-	std::cout << ctime(&now);
+	std::cout << "\n" << ctime(&now) << JSON_msg << std::endl;
 
 	if (type == LOGIN) {
 		Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
@@ -233,7 +234,7 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 	std::string response_body;
 	
 	time_t now = time(0);
-	std::cout << ctime(&now);
+	std::cout << "\n" << ctime(&now) << JSON_msg << std::endl;
 
 	if (type == LOGIN) {
 		response_body = Login(g_cloudchat_srv, hdl, (LoginMsg*)client_msg);
@@ -259,9 +260,14 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 		response_body = LoadFriendRequest(g_cloudchat_srv, hdl, (LoadFriendRequestMsg*)client_msg);
 	} else if (type == DELETE_CONTACT) {
 		response_body = DeleteContact(g_cloudchat_srv, hdl, (DeleteContactMsg*)client_msg);
+	} else if (type == ILLEGAL_MSG) {
+		response_body = "Illegal message received.";
 	}
 
-	con->set_status(websocketpp::http::status_code::ok);
+	if (type != ILLEGAL_MSG) con->set_status(websocketpp::http::status_code::ok);
+	else con->set_status(websocketpp::http::status_code::bad_request);
 	con->set_body(response_body);
 	con->append_header("Content-Type", "application/json");
+
+	std::cout << "HTTP response body: " << response_body << std::endl;
 }
