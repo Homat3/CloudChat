@@ -4,7 +4,7 @@ import { common } from '@kit.AbilityKit';
 import { CloudChat } from '../../../../CloudChat';
 import { EventBus } from '../../../../core/service/event/EventBus';
 import { Event } from '../../../../core/tag/Event';
-import { ContactList } from './ContactList';
+import { ContactList } from './contact/ContactList';
 import { LoadContactsPayload, LoadMessagesPayload } from '../../../../core/protocol/http/client.http.protocol';
 import { ContactsLoadedFailedPayload } from '../../../../core/protocol/http/service.http.protocol';
 

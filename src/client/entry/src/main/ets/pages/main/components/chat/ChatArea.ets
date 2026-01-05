@@ -1,10 +1,10 @@
 
 import { common } from "@kit.AbilityKit";
-import { Contact, User } from "../../../core/models/models";
-import { Message, TextMessage } from "../../../core/models/message";
-import { Event } from "../../../core/tag/Event";
-import { EventBus } from "../../../core/service/event/EventBus";
-import { Home } from "./home/Home";
+import { Contact, User } from "../../../../core/models/models";
+import { Message, TextMessage } from "../../../../core/models/message";
+import { Event } from "../../../../core/tag/Event";
+import { EventBus } from "../../../../core/service/event/EventBus";
+import { Home } from "../home/Home";
 
 /**
  * 预览界面

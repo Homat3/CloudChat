@@ -1,7 +1,7 @@
 import { ContactItem } from "./ContactItem";
 import { common } from "@kit.AbilityKit";
-import { Contact } from "../../../../core/models/models";
-import { Message } from "../../../../core/models/message";
+import { Contact } from "../../../../../core/models/models";
+import { Message } from "../../../../../core/models/message";
 
 @Component
 /**

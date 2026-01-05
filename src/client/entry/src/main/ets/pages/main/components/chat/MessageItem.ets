@@ -1,6 +1,6 @@
 import { common } from "@kit.AbilityKit";
-import { Message } from "../../../core/models/message";
-import { Contact } from "../../../core/models/models";
+import { Message } from "../../../../core/models/message";
+import { Contact } from "../../../../core/models/models";
 
 @Component
   /**
