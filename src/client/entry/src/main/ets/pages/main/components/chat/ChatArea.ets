@@ -27,6 +27,8 @@ struct ChatAreaInstance{
     type: "text"
   }
 
+  @State messages: Message[] = [];
+
   //@State messages: Message[] | null = null;
   @State newMessage: string = '';
   @State showEmojiPicker: boolean = false;
@@ -65,20 +67,23 @@ struct ChatAreaInstance{
     Row() {
       Row(){
         //返回键
-        Button($r('app.string.text_chatArea_backButton'))
-          .backgroundColor($r('app.color.chatArea_backButton'))
-          .fontColor($r('app.color.primary_text'))
-          .type(ButtonType.Normal)
-          .height(40)
-          .width(40)
+        Image($r('app.media.backicon'))
+          .height(24)
+          .width(24)
           .padding(0)
-          .margin({ right: 4 })
+          .margin({ right: 0 })
           .onClick(()=>{
-              this.uiContext.getRouter().back();
+            EventBus.emit(Event.CLOSE_CHAT_AREA);
           })
 
+        Image($r('app.media.Zombatar_1'))
+          .width(48)
+          .height(48)
+          .margin(8)
+          .borderRadius(24)
+
         //用户名
-        Text(this.currentUser.username)
+        Text(this.selectedContact.username)
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.primary_text'))
@@ -87,15 +92,17 @@ struct ChatAreaInstance{
       .height('100%')
 
       //详情栏
+      Row(){
         Image($r('app.media.startIcon'))
           .width(24)
           .height(24)
+      }
       .backgroundColor(Color.Transparent)
       .width(40)
       .height(40)
       .padding(0)
       .onClick(()=>{
-        this.uiContext.getRouter().replaceUrl({url:'../components/DetailPanel'})
+        //跳转到详情页
       })
     }
     .width('100%')
@@ -109,7 +116,21 @@ struct ChatAreaInstance{
 
   @Builder
   buildMessageList() {
-
+    //消息列表
+    List({ space: 10, initialIndex: this.messages.length - 1 }) {
+      ForEach(this.messages, (message: Message) => {
+        ListItem() {
+          MessageItem({
+            message: message,
+            isCurrentUser: this.currentUser.userId === this.selectedContact.contactId
+          })
+        }
+      }, (message: Message) => message.id.toString())
+    }
+    .height('100%')
+    .width('100%')
+    .layoutWeight(1)
+    .scrollBar(BarState.Auto)
   }
 
   @Builder
@@ -136,7 +157,7 @@ struct ChatAreaInstance{
       .borderRadius(10)
       .height(40)
 
-//发送按钮
+      //发送按钮
       Button($r("app.string.text_contactList_chatArea_Send"))
         .width(70)
         .height(32)
@@ -207,13 +228,11 @@ export struct ChatArea{
     Row() {
       Row(){
         //返回键
-        Button($r('app.media.backIcon'))
-          .backgroundColor($r('app.color.chatArea_backButton'))
-          .type(ButtonType.Circle)
-          .height(40)
-          .width(40)
+        Image($r('app.media.backicon'))
+          .height(24)
+          .width(24)
           .padding(0)
-          .margin({ right: 4 })
+          .margin({ right: 0 })
           .onClick(()=>{
             EventBus.emit(Event.CLOSE_CHAT_AREA);
           })
