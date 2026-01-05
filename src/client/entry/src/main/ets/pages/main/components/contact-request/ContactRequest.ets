@@ -19,367 +19,355 @@ export struct ContactRequest {
 
   build() {
     Column() {
+      // 搜索区域
+      this.SearchSection()
+
+      Scroll() {
+        Column() {
+          if (this.searchKeyword.length > 0 && this.searchedUser) {
+            this.SectionTitle('搜索结果')
+            this.SearchUserCard(this.searchedUser)
+          } else if (this.searchKeyword.length > 0 && !this.searchedUser) {
+            this.EmptyState('没有找到相关用户', '请检查ID是否正确')
+          } else {
+            // 标签页切换
+            this.TabSection()
+
+            // 内容区域
+            if (this.activeTab === 0) {
+              if (this.sentRequests.length > 0) {
+                ForEach(this.sentRequests, (user: User) => {
+                  this.SentRequestCard(user)
+                }, (item: User) => item.userId.toString())
+              } else {
+                this.EmptyState('暂无已发送的请求', '搜索并添加好友吧')
+              }
+            } else {
+              if (this.receivedRequests.length > 0) {
+                ForEach(this.receivedRequests, (user: User) => {
+                  this.ReceivedRequestCard(user)
+                }, (item: User) => item.userId.toString())
+              } else {
+                this.EmptyState('暂无收到的好友请求', '好友请求会在这里显示')
+              }
+            }
+          }
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start)
+        .padding({ top: 8 })
+      }
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+      .width('100%')
+    }
+    .padding({ top: 12, left: 16, right: 16, bottom: 16 })
+    .backgroundColor($r('app.color.input_background'))
+    .height('100%')
+  }
+
+  @Builder SearchSection() {
+    Row() {
       Search({
         value: this.searchKeyword,
-        placeholder: '请输入用户id...'
+        placeholder: '输入用户ID搜索...'
       })
-        .searchButton('search')
+        .searchButton('搜索')
+        .placeholderFont({ size: 14 })
+        .height(42)
         .width('100%')
-        .height(40)
-        .margin({ bottom: 20 })
+        .backgroundColor(Color.White)
+        .borderRadius(21)
+        .padding({ left: 16, right: 16 })
         .onChange((value: string) => {
           this.searchKeyword = value;
-          if(value.length > 0) {
+          if (value.length > 0) {
             let searchId = Number.parseInt(value);
-            if(!isNaN(searchId)) {
-              // TODO
+            if (!isNaN(searchId)) {
+              // TODO: 实际搜索逻辑
               // this.searchedUser = {
               //   userId: searchId,
-              //   username: `${searchId}`,
-              //   email: `${searchId}`,
-              //   avatar: `${searchId}`,
+              //   username: `用户${searchId}`,
+              //   email: `user${searchId}@example.com`,
+              //   avatar: 'https://via.placeholder.com/45'
               // };
             }
           } else {
             this.searchedUser = null;
           }
         })
-
-      Scroll() {
-        Column() {
-          if(this.searchKeyword.length > 0) {
-            this.SectionTitle('搜索结果')
-            if(this.searchedUser) {
-              this.SearchUserCard(this.searchedUser)
-            }
-          } else {
-            this.SectionTitle('已发送的请求')
-            ForEach(this.sentRequests, (user: User) => {
-              this.SentRequestCard(user)
-            }, (item: User) => item.userId.toString())
-
-            this.SectionTitle('收到的好友请求')
-            ForEach(this.receivedRequests, (user: User) => {
-              this.ReceivedRequestCard(user)
-            }, (item: User) => item.userId.toString())
-          }
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-      }
-      .layoutWeight(1)
-      .scrollBar(BarState.Off)
     }
-    .padding(16)
-    .backgroundColor($r('app.color.panel_background'))
-    .height('100%')
+    .width('100%')
+    .padding({ bottom: 20 })
+  }
+
+  @Builder TabSection() {
+    Row({ space: 0 }) {
+      // 已发送标签
+      Column() {
+        Text('已发送的请求')
+          .fontSize(16)
+          .fontWeight(this.activeTab === 0 ? FontWeight.Bold : FontWeight.Normal)
+          .fontColor(this.activeTab === 0 ? $r('app.color.primary') : $r('app.color.secondary_text'))
+          .padding({ bottom: 8 })
+
+        // 激活指示器
+        if (this.activeTab === 0) {
+          Divider()
+            .color($r('app.color.primary'))
+            .height(2)
+            .width(24)
+            .align(Alignment.Bottom)
+        }
+      }
+      .height(48)
+      .layoutWeight(1)
+      .onClick(() => {
+        this.activeTab = 0;
+      })
+
+      // 收到的请求标签
+      Column() {
+        Text('收到的好友请求')
+          .fontSize(16)
+          .fontWeight(this.activeTab === 1 ? FontWeight.Bold : FontWeight.Normal)
+          .fontColor(this.activeTab === 1 ? $r('app.color.primary_text') : $r('app.color.secondary_text'))
+          .padding({ bottom: 8 })
+
+        // 激活指示器
+        if (this.activeTab === 1) {
+          Divider()
+            .color($r('app.color.primary'))
+            .height(2)
+            .width(24)
+            .align(Alignment.Bottom)
+        }
+      }
+      .height(48)
+      .layoutWeight(1)
+      .onClick(() => {
+        this.activeTab = 1;
+      })
+    }
+    .width('100%')
+    .borderWidth({ bottom: 1 })
+    .borderColor({ bottom: $r('app.color.divider') })
+    .margin({ bottom: 16 })
   }
 
   @Builder SectionTitle(title: string) {
     Text(title)
-      .fontSize(13)
-      .fontColor($r('app.color.header_text'))
-      .margin({ top: 10, bottom: 10, left: 4 })
+      .fontSize(14)
+      .fontColor($r('app.color.secondary_text'))
+      .fontWeight(FontWeight.Medium)
+      .margin({ top: 8, bottom: 12, left: 4 })
   }
 
   @Builder SearchUserCard(user: User) {
-    Row() {
-      Image(user.avatar)
-        .width(45)
-        .height(45)
-        .borderRadius(8)
-        .margin({ right: 12 })
-      Column() {
-        Text(user.username)
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-        Text(`ID: ${user.userId}`)
-          .fontSize(12)
-          .fontColor($r('app.color.header_text'))
-          .margin({ top: 4 })
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
+    Column() {
+      Row() {
+        // 头像
+        Image(user.avatar)
+          .width(48)
+          .height(48)
+          .borderRadius(24)
+          .margin({ right: 12 })
+          .backgroundColor($r('app.color.header_background'))
 
-      Button('发送请求')
-        .fontSize(12)
-        .height(30)
-        .backgroundColor($r('app.color.send_button'))
-        .borderRadius(15)
+        // 用户信息
+        Column({ space: 2 }) {
+          Text(user.username)
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.primary_text'))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+          Row({ space: 4 }) {
+            Text('ID:')
+              .fontSize(12)
+              .fontColor($r('app.color.secondary_text'))
+            Text(user.userId.toString())
+              .fontSize(12)
+              .fontColor($r('app.color.secondary_text'))
+              .fontWeight(FontWeight.Medium)
+          }
+          .margin({ top: 2 })
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.Center)
+
+        // 操作按钮
+        Button('添加好友', { type: ButtonType.Normal })
+          .fontSize(14)
+          .fontColor(Color.White)
+          .height(36)
+          .width(80)
+          .backgroundColor($r('app.color.primary'))
+          .borderRadius(18)
+      }
+      .width('100%')
+      .padding(12)
     }
-    .cardStyle()
+    .width('100%')
+    .backgroundColor(Color.White)
+    .borderRadius(12)
+    .shadow({ radius: 8, color: '#1A000000', offsetX: 0, offsetY: 2 })
+    .margin({ bottom: 12 })
   }
 
   @Builder SentRequestCard(user: User) {
-    Row() {
-      Image(user.avatar)
-        .width(45)
-        .height(45)
-        .borderRadius(8)
-        .margin({ right: 12 })
-      Column() {
-        Text(user.username)
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-        Text(`ID: ${user.userId}`)
-          .fontSize(12)
-          .fontColor($r('app.color.header_text'))
-          .margin({ top: 4 })
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
+    Column() {
+      Row() {
+        // 头像
+        Image(user.avatar)
+          .width(48)
+          .height(48)
+          .borderRadius(24)
+          .margin({ right: 12 })
+          .backgroundColor($r('app.color.avatar_bg'))
 
-      Text('等待验证')
-        .fontSize(12)
-        .fontColor($r('app.color.primary_text'))
+        // 用户信息
+        Column({ space: 2 }) {
+          Text(user.username)
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.primary_text'))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+          Row({ space: 4 }) {
+            Text('ID:')
+              .fontSize(12)
+              .fontColor($r('app.color.secondary_text'))
+            Text(user.userId.toString())
+              .fontSize(12)
+              .fontColor($r('app.color.secondary_text'))
+              .fontWeight(FontWeight.Medium)
+          }
+          .margin({ top: 2 })
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.Center)
+
+        // 状态标签
+        Row() {
+          Image($r('app.media.clock'))
+            .width(14)
+            .height(14)
+            .margin({ right: 4 })
+          Text('等待验证')
+            .fontSize(12)
+            .fontColor($r('app.color.warning'))
+        }
+        .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+        .backgroundColor($r('app.color.warning_bg'))
+        .borderRadius(15)
+      }
+      .width('100%')
+      .padding(12)
     }
-    .cardStyle()
+    .width('100%')
+    .backgroundColor(Color.White)
+    .borderRadius(12)
+    .shadow({ radius: 4, color: '#0A000000', offsetX: 0, offsetY: 1 })
+    .margin({ bottom: 10 })
   }
 
   @Builder ReceivedRequestCard(user: User) {
-    Row() {
-      Image(user.avatar)
-        .width(45)
-        .height(45)
-        .borderRadius(8)
-        .margin({ right: 12 })
-      Column() {
-        Text(user.username)
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-        Text(`ID: ${user.userId} 申请添加`)
-          .fontSize(12)
-          .fontColor($r('app.color.header_text'))
-          .margin({ top: 4 })
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
+    Column() {
+      Row() {
+        // 头像
+        Image(user.avatar)
+          .width(48)
+          .height(48)
+          .borderRadius(24)
+          .margin({ right: 12 })
+          .backgroundColor($r('app.color.avatar_bg'))
 
-      Row({ space: 10 }) {
-        Text('拒绝')
-          .fontSize(14)
-          .fontColor($r('app.color.primary_text'))
-        Button('同意')
-          .fontSize(12)
-          .height(30)
-          .backgroundColor($r('app.color.panel_background'))
-          .borderRadius(6)
+        // 用户信息
+        Column({ space: 2 }) {
+          Text(user.username)
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.primary_text'))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+          Text('申请添加好友')
+            .fontSize(12)
+            .fontColor($r('app.color.secondary_text'))
+            .margin({ top: 2 })
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.Center)
+
+        // 操作按钮
+        Row({ space: 8 }) {
+          Button('拒绝', { type: ButtonType.Normal })
+            .fontSize(14)
+            .fontColor($r('app.color.secondary_text'))
+            .height(36)
+            .width(70)
+            .backgroundColor(Color.Transparent)
+            .border({
+              width: 1,
+              color: $r('app.color.divider'),
+              style: BorderStyle.Solid
+            })
+            .borderRadius(18)
+            .onClick(() => {
+              // TODO: 拒绝请求逻辑
+            })
+
+          Button('同意', { type: ButtonType.Normal })
+            .fontSize(14)
+            .fontColor(Color.White)
+            .height(36)
+            .width(70)
+            .backgroundColor($r('app.color.primary'))
+            .borderRadius(18)
+            .onClick(() => {
+              // TODO: 同意请求逻辑
+            })
+        }
       }
+      .width('100%')
+      .padding(12)
     }
-    .cardStyle()
+    .width('100%')
+    .backgroundColor(Color.White)
+    .borderRadius(12)
+    .shadow({ radius: 4, color: '#0A000000', offsetX: 0, offsetY: 1 })
+    .margin({ bottom: 10 })
   }
 
-  @Styles cardStyle() {
+  @Builder EmptyState(title: string, description: string) {
+    Column() {
+      Image($r('app.media.empty'))
+        .width(120)
+        .height(120)
+        .margin({ bottom: 16 })
+        .opacity(0.6)
+
+      Text(title)
+        .fontSize(16)
+        .fontColor($r('app.color.secondary_text'))
+        .fontWeight(FontWeight.Medium)
+        .margin({ bottom: 8 })
+
+      Text(description)
+        .fontSize(14)
+        .fontColor($r('app.color.tertiary_text'))
+        .textAlign(TextAlign.Center)
+        .padding({ left: 32, right: 32 })
+    }
     .width('100%')
-    .padding(12)
-    .backgroundColor(Color.White)
-    .borderRadius(10)
-    .margin({ bottom: 8 })
+    .height(300)
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
   }
 }
-//   @Builder
-//   buildFriendRequestsTab() {
-//     Column() {
-//       if (this.pendingRequests.length > 0) {
-//         List({ space: 10 }) {
-//           ForEach(this.pendingRequests, (request) => {
-//             ListItem() {
-//               this.buildRequestItem(request)
-//             }
-//           })
-//         }
-//         .width('100%')
-//         .layoutWeight(1)
-//       } else {
-//         this.buildEmptyState("暂无待处理的好友请求")
-//       }
-//     }
-//     .width('100%')
-//     .height('100%')
-//   }
-//
-//   @Builder
-//   buildRequestItem(user: User) {
-//     Row() {
-//       Image($r('app.media.user_placeholder'))
-//         .width(60)
-//         .height(60)
-//         .borderRadius(30)
-//
-//       Column() {
-//         Text(user.username)
-//           .fontSize(18)
-//           .fontWeight(FontWeight.Bold)
-//         Text(`申请添加您为好友`)
-//           .fontSize(14)
-//           .fontColor(Color.Gray)
-//           .margin({ top: 4 })
-//       }
-//       .alignItems(HorizontalAlign.Start)
-//       .margin({ left: 15})
-//       .layoutWeight(1)
-//
-//       Button("通过")
-//         .backgroundColor($r('app.color.accept_button'))
-//         .margin({ right: 10 })
-//         .onClick(() => this.handleRespondToRequest(user, true))
-//
-//       Button("拒绝")
-//         .backgroundColor($r('app.color.reject_button'))
-//         .onClick(() => this.handleRespondToRequest(user, false))
-//     }
-//     .width('92%')
-//     .padding(15)
-//     .backgroundColor(Color.White)
-//     .borderRadius(12)
-//     .shadow({ radius: 10, color: '#10000000' })
-//   }
-//
-//   private handleRespondToRequest(user: User, accept: boolean) {
-//     if (accept) {
-//       CloudChat.acceptRequest(user.userId);
-//     } else {
-//       CloudChat.rejectRequest(user.userId);
-//     }
-//     this.pendingRequests = this.pendingRequests.filter(u => u.userId !== user.userId);
-//   }
-//
-//   build() {
-//     Column() {
-//       // 标签页切换
-//       Tabs({ barPosition: BarPosition.Start }) {
-//         TabContent() {
-//           this.buildAddFriendTab()
-//         }.tabBar('添加好友')
-//
-//         TabContent() {
-//           this.buildFriendRequestsTab()
-//         }.tabBar('好友请求')
-//       }
-//       .barWidth('80%')
-//       .barHeight(48)
-//       .animationDuration(0)
-//       .onChange((index: number) => {
-//         this.activeTab = index;
-//         if (index === 1) {
-//           this.pendingRequests = CloudChat.pendingRequests; // 切换时刷新请求列表
-//         }
-//       })
-//     }
-//     .width('100%')
-//     .height('100%')
-//   }
-//
-//   @Builder
-//   buildAddFriendTab() {
-//     Column() {
-//       Text("添加联系人")
-//         .fontSize(20)
-//         .fontWeight(FontWeight.Bold)
-//         .margin({ top: 30, bottom: 20 })
-//         .fontColor($r('app.color.primary_text'))
-//       Row() {
-//         Search({ value: this.searchKeyword, placeholder: '请输入用户 ID' })
-//           .layoutWeight(1)
-//           .height(48)
-//           .backgroundColor(Color.White)
-//           .onSubmit(() => this.executeSearch()) // 键盘点击“搜索/确定”触发
-//           .onChange((value: string) => {
-//             this.searchKeyword = value;
-//             this.searchError = '';
-//           })
-//
-//         Button("搜索")
-//           .height(48)
-//           .margin({ left: 10 })
-//           .padding({ left: 20, right: 20 })
-//           .onClick(() => this.executeSearch()) // 点击按钮触发
-//           .enabled(!this.isLoading) //加载时禁用按钮
-//       }
-//       .width('92%')
-//
-//       // 显示加载状态
-//       if (this.isLoading) {
-//         this.buildLoadingState()
-//       }
-//       // 显示错误信息
-//       else if (this.searchError) {
-//         this.buildErrorState(this.searchError)
-//       }
-//       // 结果展示区
-//       if (this.searchedUser) {
-//         this.buildUserCard(this.searchedUser)
-//       } else if (this.hasSearched) {
-//         this.buildEmptyState("未找到该用户，请检查 ID 是否正确")
-//       } else {
-//         this.buildEmptyState("搜索 ID 以添加好友")
-//       }
-//     }
-//     .width('100%')
-//     .height('100%')
-//   }
-//
-//   // 搜索核心逻辑
-//   private executeSearch() {
-//     if (!this.searchKeyword.trim()) return;
-//
-//     this.hasSearched = true;
-//     this.isLoading = true;
-//     this.searchError = '';
-//     this.searchedUser = null;
-//     // 精确匹配 ID
-//     const result = CloudChat.allUsers.find(u =>
-//     u.userId.toString() === this.searchKeyword.trim()
-//     );
-//
-//     this.searchedUser = result ? result : null;
-//   }
-//
-//   @Builder
-//   buildUserCard(user: User) {
-//     Row() {
-//       Image($r('app.media.user_placeholder'))
-//         .width(60)
-//         .height(60)
-//         .borderRadius(30)
-//
-//       Column() {
-//         Text(user.username)
-//           .fontSize(18)
-//           .fontWeight(FontWeight.Bold)
-//         Text(`用户 ID: ${user.userId}`)
-//           .fontSize(14)
-//           .fontColor(Color.Gray)
-//           .margin({ top: 4 })
-//       }
-//       .alignItems(HorizontalAlign.Start)
-//       .margin({ left: 15 })
-//       .layoutWeight(1)
-//
-//       Button("发送申请")
-//         .backgroundColor($r('app.color.send_button'))
-//         .onClick(() => this.onSendRequest(user))
-//     }
-//     .width('92%')
-//     .margin({ top: 20 })
-//     .padding(15)
-//     .backgroundColor(Color.White)
-//     .borderRadius(12)
-//     .shadow({ radius: 10, color: '#10000000' })
-//   }
-//
-//   @Builder
-//   buildEmptyState(tips: string) {
-//     Column() {
-//       Image($r('app.media.ic_search_empty'))
-//         .width(80)
-//         .height(80)
-//         .opacity(0.2)
-//       Text(tips)
-//         .fontSize(14)
-//         .fontColor(Color.Gray)
-//         .margin({ top: 10 })
-//     }
-//     .margin({ top: 100 })
-//   }
-// }

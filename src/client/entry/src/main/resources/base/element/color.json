@@ -183,6 +183,30 @@
     {
       "name": "DetailPanel_wholeBackground",
       "value": "#F5F5F5"
+    },
+    {
+      "name": "tertiary_text",
+      "value": "#999999"
+    },
+    {
+      "name": "primary",
+      "value": "#007DFF"
+    },
+    {
+      "name": "divider",
+      "value": "#E0E0E0"
+    },
+    {
+      "name": "avatar_bg",
+      "value": "#E0E0E0"
+    },
+    {
+      "name": "warning",
+      "value": "#FF9500"
+    },
+    {
+      "name": "warning_bg",
+      "value": "#FFF5E6"
     }
   ]
 }
