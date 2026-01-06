@@ -25,7 +25,7 @@ import {
   SearchForUserByUserNamePayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleLoadContacts } from './server/contact-server';
-import { handleLoadMessages } from './server/message-server';
+import { handleLoadMessages, handleSendMessage } from './server/message-server';
 import { handleRegister } from './server/register-server';
 import { CloudChat } from '../CloudChat';
 import {
@@ -34,6 +34,7 @@ import {
   handlePostFriendRequest,
   handleRefuseRequest,
   handleSearchForUsersById, handleSearchForUsersByName } from './server/friend_request-server';
+import { SendMessagePayload } from '../core/protocol/websocket/client.websocket.protocol';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -57,6 +58,8 @@ export default class MainUIAbility extends UIAbility {
     EventBus.on(Event.LOAD_CONTACT_LIST, (data: LoadContactsPayload): void => handleLoadContacts(data));
     EventBus.on(Event.LOAD_MESSAGES_START, (count: number): void => CloudChat.startLoadMessage(count));
     EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => handleLoadMessages(data));
+
+    EventBus.on(Event.SEND_MESSAGE, (data: SendMessagePayload): void => handleSendMessage(data));
 
     EventBus.on(Event.SEARCH_FOR_USERS_BY_NAME, (data: SearchForUserByUserNamePayload): void => handleSearchForUsersByName(data));
     EventBus.on(Event.SEARCH_FOR_USERS_BY_ID, (data: SearchForUserByIdPayload): void => handleSearchForUsersById(data));

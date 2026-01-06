@@ -12,7 +12,7 @@ export class WebsocketService {
   private serverUrl: string;
   private port: string | null;
   private _newMessage: string = "";
-  private newMessageObservers: Array<(newMessage: string) => void> = [];
+  private messageObservers: Array<(newMessage: string) => void> = [];
 
   private retryCount = 0;
   private maxRetryCount = 5;
@@ -28,7 +28,7 @@ export class WebsocketService {
   }
 
   private OnNewMessage(newValue: string){
-    this.newMessageObservers.forEach(it => it(newValue));
+    this.messageObservers.forEach(it => it(newValue));
   }
 
   private subscribe(){// 连接成功事件
@@ -74,8 +74,8 @@ export class WebsocketService {
     this.serverUrl = serverUrl;
   }
 
-  public addNewMessageObserver(observer: (newMessage: string) => void): void {
-    this.newMessageObservers.push(observer);
+  public addMessageObserver(observer: (newMessage: string) => void): void {
+    this.messageObservers.push(observer);
   }
 
   public connect() {

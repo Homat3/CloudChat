@@ -23,7 +23,8 @@ import { WebsocketServiceMessage,
   WebsocketServiceMessageType,
   AddFriendRequestPayload as RequireAddFriendRequestPayload,
   AcceptFriendRequestPayload as RequireAcceptFriendRequestPayload,
-  RefuseFriendRequestPayload as RequireRefuseFriendRequestPayload
+  RefuseFriendRequestPayload as RequireRefuseFriendRequestPayload,
+  MessageReceivedOtherPayload
 } from '../../../../core/protocol/websocket/service.websocket.protocol';
 
 @Component
@@ -160,7 +161,7 @@ export struct ContactRequest {
       }
     })
 
-    CloudChat.websocketServer.addNewMessageObserver((msg: string) => {
+    CloudChat.websocketServer.addMessageObserver((msg: string) => {
       //控制台响应
       console.log("Received: " + msg);
       let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;

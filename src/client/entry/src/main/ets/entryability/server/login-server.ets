@@ -72,7 +72,7 @@ export function handleLogin(data: LoginPayload) {
 function websocketNormalVerify(data: HdlInfoPayload, verifyData: LoginSuccessPayload) {
   const ws = CloudChat.websocketServer;
   try {
-    ws.addNewMessageObserver((msg) => {
+    ws.addMessageObserver((msg) => {
       //控制台响应
       console.log("Received: " + msg);
       let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
@@ -138,7 +138,7 @@ export function handleLoginByToken(data: hLoginByTokenPayload): void {
 function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPayload) {
   const ws = CloudChat.websocketServer;
   try {
-    ws.addNewMessageObserver((msg) => {
+    ws.addMessageObserver((msg) => {
       //控制台响应
       console.log("Received: " + msg);
       let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
