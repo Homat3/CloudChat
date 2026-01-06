@@ -14,6 +14,7 @@ import {
   MessageReceivedOtherPayload,
   WebsocketServiceMessage,
   WebsocketServiceMessageType} from '../../core/protocol/websocket/service.websocket.protocol';
+import { AiPage } from './components/ai-chat/AiPage';
 
 export interface MessageUpdateData{
   messages: Message[]
@@ -192,6 +193,9 @@ struct MainContainer {
     }
     else {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
+        TabContent() {
+          AiPage()
+        }.tabBar($r('app.string.text_MainContainer_aiPage'))
         TabContent() {
           Home({
             selectedContact: this.selectedContact,

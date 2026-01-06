@@ -383,6 +383,10 @@
     {
       "name": "text_ContactRequest_wait",
       "value": "等待验证"
+    },
+    {
+      "name": "text_MainContainer_aiPage",
+      "value": "AI"
     }
   ]
 }
