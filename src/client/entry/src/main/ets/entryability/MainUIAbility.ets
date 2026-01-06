@@ -15,6 +15,7 @@ import { Event } from '../core/tag/Event';
 import {
   AcceptFriendRequestPayload,
   AddFriendRequestPayload,
+  DeleteContactPayload,
   LoadContactsPayload,
   LoadFriendRequestPayload,
   LoadMessagesPayload,
@@ -24,7 +25,7 @@ import {
   SearchForUserByIdPayload,
   SearchForUserByUserNamePayload } from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
-import { handleLoadContacts } from './server/contact-server';
+import { handleDeleteContact, handleLoadContacts } from './server/contact-server';
 import { handleLoadMessages, handleSendMessage } from './server/message-server';
 import { handleRegister } from './server/register-server';
 import { CloudChat } from '../CloudChat';
@@ -58,6 +59,7 @@ export default class MainUIAbility extends UIAbility {
     EventBus.on(Event.LOAD_CONTACT_LIST, (data: LoadContactsPayload): void => handleLoadContacts(data));
     EventBus.on(Event.LOAD_MESSAGES_START, (count: number): void => CloudChat.startLoadMessage(count));
     EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => handleLoadMessages(data));
+    EventBus.on(Event.DELETE_CONTACT, (data: DeleteContactPayload): void => handleDeleteContact(data));
 
     EventBus.on(Event.SEND_MESSAGE, (data: SendMessagePayload): void => handleSendMessage(data));
 

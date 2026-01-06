@@ -54,7 +54,8 @@ export struct ChatArea{
     Column() {
       if (this.showPanel){
         DetailPanel({
-          contact: this.selectedContact
+          contact: this.selectedContact,
+          currentUser: this.currentUser
         });
       }
       else {

@@ -3,6 +3,7 @@ export interface WebsocketServiceMessage {
   payload: ServicePayload;
 }
 
+
 export enum WebsocketServiceMessageType {
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGIN_FAILURE = 'LOGIN_FAILURE',
@@ -14,7 +15,9 @@ export enum WebsocketServiceMessageType {
   MESSAGE_RECEIVED_OTHER = 'MESSAGE_RECEIVED_OTHER',
   ADD_FRIEND_REQUEST = 'ADD_FRIEND_REQUEST',
   REFUSE_FRIEND_REQUEST = 'REFUSE_FRIEND_REQUEST',
-  ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST'
+  ACCEPT_FRIEND_REQUEST = 'ACCEPT_FRIEND_REQUEST',
+  CONTACT_ADDED = "CONTACT_ADDED",
+  DELETED_BY_CONTACT = "DELETED_BY_CONTACT"
 }
 
 export type ServicePayload =
@@ -28,6 +31,8 @@ export type ServicePayload =
   MessageReceivedOtherPayload |
   AddFriendRequestPayload |
   RefuseFriendRequestPayload |
+  DeleteByContactPayload |
+  ContactAddedPayload |
   AcceptFriendRequestPayload;
 
 export interface LoginSuccessPayload {
@@ -92,6 +97,17 @@ export interface AddFriendRequestPayload {
 
 export interface RefuseFriendRequestPayload {
   id: number;
+}
+
+export interface DeleteByContactPayload{
+  contactId: number;
+}
+
+export interface ContactAddedPayload {
+  userId: number,
+  username: string,
+  online: boolean,
+  avatar: string
 }
 
 export interface AcceptFriendRequestPayload {

@@ -10,6 +10,7 @@ export enum HttpClientMessageType {
   UPDATE_PROFILE = 'UPDATE_PROFILE',
   LOGOUT = 'LOGOUT',
   LOAD_CONTACTS = 'LOAD_CONTACTS',
+  DELETE_CONTACT = 'DELETE_CONTACT',
   SEARCH_FOR_USER_BY_ID = 'SEARCH_FOR_USER_BY_ID',
   SEARCH_FOR_USER_BY_NAME = 'SEARCH_FOR_USER_BY_NAME',
   LOAD_FRIEND_REQUEST = 'LOAD_FRIEND_REQUEST',
@@ -27,6 +28,7 @@ type ClientPayload =
   | UpdateProfilePayload
   | LogoutPayload
   | LoadContactsPayload
+  | DeleteContactPayload
   | SearchForUserByIdPayload
   | SearchForUserByUserNamePayload
   | LoadFriendRequestPayload
@@ -66,6 +68,11 @@ export interface UpdateProfilePayload {
 
 export interface LoadContactsPayload {
   userId: number;
+}
+
+export interface DeleteContactPayload{
+  userId: number,
+  targetId: number
 }
 
 export interface SearchForUserByIdPayload {

@@ -1,5 +1,6 @@
 import { common } from "@kit.AbilityKit";
-import { Contact } from "../../../../core/models/models";
+import { Contact, User } from "../../../../core/models/models";
+import { DeleteContactPayload } from "../../../../core/protocol/http/client.http.protocol";
 import { EventBus } from "../../../../core/service/event/EventBus";
 import { Event } from "../../../../core/tag/Event";
 import { getAvatar } from "../../../../core/util";
@@ -8,6 +9,7 @@ import { getAvatar } from "../../../../core/util";
 export struct DetailPanel{
   // 从外部接收的用户参数
   @Prop contact: Contact;
+  @Prop currentUser: User;
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -82,7 +84,7 @@ export struct DetailPanel{
         .margin({ bottom: 40 })
         .onClick(() => {
           // 删除好友逻辑
-          this.deleteFriend();
+          EventBus.emit(Event.DELETE_CONTACT, { userId: this.currentUser.userId, targetId: this.contact.contactId } as DeleteContactPayload)
         })
     }
     .height('100%')
@@ -123,9 +125,5 @@ export struct DetailPanel{
     .alignItems(VerticalAlign.Center)
     .justifyContent(FlexAlign.SpaceBetween)
     .border({ width: { bottom: 1 }, color: $r('app.color.DetailPanel_border') })
-  }
-
-  private deleteFriend() {
-    // 删除好友的逻辑
   }
 }

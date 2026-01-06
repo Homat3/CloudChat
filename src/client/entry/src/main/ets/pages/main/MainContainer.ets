@@ -7,10 +7,12 @@ import { ChatArea } from './components/chat/ChatArea';
 import { Message } from '../../core/models/message';
 import { Contact, User } from '../../core/models/models';
 import { CloudChat } from '../../CloudChat';
-import { ContactsLoadedFailedPayload } from '../../core/protocol/http/service.http.protocol';
+import { ContactDeletedPayload, ContactsLoadedFailedPayload } from '../../core/protocol/http/service.http.protocol';
 import { common } from '@kit.AbilityKit';
 import { LoadContactsPayload, LoadMessagesPayload } from '../../core/protocol/http/client.http.protocol';
 import {
+  ContactAddedPayload,
+  DeleteByContactPayload,
   MessageReceivedOtherPayload,
   WebsocketServiceMessage,
   WebsocketServiceMessageType} from '../../core/protocol/websocket/service.websocket.protocol';
@@ -39,7 +41,7 @@ struct MainContainer {
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   onSwitchToChatArea(){
-    EventBus.emit(Event.OPEN_CHAT_AREA);
+    if (this.selectedContact) EventBus.emit(Event.OPEN_CHAT_AREA);
   }
 
   // 添加页面生命周期
@@ -53,6 +55,32 @@ struct MainContainer {
 
       EventBus.on(Event.CONTACT_LIST_LOADED, (): void => this.catchContacts());
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
+      EventBus.on(Event.CONTACT_ADDED, (payload: ContactAddedPayload): void => {
+        if (this.contacts){
+          CloudChat.contacts = [...this.contacts, new Contact(
+            payload.userId, payload.username, payload.online, payload.avatar
+          )];
+          this.contacts = CloudChat.contacts;
+        }
+      })
+      EventBus.on(Event.CONTACT_DELETED, (payload: ContactDeletedPayload): void => {
+        if (this.contacts){
+          CloudChat.contacts = this.contacts.filter((contact: Contact) => !(contact.contactId === payload.targetId));
+          this.contacts = CloudChat.contacts;
+          this.selectedContact = null;
+          EventBus.emit(Event.CLOSE_CHAT_AREA);
+        }
+      })
+      EventBus.on(Event.CONTACT_DELETED_FAILED, (e: string): void => {
+        try {
+          this.uiContext.getPromptAction().showToast({
+            message: "联系人删除失败：" + e,
+            duration: 2000
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      })
 
       EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
         if (this.selectedContact){
@@ -119,6 +147,16 @@ struct MainContainer {
           case WebsocketServiceMessageType.MESSAGE_RECEIVED_OTHER: {
             const payload = receivedObject.payload as MessageReceivedOtherPayload;
             EventBus.emit(Event.RECEIVE_MESSAGE, payload);
+            break;
+          }
+          case WebsocketServiceMessageType.DELETED_BY_CONTACT: {
+            const payload = receivedObject.payload as DeleteByContactPayload;
+            EventBus.emit(Event.CONTACT_DELETED, { targetId: payload.contactId } as ContactDeletedPayload);
+            break;
+          }
+          case WebsocketServiceMessageType.CONTACT_ADDED: {
+            const payload = receivedObject.payload as ContactAddedPayload;
+            EventBus.emit(Event.CONTACT_ADDED, payload);
             break;
           }
         }
@@ -194,9 +232,6 @@ struct MainContainer {
     else {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
         TabContent() {
-          AiPage()
-        }.tabBar($r('app.string.text_MainContainer_aiPage'))
-        TabContent() {
           Home({
             selectedContact: this.selectedContact,
             contacts: this.contacts,
@@ -208,6 +243,10 @@ struct MainContainer {
             currentUser: this.currentUser
           })
         }.tabBar($r('app.string.text_MainContainer_contactRequest'));
+
+        TabContent() {
+          AiPage()
+        }.tabBar($r('app.string.text_MainContainer_aiPage'))
 
         TabContent() {
           OwnPage()

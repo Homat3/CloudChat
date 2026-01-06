@@ -12,10 +12,10 @@ export enum HttpServiceMessageType {
 
   PROFILE_UPDATED_SUCCESS = 'PROFILE_UPDATED_SUCCESS',
   PROFILE_UPDATED_FAILED = 'PROFILE_UPDATED_FAILED',
-
-  CONTACT_ADDED = 'CONTACT_ADDED',
   CONTACTS_LOADED = 'CONTACTS_LOADED',
   CONTACTS_LOADED_FAILED = 'CONTACTS_LOADED_FAILED',
+  CONTACT_DELETED = "CONTACT_DELETED",
+  CONTACT_DELETED_FAILED = "CONTACT_DELETED_FAILED",
 
   SEARCH_FOR_USER_RESULT = 'SEARCH_FOR_USER_RESULT',
 
@@ -46,9 +46,10 @@ export type ServicePayload =
   ProfileUpdatedSuccessPayload |
   ProfileUpdatedFailedPayload |
 
-  ContactAddedPayload |
   ContactsLoadedPayload |
   ContactsLoadedFailedPayload |
+  ContactDeletedPayload |
+  ContactDeletedFailedPayload |
 
   SearchForUserResultPayload |
 
@@ -105,13 +106,6 @@ export interface ProfileUpdatedFailedPayload {
   error: string;
 }
 
-export interface ContactAddedPayload {
-  userId: number;
-  username: string;
-  online: boolean;
-  avatar: string;
-}
-
 export interface ContactsLoadedPayload {
   contacts: Array<{
     contactId: number;
@@ -123,6 +117,14 @@ export interface ContactsLoadedPayload {
 
 export interface ContactsLoadedFailedPayload {
   error: string;
+}
+
+export interface ContactDeletedPayload{
+  targetId: number
+}
+
+export interface ContactDeletedFailedPayload{
+  error: string
 }
 
 export interface SearchForUserResultPayload {
