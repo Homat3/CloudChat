@@ -642,6 +642,7 @@ std::string to_JSON_string(std::string str) {
 		else if (c == '\t') JSON.append("\\t");
 		else if (c == '\n') JSON.append("\\n");
 		else if (c == '\r') JSON.append("\\r");
+		else if (c == '"') JSON.append("\\\"");
 		else JSON.push_back(c);
 	}
 	return JSON;

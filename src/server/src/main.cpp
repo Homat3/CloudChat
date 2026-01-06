@@ -272,6 +272,8 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 	} else if (type == REFUSE_FRIEND_REQUEST) {
 		response_body = RefuseFriendRequest(g_cloudchat_srv, hdl,
 											(RefuseFriendRequestClientMsg*)client_msg);
+	} else if (type == SEND_MESSAGE) {
+		response_body = SendMessage(g_cloudchat_srv, hdl, (SendMessageMsg*)client_msg);
 	}
 
 	if (type != ILLEGAL_MSG) con->set_status(websocketpp::http::status_code::ok);

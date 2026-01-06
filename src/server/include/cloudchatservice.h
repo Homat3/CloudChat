@@ -21,7 +21,7 @@ std::string LoadContacts(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 				  LoadContactsMsg* load_contacts_msg);
 std::string LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				  LoadMessagesMsg* load_messages_msg);
-void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				 SendMessageMsg* send_message_msg);
 void SendFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl, SendFileMsg* send_file_msg);
 void SendImage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
