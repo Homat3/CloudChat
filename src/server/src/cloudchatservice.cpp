@@ -1,9 +1,5 @@
 #include "cloudchatservice.h"
-#include "cloudchatdat.h"
 #include "cloudchatmsg.h"
-#include "cloudchatsys.h"
-#include "cloudchatuser.h"
-#include <websocketpp/common/connection_hdl.hpp>
 
 std::map<websocketpp::connection_hdl, int,
 	std::owner_less<websocketpp::connection_hdl>> g_online_users;
@@ -201,13 +197,15 @@ std::string LoadMessages(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 	return messages_loaded_msg->to_JSON();
 }
 
-void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				 SendMessageMsg* send_message_msg) { // 发送消息业务
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	std::string temp_id = send_message_msg->get_temp_id();
-	int sender_id = send_message_msg->get_sender_id();
-	int receiver_id = send_message_msg->get_receiver_id();
-	std::string content = send_message_msg->get_content();
-	time_t created_at = time(0);
+	int         sender_id = send_message_msg->get_sender_id();
+	int         receiver_id = send_message_msg->get_receiver_id();
+	std::string content     = send_message_msg->get_content();
+	time_t      created_at  = time(0);
 
 	std::cout << "发送消息：" << std::endl;
 	std::cout << "temp_id: " << temp_id << std::endl;
@@ -218,14 +216,17 @@ void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	CloudChatMessage* message = new CloudChatMessage(0, false, TEXT_MESSAGE, sender_id, receiver_id,
 													 content, "", 0, "", false, created_at);
 	if (!CloudChatDatabase::GetInstance()->AddMessage(message)) {
-		SendMsgToClient(cloudchat_srv, hdl, new MessageSendFailedMsg(temp_id,
-																	 "messages 数据表更新失败"));
-		return;
+		MessageSendFailedMsg* message_send_failed_msg =
+			new MessageSendFailedMsg(temp_id, "messages 数据表更新失败");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, message_send_failed_msg);
+		return message_send_failed_msg->to_JSON();
 	}
 
-	SendMsgToClient(cloudchat_srv, hdl, new SelfMessageReceivedMsg(temp_id, 0, ctime(&created_at)));
+	SelfMessageReceivedMsg* self_message_received_msg =
+		new SelfMessageReceivedMsg(temp_id, 0, ctime(&created_at));
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, self_message_received_msg);
 	CloudChatUser* target = CloudChatDatabase::GetInstance()->GetUserById(receiver_id);
-	if (target == nullptr) return;
+	if (target == nullptr) return self_message_received_msg->to_JSON();
 	if (target->is_online()) {
 		for (auto& p : g_online_users) {
 			if (p.second == receiver_id) {
@@ -234,6 +235,7 @@ void SendMessage(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 			}
 		}
 	}
+	return self_message_received_msg->to_JSON();
 }
 
 void SendFile(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
