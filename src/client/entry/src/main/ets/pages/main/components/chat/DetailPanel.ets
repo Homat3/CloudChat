@@ -131,12 +131,10 @@ struct DetailPanel{
   buildHeader() {
     Row() {
       // 返回按钮
-      Button($r('app.string.text_DetailPanel_backPage'))
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(Color.Black)
-        .width(60)
-        .height(40)
+      Image($r('app.media.backicon'))
+        .height(24)
+        .width(24)
+        .margin({left:8})
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           // 返回上一页逻辑

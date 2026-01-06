@@ -140,15 +140,15 @@ struct MainContainer {
             contacts: this.contacts,
             messagesMap: this.messagesMap,
           })
-        }.tabBar('主页');
+        }.tabBar($r('app.string.text_MainContainer_homePage'));
 
         TabContent() {
           ContactRequest()
-        }.tabBar('添加联系人');
+        }.tabBar($r('app.string.text_MainContainer_contactRequest'));
 
         TabContent() {
           OwnPage()
-        }.tabBar('个人');
+        }.tabBar($r('app.string.text_MainContainer_ownPage'));
       }
       .width('100%')
       .onChange((index: number) => {

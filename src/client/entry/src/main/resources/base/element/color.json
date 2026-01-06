@@ -207,6 +207,10 @@
     {
       "name": "warning_bg",
       "value": "#FFF5E6"
+    },
+    {
+      "name": "ContactRequest_shadow",
+      "value": "#0A000000"
     }
   ]
 }

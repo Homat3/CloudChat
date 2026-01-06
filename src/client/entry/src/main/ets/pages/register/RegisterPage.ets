@@ -59,7 +59,7 @@ struct Register {
     Column({ space: 8 }) {
       // Logo/标语顶部区域
       Column() {
-        Text('💬')
+        Text($r('app.string.text_all_logo'))
           .fontSize(64)
           .margin({ bottom: 8 })
         Column() {

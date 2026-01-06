@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { User } from '../../../../core/models/models';
 import { CloudChat } from '../../../../CloudChat';
+import { loadStringResource } from '../../../../core/service/resource/load-resource';
 
 @Component
 export struct ContactRequest {
@@ -16,6 +17,8 @@ export struct ContactRequest {
   // 好友请求相关状态
   // @State pendingRequests: User[] = CloudChat.pendingRequests; // 从云服务获取待处理请求
   @State activeTab: number = 0; // 当前激活的标签页
+  private uiContext: UIContext = this.getUIContext();
+  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   build() {
     Column() {
@@ -25,10 +28,13 @@ export struct ContactRequest {
       Scroll() {
         Column() {
           if (this.searchKeyword.length > 0 && this.searchedUser) {
-            this.SectionTitle('搜索结果')
+            this.SectionTitle(loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_sectionTitle')))
             this.SearchUserCard(this.searchedUser)
           } else if (this.searchKeyword.length > 0 && !this.searchedUser) {
-            this.EmptyState('没有找到相关用户', '请检查ID是否正确')
+            this.EmptyState(
+              loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSearched_title')),
+              loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSearched_description'))
+            )
           } else {
             // 标签页切换
             this.TabSection()
@@ -40,7 +46,10 @@ export struct ContactRequest {
                   this.SentRequestCard(user)
                 }, (item: User) => item.userId.toString())
               } else {
-                this.EmptyState('暂无已发送的请求', '搜索并添加好友吧')
+                this.EmptyState(
+                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSend_title')),
+                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSend_description'))
+                )
               }
             } else {
               if (this.receivedRequests.length > 0) {
@@ -48,7 +57,10 @@ export struct ContactRequest {
                   this.ReceivedRequestCard(user)
                 }, (item: User) => item.userId.toString())
               } else {
-                this.EmptyState('暂无收到的好友请求', '好友请求会在这里显示')
+                this.EmptyState(
+                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noReceived_title')),
+                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noReceived_description'))
+                )
               }
             }
           }
@@ -70,9 +82,9 @@ export struct ContactRequest {
     Row() {
       Search({
         value: this.searchKeyword,
-        placeholder: '输入用户ID搜索...'
+        placeholder:$r('app.string.text_ContactRequest_SearchSection_searchPlaceholder')
       })
-        .searchButton('搜索')
+        .searchButton($r('app.string.text_ContactRequest_SearchSection_searchButton'))
         .placeholderFont({ size: 14 })
         .height(42)
         .width('100%')
@@ -105,7 +117,7 @@ export struct ContactRequest {
     Row({ space: 0 }) {
       // 已发送标签
       Column() {
-        Text('已发送的请求')
+        Text($r('app.string.text_ContactRequest_TabSection_Send'))
           .fontSize(16)
           .fontWeight(this.activeTab === 0 ? FontWeight.Bold : FontWeight.Normal)
           .fontColor(this.activeTab === 0 ? $r('app.color.primary') : $r('app.color.secondary_text'))
@@ -128,7 +140,7 @@ export struct ContactRequest {
 
       // 收到的请求标签
       Column() {
-        Text('收到的好友请求')
+        Text($r('app.string.text_ContactRequest_TabSection_Received'))
           .fontSize(16)
           .fontWeight(this.activeTab === 1 ? FontWeight.Bold : FontWeight.Normal)
           .fontColor(this.activeTab === 1 ? $r('app.color.primary_text') : $r('app.color.secondary_text'))
@@ -199,7 +211,7 @@ export struct ContactRequest {
         .justifyContent(FlexAlign.Center)
 
         // 操作按钮
-        Button('添加好友', { type: ButtonType.Normal })
+        Button($r('app.string.text_ContactRequest_SearchUserCard'), { type: ButtonType.Normal })
           .fontSize(14)
           .fontColor(Color.White)
           .height(36)
@@ -213,7 +225,7 @@ export struct ContactRequest {
     .width('100%')
     .backgroundColor(Color.White)
     .borderRadius(12)
-    .shadow({ radius: 8, color: '#1A000000', offsetX: 0, offsetY: 2 })
+    .shadow({ radius: 8, color: $r('app.color.ContactRequest_shadow'), offsetX: 0, offsetY: 2 })
     .margin({ bottom: 12 })
   }
 
@@ -238,7 +250,7 @@ export struct ContactRequest {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
           Row({ space: 4 }) {
-            Text('ID:')
+            Text($r('app.string.text_ContactRequest_SentRequestCard_ID'))
               .fontSize(12)
               .fontColor($r('app.color.secondary_text'))
             Text(user.userId.toString())
@@ -258,7 +270,7 @@ export struct ContactRequest {
             .width(14)
             .height(14)
             .margin({ right: 4 })
-          Text('等待验证')
+          Text($r('app.string.text_ContactRequest_SentRequestCard_State'))
             .fontSize(12)
             .fontColor($r('app.color.warning'))
         }
@@ -272,7 +284,7 @@ export struct ContactRequest {
     .width('100%')
     .backgroundColor(Color.White)
     .borderRadius(12)
-    .shadow({ radius: 4, color: '#0A000000', offsetX: 0, offsetY: 1 })
+    .shadow({ radius: 4, color: $r('app.color.ContactRequest_shadow'), offsetX: 0, offsetY: 1 })
     .margin({ bottom: 10 })
   }
 
@@ -296,7 +308,7 @@ export struct ContactRequest {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-          Text('申请添加好友')
+          Text($r('app.string.text_ContactRequest_ReceivedRequestCard_Title'))
             .fontSize(12)
             .fontColor($r('app.color.secondary_text'))
             .margin({ top: 2 })
@@ -307,7 +319,7 @@ export struct ContactRequest {
 
         // 操作按钮
         Row({ space: 8 }) {
-          Button('拒绝', { type: ButtonType.Normal })
+          Button($r('app.string.text_ContactRequest_ReceivedRequestCard_Refuse'), { type: ButtonType.Normal })
             .fontSize(14)
             .fontColor($r('app.color.secondary_text'))
             .height(36)
@@ -323,7 +335,7 @@ export struct ContactRequest {
               // TODO: 拒绝请求逻辑
             })
 
-          Button('同意', { type: ButtonType.Normal })
+          Button($r('app.string.text_ContactRequest_ReceivedRequestCard_Accept'), { type: ButtonType.Normal })
             .fontSize(14)
             .fontColor(Color.White)
             .height(36)
@@ -341,7 +353,7 @@ export struct ContactRequest {
     .width('100%')
     .backgroundColor(Color.White)
     .borderRadius(12)
-    .shadow({ radius: 4, color: '#0A000000', offsetX: 0, offsetY: 1 })
+    .shadow({ radius: 4, color: $r('app.color.ContactRequest_shadow'), offsetX: 0, offsetY: 1 })
     .margin({ bottom: 10 })
   }
 

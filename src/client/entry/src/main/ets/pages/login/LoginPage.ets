@@ -66,7 +66,7 @@ struct LoginPage {
     Column({ space: 8 }) {
       Column() {
         //Logo
-        Text('💬').fontSize(64).margin({ bottom: 8 })
+        Text($r('app.string.text_all_logo')).fontSize(64).margin({ bottom: 8 })
         Column() {
           Text($r("app.string.text_all_Title")).fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
           Text($r("app.string.text_all_Subtitle")).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
@@ -176,7 +176,7 @@ struct LoginPage {
           })
 
         //注册按钮
-        Button('注册账号')
+        Button($r('app.string.text_login_RegisterAccount'))
           .id('registerButton')
           .width('80%')
           .height(50)

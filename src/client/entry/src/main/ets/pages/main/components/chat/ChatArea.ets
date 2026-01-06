@@ -71,20 +71,20 @@ struct ChatAreaInstance{
           .height(24)
           .width(24)
           .padding(0)
-          .margin({ right: 0 })
+          .margin({left:8})
           .onClick(()=>{
             EventBus.emit(Event.CLOSE_CHAT_AREA);
           })
 
         Image($r('app.media.Zombatar_1'))
-          .width(48)
-          .height(48)
-          .margin(8)
+          .width(40)
+          .height(40)
+          .margin({left:4,right:8})
           .borderRadius(24)
 
         //用户名
         Text(this.selectedContact.username)
-          .fontSize(18)
+          .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.primary_text'))
       }
@@ -93,7 +93,7 @@ struct ChatAreaInstance{
 
       //详情栏
       Row(){
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.detail'))
           .width(24)
           .height(24)
       }
@@ -232,20 +232,20 @@ export struct ChatArea{
           .height(24)
           .width(24)
           .padding(0)
-          .margin({ right: 0 })
+          .margin({left:8})
           .onClick(()=>{
             EventBus.emit(Event.CLOSE_CHAT_AREA);
           })
 
         Image(getAvatar(this.selectedContact.avatar))
-          .width(48)
-          .height(48)
-          .margin(8)
+          .width(40)
+          .height(40)
+          .margin({left:4,right:8})
           .borderRadius(24)
 
         //用户名
         Text(this.selectedContact.username)
-          .fontSize(18)
+          .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.primary_text'))
       }
@@ -254,7 +254,7 @@ export struct ChatArea{
 
       //详情栏
       Row(){
-        Image($r('app.media.startIcon'))
+        Image($r('app.media.detail'))
           .width(24)
           .height(24)
       }
