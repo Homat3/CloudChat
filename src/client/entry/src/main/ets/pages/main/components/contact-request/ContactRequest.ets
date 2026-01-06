@@ -499,7 +499,7 @@ export struct ContactRequest {
     Column() {
       Row() {
         // 头像
-        Image(getAvatar(request.requesterUsername))
+        Image(getAvatar(request.requesterAvatar))
           .width(48)
           .height(48)
           .borderRadius(24)
@@ -540,7 +540,7 @@ export struct ContactRequest {
               })
               .borderRadius(18)
               .onClick(() => {
-                EventBus.emit(Event.REFUSE_REQUEST, { id: request.id } as RefuseFriendRequestPayload)
+                EventBus.emit(Event.ACCEPT_REQUEST, { id: request.id } as AcceptFriendRequestPayload)
               })
 
             Button($r('app.string.text_ContactRequest_ReceivedRequestCard_Refuse'), { type: ButtonType.Normal })
@@ -551,7 +551,7 @@ export struct ContactRequest {
               .backgroundColor($r('app.color.primary'))
               .borderRadius(18)
               .onClick(() => {
-                EventBus.emit(Event.ACCEPT_REQUEST, { id: request.id } as AcceptFriendRequestPayload)
+                EventBus.emit(Event.REFUSE_REQUEST, { id: request.id } as RefuseFriendRequestPayload)
               })
           }
         }
