@@ -22,11 +22,11 @@ export struct ContactList {
   }
 
   //过滤联系人
-  private filterContacts(key: string): Contact[] {
+  private filterContacts(key: string, contacts: Contact[]): Contact[] {
     if(key.trim() === '') {
-      return [...this.contacts];
+      return [...contacts];
     } else {
-      return this.contacts.filter(contact =>
+      return contacts.filter(contact =>
         contact.username.toLowerCase().includes(key.toLowerCase())
       );
     }
@@ -45,7 +45,7 @@ export struct ContactList {
 
       //联系人列表
       List({ space: 15, initialIndex: 0 }) {
-        ForEach(this.filterContacts(this.searchKeyword), (contact: Contact) => {
+        ForEach(this.filterContacts(this.searchKeyword, this.contacts), (contact: Contact) => {
           ListItem() {
             ContactItem({
               contact: contact,

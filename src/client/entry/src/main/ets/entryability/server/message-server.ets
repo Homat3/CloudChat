@@ -81,7 +81,7 @@ export function handleLoadMessages(data: LoadMessagesPayload) {
         switch (resultData.type){
           case HttpServiceMessageType.MESSAGES_LOADED:
             const result = resultData.payload as MessagesLoadedPayload
-            CloudChat.addMessagesOfContact(result.messages);
+            CloudChat.addMessagesOfContact(result.targetId, result.messages);
             if (CloudChat.messageLoadEnd) EventBus.emit(Event.MESSAGES_LOADED);
             break;
           default:

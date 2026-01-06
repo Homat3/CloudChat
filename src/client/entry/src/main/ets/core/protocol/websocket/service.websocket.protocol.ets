@@ -104,7 +104,7 @@ export interface DeleteByContactPayload{
 }
 
 export interface ContactAddedPayload {
-  userId: number,
+  contactId: number,
   username: string,
   online: boolean,
   avatar: string

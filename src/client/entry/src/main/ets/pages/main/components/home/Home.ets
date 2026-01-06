@@ -14,7 +14,7 @@ import { ChatArea } from '../chat/ChatArea';
 export struct Home {
   // 状态变量
   @Link selectedContact: Contact | null;
-  @Link contacts: Contact[] | null;
+  @Prop contacts: Contact[];
   @State searchKeyword: string = '';
 
   // 上下文
@@ -23,7 +23,7 @@ export struct Home {
 
   build() {
     ContactList({
-      contacts: this.contacts ? this.contacts : [],
+      contacts: this.contacts,
       selectedContact: this.selectedContact,
       searchKeyword: this.searchKeyword
     })

@@ -185,6 +185,7 @@ export interface FriendRequestAcceptedFailedPayload {
 }
 
 export interface MessagesLoadedPayload {
+  targetId: number,
   messages: Array<{
     id: number;
     senderId: number;

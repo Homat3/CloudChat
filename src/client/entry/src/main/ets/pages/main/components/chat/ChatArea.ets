@@ -19,7 +19,6 @@ export struct ChatArea{
   // 状态变量
   @Prop currentUser: User;  //当前用户
   @Prop selectedContact: Contact;
-  @Prop contacts: Contact[];
 
   @State selectedMessages: Message[] | null = null;
   @State newMessage: string = '';
@@ -37,7 +36,7 @@ export struct ChatArea{
     try {
       EventBus.on(Event.UPDATE_MESSAGES, (data: MessageUpdateData) => {
         this.selectedMessages = data.messages;
-        if (data.isSelf) this.newMessage = '';
+        if (data.clearInput) this.newMessage = '';
         this.scroller.scrollToIndex(this.selectedMessages.length - 1);
       });
       EventBus.on(Event.OPEN_PANEL, () => {

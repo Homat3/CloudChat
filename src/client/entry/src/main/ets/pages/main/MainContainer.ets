@@ -20,7 +20,7 @@ import { AiPage } from './components/ai-chat/AiPage';
 
 export interface MessageUpdateData{
   messages: Message[],
-  isSelf: boolean
+  clearInput: boolean
 }
 
 @Entry
@@ -31,7 +31,7 @@ struct MainContainer {
   @State @Watch("onSwitchToChatArea") selectedContact: Contact | null = null;
   @State selectedMessages: Message[] | null = null;
   @State currentUser: User | null = CloudChat.currentUser;
-  @State contacts: Contact[] | null = null;
+  @State contacts: Contact[] = [];
   @State messagesMap: Map<number, Message[]> | null = null;
 
   @State isLoading: boolean = true;
@@ -57,20 +57,16 @@ struct MainContainer {
       EventBus.on(Event.CONTACT_LIST_LOADED, (): void => this.catchContacts());
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
       EventBus.on(Event.CONTACT_ADDED, (payload: ContactAddedPayload): void => {
-        if (this.contacts){
-          CloudChat.contacts = [...this.contacts, new Contact(
-            payload.userId, payload.username, payload.online, payload.avatar
-          )];
-          this.contacts = CloudChat.contacts;
-        }
+        CloudChat.contacts = [...CloudChat.contacts, new Contact(
+          payload.contactId, payload.username, payload.online, payload.avatar
+        )];
+        this.contacts = CloudChat.contacts;
       })
       EventBus.on(Event.CONTACT_DELETED, (payload: ContactDeletedPayload): void => {
-        if (this.contacts){
-          CloudChat.contacts = this.contacts.filter((contact: Contact) => !(contact.contactId === payload.targetId));
-          this.contacts = CloudChat.contacts;
-          this.selectedContact = null;
-          EventBus.emit(Event.CLOSE_CHAT_AREA);
-        }
+        CloudChat.contacts = this.contacts.filter((contact: Contact) => !(contact.contactId === payload.targetId));
+        this.contacts = CloudChat.contacts;
+        this.selectedContact = null;
+        EventBus.emit(Event.CLOSE_CHAT_AREA);
       })
       EventBus.on(Event.CONTACT_DELETED_FAILED, (e: string): void => {
         try {
@@ -107,7 +103,7 @@ struct MainContainer {
           this.messagesMap.set(message.receiverId, changedMessageList);
           if (this.selectedContact?.contactId === message.receiverId){
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, isSelf: true } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, clearInput: true } as MessageUpdateData);
           }
         }
       })
@@ -134,7 +130,7 @@ struct MainContainer {
           this.messagesMap.set(message.senderId, changedMessageList);
           if (this.selectedContact?.contactId === message.senderId){
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, clearInput: false } as MessageUpdateData);
           }
         }
       })
@@ -197,11 +193,9 @@ struct MainContainer {
   }
 
   loadMessages() {
-    if(this.contacts){
-      EventBus.emit(Event.LOAD_MESSAGES_START, this.contacts.length);
-      for (const contact of this.contacts){
-        EventBus.emit(Event.LOAD_MESSAGES, { userId: this.currentUser?.userId, targetId: contact.contactId } as LoadMessagesPayload);
-      }
+    EventBus.emit(Event.LOAD_MESSAGES_START, this.contacts.length);
+    for (const contact of this.contacts){
+      EventBus.emit(Event.LOAD_MESSAGES, { userId: this.currentUser?.userId, targetId: contact.contactId } as LoadMessagesPayload);
     }
   }
 
@@ -223,11 +217,10 @@ struct MainContainer {
     if (this.isChatAreaOpen){
       ChatArea({
         currentUser: this.currentUser!!,
-        selectedContact: this.selectedContact!!,
-        contacts: this.contacts!!,
+        selectedContact: this.selectedContact!!
       })
         .onAppear(() => {
-          EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
+          EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, clearInput: false } as MessageUpdateData);
         })
     }
     else {

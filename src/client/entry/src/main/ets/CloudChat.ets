@@ -53,18 +53,18 @@ export class CloudChat{
     }
   }
 
-  public static addMessagesOfContact(messages: Message[]){
+  public static addMessagesOfContact(targetId: number, messages: Message[]){
     if (CloudChat._messageMapBuilder){
       if (CloudChat.currentUser){
-        const contactId = messages[0].senderId === CloudChat.currentUser.userId ? messages[0].receiverId : messages[0].senderId;
+        CloudChat._messageMapBuilder.set(targetId, []);
         for (const message of messages) {
-          if (message.senderId === contactId || message.receiverId === contactId){
-            const contactMessages = CloudChat._messageMapBuilder.get(contactId);
+          if (message.senderId === targetId || message.receiverId === targetId){
+            const contactMessages = CloudChat._messageMapBuilder.get(targetId);
             if (contactMessages) {
               contactMessages.push(message);
             }
             else {
-              CloudChat._messageMapBuilder.set(contactId, [message]);
+              CloudChat._messageMapBuilder.set(targetId, [message]);
             }
           }
           else {
