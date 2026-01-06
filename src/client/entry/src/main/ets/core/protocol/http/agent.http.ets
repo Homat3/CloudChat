@@ -2,11 +2,14 @@ export namespace send{
   export interface CreateNewConversationPayload{
     username: string;
   }
+  export interface DeleteConversationPayload{
+    conversationId: string
+  }
 }
 
 export namespace receive{
   export interface ConversationCreateSuccessPayload{
-    id: string,
-    name: string
+    conversationId: string,
+    conversationName: string
   }
 }
