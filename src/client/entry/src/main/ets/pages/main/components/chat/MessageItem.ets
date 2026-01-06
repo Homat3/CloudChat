@@ -41,7 +41,8 @@ export struct MessageItem{
       .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
       .width('100%')
     }
+    .justifyContent(FlexAlign.Center)
     .width('100%')
-    .margin({ left: 10, top: 8, right: 10 })
+    .margin({ left:10, top: 8 })
   }
 }
