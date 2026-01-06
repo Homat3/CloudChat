@@ -1,25 +1,14 @@
-import { common } from "@kit.AbilityKit";
 import { Message } from "../../../../core/models/message";
-import { Contact } from "../../../../core/models/models";
 
 @Component
-  /**
-   * 消息项组件，把处理消息的功能提取出来
-   */
-export struct MessageItem{
-  // 状态变量
-
-  // 上下文
-  private uiContext: UIContext = this.getUIContext();
-  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
-
+export struct MessageItem {
   @Prop message: Message;
   @Prop isCurrentUser: boolean;
 
   build() {
     Column() {
-      //消息行
-      Row(){
+      // 消息气泡行
+      Row() {
         Text(this.message.content)
           .padding(12)
           .backgroundColor(
@@ -39,7 +28,7 @@ export struct MessageItem{
               : $r('app.color.other_message_text')
           )
           .textAlign(this.isCurrentUser ? TextAlign.End : TextAlign.Start)
-          // 显式声明换行，避免极端情况文本溢出
+          // 显式声明换行
           .constraintSize({
             minWidth: 0,
             maxWidth: '75%'
@@ -54,12 +43,12 @@ export struct MessageItem{
       .width('100%')
       .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
 
+      // 时间戳行
       Row() {
         Text(this.message.timestamp)
           .fontSize(12)
           .fontColor(Color.Gray)
           .textAlign(this.isCurrentUser ? TextAlign.End : TextAlign.Start)
-          // 时间戳和消息气泡对齐，保留边缘间距
           .margin({
             left: this.isCurrentUser ? 0 : 12,
             right: this.isCurrentUser ? 12 : 0
