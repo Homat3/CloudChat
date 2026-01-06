@@ -1,14 +1,25 @@
+import { common } from "@kit.AbilityKit";
 import { Message } from "../../../../core/models/message";
+import { Contact } from "../../../../core/models/models";
 
 @Component
-export struct MessageItem {
+  /**
+   * 消息项组件，把处理消息的功能提取出来
+   */
+export struct MessageItem{
+  // 状态变量
+
+  // 上下文
+  private uiContext: UIContext = this.getUIContext();
+  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+
   @Prop message: Message;
   @Prop isCurrentUser: boolean;
 
   build() {
     Column() {
-      // 消息气泡行
-      Row() {
+      //消息行
+      Row(){
         Text(this.message.content)
           .padding(12)
           .backgroundColor(
@@ -16,7 +27,6 @@ export struct MessageItem {
               ? $r('app.color.my_message_bg')
               : $r('app.color.other_message_bg')
           )
-          // 优化：差异化圆角，更符合聊天场景视觉习惯
           .borderRadius({
             topLeft: this.isCurrentUser ? 12 : 0,
             topRight: this.isCurrentUser ? 0 : 12,
@@ -44,7 +54,6 @@ export struct MessageItem {
       .width('100%')
       .justifyContent(this.isCurrentUser ? FlexAlign.End : FlexAlign.Start)
 
-      // 时间戳行：同步优化对齐和间距
       Row() {
         Text(this.message.timestamp)
           .fontSize(12)

@@ -16,8 +16,7 @@ import {
   WebsocketServiceMessageType} from '../../core/protocol/websocket/service.websocket.protocol';
 
 export interface MessageUpdateData{
-  messages: Message[],
-  isSelf: boolean
+  messages: Message[]
 }
 
 @Entry
@@ -78,7 +77,7 @@ struct MainContainer {
           this.messagesMap.set(message.receiverId, changedMessageList);
           if (this.selectedContact?.contactId === message.receiverId){
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, isSelf: message.senderId === this.currentUser?.userId } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
           }
         }
       })
@@ -105,7 +104,7 @@ struct MainContainer {
           this.messagesMap.set(message.senderId, changedMessageList);
           if (this.selectedContact?.contactId === message.senderId){
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, isSelf: message.senderId === this.currentUser?.userId } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
           }
         }
       })

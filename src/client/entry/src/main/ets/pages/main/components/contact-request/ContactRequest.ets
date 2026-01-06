@@ -245,7 +245,8 @@ export struct ContactRequest {
         .alignItems(HorizontalAlign.Start)
         .padding({ top: 8 })
       }
-      .scrollBar(BarState.Auto)
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
       .width('100%')
     }
     .padding({ top: 12, left: 16, right: 16, bottom: 16 })
