@@ -361,6 +361,10 @@
       "value": "同意"
     },
     {
+      "name": "text_MainContainer_aiPage",
+      "value": "AI"
+    },
+    {
       "name": "text_MainContainer_homePage",
       "value": "主页"
     },
