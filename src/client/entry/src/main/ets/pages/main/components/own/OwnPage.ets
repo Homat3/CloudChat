@@ -73,22 +73,6 @@ export struct OwnPage {
       .padding({ left: 20, right: 20 })
       .margin({ top: 20 })
 
-      // 消息通知开关
-      Row() {
-        Text($r("app.string.text_OwnPage_MessageNotify"))
-          .fontSize(16)
-          .width(100)
-        Toggle({ type: ToggleType.Switch, isOn: this.notificationsEnabled })
-          .onChange((isOn: boolean) => {
-            this.notificationsEnabled = isOn;
-          })
-          .margin({ left: 16 })
-      }
-      .width('100%')
-      .padding({ left: 20, right: 20 })
-      .margin({ top: 20 })
-
-
       // 颜色模式选择
       Column() {
         Text($r('app.string.text_OwnPage_colorMode'))

@@ -1,21 +1,20 @@
 
 import { common } from "@kit.AbilityKit";
-import { User } from "../../../../core/models/models";
+import { Contact, User } from "../../../../core/models/models";
+import { EventBus } from "../../../../core/service/event/EventBus";
+import { Event } from "../../../../core/tag/Event";
+import { getAvatar } from "../../../../core/util";
 
-@Entry
 @Component
-struct DetailPanel{
+export struct DetailPanel{
   // 从外部接收的用户参数
-  @State user: User | null = null
-  @State notificationsEnabled: boolean = true
-
+  @Prop contact: Contact;
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   aboutToAppear() {
     // 接受路由参数
-
   }
 
   build() {
@@ -26,7 +25,7 @@ struct DetailPanel{
       // 头像和基本信息区域
       Column() {
         // 头像
-        Image(this.user?.avatar)
+        Image(getAvatar(this.contact.avatar))
           .width(100)
           .height(100)
           .borderRadius(50)
@@ -38,7 +37,7 @@ struct DetailPanel{
             .fontSize(16)
             .fontColor(Color.Gray)
             .width(80)
-          Text(this.user?.userId?.toString())
+          Text(this.contact.contactId.toString())
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .layoutWeight(1)
@@ -54,7 +53,7 @@ struct DetailPanel{
             .fontSize(16)
             .fontColor(Color.Gray)
             .width(80)
-          Text(this.user?.username || $r('app.string.text_DetailPanel_unknownUser'))
+          Text(this.contact.username || $r('app.string.text_DetailPanel_unknownUser'))
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .layoutWeight(1)
@@ -63,46 +62,12 @@ struct DetailPanel{
         .width('100%')
         .padding({ left: 24, right: 24 })
         .margin({ top: 10, bottom: 10 })
-
-        // 邮箱
-        Row() {
-          Text($r('app.string.text_DetailPanel_email'))
-            .fontSize(16)
-            .fontColor(Color.Gray)
-            .width(80)
-          Text(this.user?.email || $r('app.string.text_DetailPanel_unSet'))
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .layoutWeight(1)
-            .margin({ left: 16 })
-        }
-        .width('100%')
-        .padding({ left: 24, right: 24 })
-        .margin({ top: 10, bottom: 10 })
-
       }
       .width('100%')
       .backgroundColor(Color.White)
       .borderRadius(12)
       .margin({ top: 20, left: 16, right: 16 })
       .padding({ bottom: 20 })
-
-      // 消息通知开关
-      Row() {
-        Text($r('app.string.text_DetailPanel_messageNotice'))
-          .fontSize(16)
-          .fontColor(Color.Gray)
-          .layoutWeight(1)
-        Toggle({ type: ToggleType.Switch, isOn: this.notificationsEnabled })
-          .onChange((isOn: boolean) => {
-            this.notificationsEnabled = isOn;
-          })
-      }
-      .width('100%')
-      .padding({ left: 24, right: 24, top: 16, bottom: 16 })
-      .backgroundColor(Color.White)
-      .margin({ top: 12, left: 16, right: 16 })
-      .borderRadius(12)
 
       // 中间空白区域
       Blank()
@@ -137,8 +102,7 @@ struct DetailPanel{
         .margin({left:8})
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          // 返回上一页逻辑
-          // router.back();
+          EventBus.emit(Event.CLOSE_PANEL);
         })
 
       // 标题

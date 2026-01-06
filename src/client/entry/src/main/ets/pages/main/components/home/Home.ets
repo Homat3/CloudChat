@@ -14,10 +14,7 @@ import { ChatArea } from '../chat/ChatArea';
 export struct Home {
   // 状态变量
   @Link selectedContact: Contact | null;
-  @Link selectedMessages: Message[] | null;
-  @Link currentUser: User | null;
   @Link contacts: Contact[] | null;
-  @Link messagesMap: Map<number, Message[]> | null;
   @State searchKeyword: string = '';
 
   // 上下文

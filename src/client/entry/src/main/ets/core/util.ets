@@ -1,4 +1,4 @@
-export function getAvatar(string: string): Resource{
+export function getAvatar(string: string | undefined | null): Resource{
   switch (string){
     case "default.png":
       return $r("app.media.default");

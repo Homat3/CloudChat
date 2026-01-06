@@ -14,7 +14,6 @@ import {
   MessageReceivedOtherPayload,
   WebsocketServiceMessage,
   WebsocketServiceMessageType } from '../../core/protocol/websocket/service.websocket.protocol';
-import { AIPage } from './components/ai/AIPage';
 
 @Entry
 @Component
@@ -187,12 +186,6 @@ struct MainContainer {
     }
     else {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
-        //AI聊天页面
-        TabContent() {
-          AIPage()
-        }.tabBar($r('app.string.text_MainContainer_aiPage'))
-
-        //联系人页面（主页面）
         TabContent() {
           Home({
             selectedContact: this.selectedContact,
@@ -203,14 +196,12 @@ struct MainContainer {
           })
         }.tabBar($r('app.string.text_MainContainer_homePage'));
 
-        //添加联系人页面
         TabContent() {
           ContactRequest({
             currentUser: this.currentUser
           })
         }.tabBar($r('app.string.text_MainContainer_contactRequest'));
 
-        //个人信息页面
         TabContent() {
           OwnPage()
         }.tabBar($r('app.string.text_MainContainer_ownPage'));
