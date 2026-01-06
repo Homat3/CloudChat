@@ -302,7 +302,7 @@
     },
     {
       "name": "text_ContactRequest_emptyState_noSearched_description",
-      "value": "请检查ID是否正确"
+      "value": "请再确定一下搜索内容哦"
     },
     {
       "name": "text_ContactRequest_emptyState_noSend_title",
@@ -371,6 +371,18 @@
     {
       "name": "text_MainContainer_ownPage",
       "value": "个人"
+    },
+    {
+      "name": "text_ContactRequest_RequestList_refuse",
+      "value": "已拒绝"
+    },
+    {
+      "name": "text_ContactRequest_RequestList_accept",
+      "value": "已通过"
+    },
+    {
+      "name": "text_ContactRequest_wait",
+      "value": "等待验证"
     }
   ]
 }

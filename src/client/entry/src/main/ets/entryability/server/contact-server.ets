@@ -12,7 +12,7 @@ import { EventBus } from '../../core/service/event/EventBus';
 import { Event } from '../../core/tag/Event';
 
 export function handleLoadContacts(data: LoadContactsPayload) {
-  const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
+  const httpService = CloudChat.httpServer;
   const loginRequest: HttpClientMessage ={
     type : HttpClientMessageType.LOAD_CONTACTS,
     payload : data

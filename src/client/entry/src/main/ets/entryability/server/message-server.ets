@@ -10,9 +10,41 @@ import { Event } from "../../core/tag/Event";
 import { EventBus } from "../../core/service/event/EventBus";
 import { HttpService } from "../../core/service/network/http/server.http";
 import { http } from "@kit.NetworkKit";
+import { SendMessagePayload, WebSocketClientMessage,
+  WebsocketClientMessageType } from "../../core/protocol/websocket/client.websocket.protocol";
+import {
+  MessageReceivedSelfPayload,
+  WebsocketServiceMessage,
+  WebsocketServiceMessageType } from "../../core/protocol/websocket/service.websocket.protocol";
+import { util } from "@kit.ArkTS";
+
+class SentMessageTempStore{
+  private static storeMap: Map<string, SendMessagePayload> = new Map();
+  public static pushStore(tempUuid: string, payload: SendMessagePayload){
+    if (SentMessageTempStore.storeMap.has(tempUuid)){
+      throw new Error("This UUID has been used");
+    }
+    SentMessageTempStore.storeMap.set(tempUuid, payload);
+    setTimeout(() => {
+      if (SentMessageTempStore.storeMap.has(tempUuid)){
+        SentMessageTempStore.takeStore(tempUuid);
+        EventBus.emit(Event.SEND_MESSAGE_FAILED, "Service response time out: 5s");
+      }
+    }, 5000)
+  }
+  public static takeStore(tempUuid: string): SendMessagePayload{
+    const payload = SentMessageTempStore.storeMap.get(tempUuid);
+    if (payload){
+      return payload;
+    }
+    else {
+      throw new Error("Not found");
+    }
+  }
+}
 
 export function handleLoadMessages(data: LoadMessagesPayload) {
-  const httpService = new HttpService("cloudchat.infinomat.com", "14514", false);
+  const httpService = CloudChat.httpServer;
   const loginRequest: HttpClientMessage ={
     type : HttpClientMessageType.LOAD_MESSAGES,
     payload : data
@@ -46,4 +78,47 @@ export function handleLoadMessages(data: LoadMessagesPayload) {
       EventBus.emit(Event.MESSAGES_LOADED_FAILED, e);
     }
   });
+}
+
+export function handleSendMessage(data: SendMessagePayload){
+  const ws = CloudChat.websocketServer;
+  try{
+    ws.addMessageObserver((msg)=>{
+      //控制台响应
+      console.log("Received: "+ msg);
+      let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
+      //处理登录响应
+      if( receivedObject.type === WebsocketServiceMessageType.MESSAGE_RECEIVED_SELF) {
+        const payload = receivedObject.payload as MessageReceivedSelfPayload;
+        const localPayload = SentMessageTempStore.takeStore(payload.tempId);
+        EventBus.emit(Event.SEND_MESSAGE_SUCCESS, {
+          id: payload.id,
+          senderId: localPayload.senderId, receiverId: localPayload.receiverId,
+          content: localPayload.content, timestamp: payload.timestamp,
+          status: 'sent', type: 'text'
+        } as Message);
+      }
+    });
+
+    let dataAvailable = false;
+    do {
+      data.tempId = util.generateRandomUUID(true);
+      try {
+        SentMessageTempStore.pushStore(data.tempId, data)
+        dataAvailable = true;
+      }
+      catch (e) {
+        dataAvailable = false;
+        continue;
+      }
+    } while (!dataAvailable)
+
+    const registerInfo: WebSocketClientMessage = {
+      type: WebsocketClientMessageType.SEND_MESSAGE,
+      payload: data
+    }
+    ws.send(registerInfo);
+  } catch(e){
+    EventBus.emit(Event.SEND_MESSAGE_FAILED, e);
+  }
 }

@@ -10,6 +10,10 @@ import { CloudChat } from '../../CloudChat';
 import { ContactsLoadedFailedPayload } from '../../core/protocol/http/service.http.protocol';
 import { common } from '@kit.AbilityKit';
 import { LoadContactsPayload, LoadMessagesPayload } from '../../core/protocol/http/client.http.protocol';
+import {
+  MessageReceivedOtherPayload,
+  WebsocketServiceMessage,
+  WebsocketServiceMessageType } from '../../core/protocol/websocket/service.websocket.protocol';
 
 @Entry
 @Component
@@ -45,6 +49,48 @@ struct MainContainer {
       EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
       EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
 
+      EventBus.on(Event.SEND_MESSAGE_SUCCESS, (message: Message): void => {
+        if (this.messagesMap){
+          let changedMessageList = this.messagesMap.get(message.receiverId);
+          if (changedMessageList) {
+            changedMessageList.push(message);
+          }
+          else {
+            changedMessageList = [message];
+          }
+          this.messagesMap.set(message.receiverId, changedMessageList);
+          if (this.selectedContact?.contactId === message.receiverId){
+            this.selectedMessages = changedMessageList;
+          }
+        }
+      })
+      EventBus.on(Event.SEND_MESSAGE_FAILED, (e: string): void => {
+        try {
+          this.uiContext.getPromptAction().showToast({
+            message: "消息发送失败：" + e,
+            duration: 2000
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      })
+      EventBus.on(Event.RECEIVE_MESSAGE, (payload: MessageReceivedOtherPayload): void => {
+        const message = payload as Message;
+        if (this.messagesMap){
+          let changedMessageList = this.messagesMap.get(message.senderId);
+          if (changedMessageList) {
+            changedMessageList.push(message);
+          }
+          else {
+            changedMessageList = [message];
+          }
+          this.messagesMap.set(message.senderId, changedMessageList);
+          if (this.selectedContact?.contactId === message.senderId){
+            this.selectedMessages = changedMessageList;
+          }
+        }
+      })
+
       EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
         if (this.selectedContact){
           const messageList = this.messagesMap?.get(this.selectedContact?.contactId);
@@ -59,12 +105,23 @@ struct MainContainer {
       })
 
       EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
-
-      EventBus.on(Event.SEND_MESSAGE, (message: string): void => this.sendMessage(message));
     } catch (error) {
       console.error(error);
     }
 
+    CloudChat.websocketServer.addMessageObserver((msg: string) => {
+      //控制台响应
+      console.log("Received: " + msg);
+      let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
+      //处理响应
+      switch (receivedObject.type) {
+        case WebsocketServiceMessageType.MESSAGE_RECEIVED_OTHER: {
+          const payload = receivedObject.payload as MessageReceivedOtherPayload;
+          EventBus.emit(Event.RECEIVE_MESSAGE, payload);
+          break;
+        }
+      }
+    })
     //加载数据
     this.loadContacts();
   }
@@ -117,9 +174,6 @@ struct MainContainer {
     }
   }
 
-  sendMessage(message: string){
-    // TODO
-  }
 
   //导航栏
   build() {
@@ -143,7 +197,9 @@ struct MainContainer {
         }.tabBar($r('app.string.text_MainContainer_homePage'));
 
         TabContent() {
-          ContactRequest()
+          ContactRequest({
+            currentUser: this.currentUser
+          })
         }.tabBar($r('app.string.text_MainContainer_contactRequest'));
 
         TabContent() {

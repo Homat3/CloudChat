@@ -32,7 +32,7 @@ function testWebsocket(){
   const ws = new WebsocketService("cloudchat.infinomat.com", "14514");
   try {
     ws.connect();
-    ws.addNewMessageObserver((msg) => {
+    ws.addMessageObserver((msg) => {
       console.log(JSON.stringify(msg));
     });
     const testInfo: TestInfo = {

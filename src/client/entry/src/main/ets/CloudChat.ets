@@ -1,11 +1,15 @@
 import { common } from '@kit.AbilityKit';
 import { Message, TextMessage } from './core/models/message';
 import { Contact, User } from './core/models/models';
+import { HttpService } from './core/service/network/http/server.http';
 import { WebsocketService } from './core/service/network/websocket/server.websocket';
 /**
  * @description CloudChat 全局属性
  */
 export class CloudChat{
+  public static websocketServer = new WebsocketService("cloudchat.infinomat.com", "14514");
+  public static httpServer = new HttpService("cloudchat.infinomat.com", "14514", false);
+
   private static _currentUser: User | null = null;
   private static _messageMap: Map<number, Message[]>;
   private static _messageMapBuilder: Map<number, Message[]> | null = null;

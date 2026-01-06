@@ -118,7 +118,7 @@ export function websocketServiceTest(){
 
     it('WebsocketServiceRequestTest', 0, async () => {
       let receive: string | null = null;
-      websocketService.addNewMessageObserver((get) => {
+      websocketService.addMessageObserver((get) => {
         receive = get;
       })
       setTimeout(() => {
