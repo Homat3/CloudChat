@@ -650,3 +650,24 @@ CloudChatUser* CloudChatDatabase::GetUserByEmail(std::string email) {
 	}
 	return nullptr;
 }
+
+bool CloudChatDatabase::DeleteFriendship(int user_id1, int user_id2) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+		    "delete from friends where (user_id1 = ? and user_id2 = ?) or (user_id1 = ? and user_id2 = ?)"
+		);
+		
+		pstmt->setInt(1, user_id1);
+		pstmt->setInt(2, user_id2);
+		pstmt->setInt(3, user_id2);
+		pstmt->setInt(4, user_id1);
+
+		return pstmt->executeUpdate() > 0;
+
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cerr << "add-failed:" << e.what() << std::endl;
+		std::cerr << "wrong-code:" << e.getErrorCode() << std::endl;
+		return false;
+	}
+}

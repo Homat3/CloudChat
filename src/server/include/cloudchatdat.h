@@ -51,6 +51,7 @@ public:
 	bool AddFriend(int user_id1, int user_id2);			  // 添加好友关系
 	std::vector<CloudChatUser> get_contacts(int user_id); // 根据用户 ID 获取联系人列表
 	bool is_friend(int user_id1, int user_id2);			  // 判断两个用户是否是好友
+	bool DeleteFriendship(int user_id1, int user_id2);	  // 删除好友关系
 	// messages
 	bool AddMessage(CloudChatMessage* message);	// 添加聊天消息
 	// 根据发送者和接收者用户 ID 获取聊天消息列表
