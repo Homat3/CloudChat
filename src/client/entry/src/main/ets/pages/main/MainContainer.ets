@@ -19,7 +19,8 @@ import {
 import { AiPage } from './components/ai-chat/AiPage';
 
 export interface MessageUpdateData{
-  messages: Message[]
+  messages: Message[],
+  isSelf: boolean
 }
 
 @Entry
@@ -106,7 +107,7 @@ struct MainContainer {
           this.messagesMap.set(message.receiverId, changedMessageList);
           if (this.selectedContact?.contactId === message.receiverId){
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, isSelf: true } as MessageUpdateData);
           }
         }
       })
