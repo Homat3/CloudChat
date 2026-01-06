@@ -38,6 +38,7 @@ export struct ChatArea{
       EventBus.on(Event.UPDATE_MESSAGES, (data: MessageUpdateData) => {
         this.selectedMessages = data.messages;
         this.scroller.scrollToIndex(this.selectedMessages.length - 1);
+        if (data.isSelf) this.newMessage = "";
       });
       EventBus.on(Event.OPEN_PANEL, () => {
         this.showPanel = true;
