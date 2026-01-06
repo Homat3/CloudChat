@@ -367,8 +367,10 @@ std::string AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hd
 	return friend_request_added_failed_msg->to_JSON();
 }
 
-void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 RefuseFriendRequestClientMsg* refuse_friend_request_client_msg) {
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int id = refuse_friend_request_client_msg->get_id();
 
 	std::cout << "拒绝好友请求：" << std::endl;
@@ -376,18 +378,23 @@ void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 
 	FriendRequest* friend_request = CloudChatDatabase::GetInstance()->GetFriendRequestById(id);
 	if (friend_request == nullptr) {
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedFailedMsg("该条好友请求不存在"));
-		return;
+		FriendRequestRefusedFailedMsg* friend_request_refused_failed_msg =
+			new FriendRequestRefusedFailedMsg("该条好友请求不存在");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_refused_failed_msg);
+		return friend_request_refused_failed_msg->to_JSON();
 	}
 
 	friend_request->SetStatus(FRIEND_REQUEST_STATUS_REFUSED);
 	if (!CloudChatDatabase::GetInstance()->UpdateFriendRequest(friend_request)) {
 		// friend_requests 数据表更新失败
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedFailedMsg("好友请求列表更新失败"));
-		return;
+		FriendRequestRefusedFailedMsg* friend_request_refused_failed_msg =
+			new FriendRequestRefusedFailedMsg("好友请求列表更新失败");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_refused_failed_msg);
+		return friend_request_refused_failed_msg->to_JSON();
 	}
 	// 回复消息
-	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedMsg(id));
+	FriendRequestRefusedMsg* friend_request_refused_msg = new FriendRequestRefusedMsg(id);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_refused_msg);
 	CloudChatUser* requester = CloudChatDatabase::GetInstance()->GetUserById(
 		friend_request->get_requester_id());
 	if (requester->is_online()) {
@@ -398,10 +405,13 @@ void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 			}
 		}
 	}
+	return friend_request_refused_msg->to_JSON();
 }
 
-void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 AcceptFriendRequestClientMsg* accept_friend_request_client_msg) {
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	int id = accept_friend_request_client_msg->get_id();
 
 	std::cout << "接受好友请求：" << std::endl;
@@ -409,34 +419,53 @@ void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 
 	FriendRequest* friend_request = CloudChatDatabase::GetInstance()->GetFriendRequestById(id);
 	if (friend_request == nullptr) {
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestRefusedFailedMsg("该条好友请求不存在"));
-		return;
+		FriendRequestAcceptedFailedMsg* friend_request_accepted_failed_msg =
+			new FriendRequestAcceptedFailedMsg("该条好友请求不存在");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_accepted_failed_msg);
+		return friend_request_accepted_failed_msg->to_JSON();
 	}
 
 	friend_request->SetStatus(FRIEND_REQUEST_STATUS_ACCEPTED);
 	if (!CloudChatDatabase::GetInstance()->UpdateFriendRequest(friend_request)) {
 		// friend_requests 数据表更新失败
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAcceptedFailedMsg("好友请求列表更新失败"));
-		return;
+		FriendRequestAcceptedFailedMsg* friend_request_accepted_failed_msg =
+			new FriendRequestAcceptedFailedMsg("好友请求列表更新失败");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_accepted_failed_msg);
+		return friend_request_accepted_failed_msg->to_JSON();
 	}
 	if (!CloudChatDatabase::GetInstance()->AddFriend(friend_request->get_requester_id(),
 													 friend_request->get_target_id())) {
 		// friends 数据表更新失败
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAcceptedFailedMsg("联系人列表更新失败"));
+		FriendRequestAcceptedFailedMsg* friend_request_accepted_failed_msg =
+			new FriendRequestAcceptedFailedMsg("联系人列表更新失败");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_accepted_failed_msg);
 		friend_request->SetStatus(FRIEND_REQUEST_STATUS_PENDING);
 		CloudChatDatabase::GetInstance()->UpdateFriendRequest(friend_request);
-		return;
+		return friend_request_accepted_failed_msg->to_JSON();
 	}
 	// 回复消息
-	SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAcceptedMsg(id));
+	FriendRequestAcceptedMsg* friend_request_accepted_msg = new FriendRequestAcceptedMsg(id);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_accepted_msg);
 	CloudChatUser* requester = CloudChatDatabase::GetInstance()->GetUserById(
 		friend_request->get_requester_id());
 	CloudChatUser* target = CloudChatDatabase::GetInstance()->GetUserById(
 		friend_request->get_target_id());
-	SendMsgToClient(cloudchat_srv, hdl, new ContactAddedMsg(requester->get_id(),
-															requester->get_username(),
-															requester->get_avatar(),
-															requester->is_online()));
+	if (websocket_open) {
+		SendMsgToClient(cloudchat_srv, hdl, new ContactAddedMsg(requester->get_id(),
+																requester->get_username(),
+																requester->get_avatar(),
+																requester->is_online()));
+	} else {
+		for (auto& p : g_online_users) {
+			if (p.second == friend_request->get_target_id()) {
+				SendMsgToClient(cloudchat_srv, p.first,
+								new ContactAddedMsg(requester->get_id(), requester->get_username(),
+													requester->get_avatar(),
+													requester->is_online()));
+				break;
+			}
+		}
+	}
 	if (requester->is_online()) {
 		for (auto& p : g_online_users) {
 			if (p.second == requester->get_id()) {
@@ -449,6 +478,7 @@ void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hd
 			}
 		}
 	}
+	return friend_request_accepted_msg->to_JSON();
 }
 
 std::string LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,

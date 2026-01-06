@@ -266,6 +266,12 @@ void OnHTTP(websocketpp::connection_hdl hdl) {
 	} else if (type == ADD_FRIEND_REQUEST) {
 		response_body = AddFriendRequest(g_cloudchat_srv, hdl,
 										 (AddFriendRequestClientMsg*)client_msg);
+	} else if (type == ACCEPT_FRIEND_REQUEST) {
+		response_body = AcceptFriendRequest(g_cloudchat_srv, hdl,
+											(AcceptFriendRequestClientMsg*)client_msg);
+	} else if (type == REFUSE_FRIEND_REQUEST) {
+		response_body = RefuseFriendRequest(g_cloudchat_srv, hdl,
+											(RefuseFriendRequestClientMsg*)client_msg);
 	}
 
 	if (type != ILLEGAL_MSG) con->set_status(websocketpp::http::status_code::ok);
