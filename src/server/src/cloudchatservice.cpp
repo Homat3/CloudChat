@@ -1,5 +1,7 @@
 #include "cloudchatservice.h"
+#include "cloudchatdat.h"
 #include "cloudchatmsg.h"
+#include "cloudchatuser.h"
 
 std::map<websocketpp::connection_hdl, int,
 	std::owner_less<websocketpp::connection_hdl>> g_online_users;
@@ -548,5 +550,35 @@ std::string DeleteContact(server_t& cloudchat_srv, websocketpp::connection_hdl h
 	std::cout << "userId: " << user_id << std::endl;
 	std::cout << "targetId: " << target_id << std::endl;
 
-	return "";
+	// 检查是否是好友
+	if (!CloudChatDatabase::GetInstance()->is_friend(user_id, target_id)) {
+		ContactDeletedFailedMsg* contact_deleted_failed_msg =
+			new ContactDeletedFailedMsg("你和 TA 不是好友");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, contact_deleted_failed_msg);
+		return contact_deleted_failed_msg->to_JSON();
+	}
+
+	if (!CloudChatDatabase::GetInstance()->DeleteFriendship(user_id, target_id)) {
+		// 数据表 friends 操作失败
+		ContactDeletedFailedMsg* contact_deleted_failed_msg =
+			new ContactDeletedFailedMsg("数据表 friends 操作失败");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, contact_deleted_failed_msg);
+		return contact_deleted_failed_msg->to_JSON();
+	}
+
+	// 删除成功
+	ContactDeletedMsg* contact_deleted_msg = new ContactDeletedMsg(target_id);
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, contact_deleted_msg); // Websocket 回复
+	// 通知被删用户
+	CloudChatUser* target = CloudChatDatabase::GetInstance()->GetUserById(target_id);
+	if (target == nullptr) return contact_deleted_msg->to_JSON();
+	if (target->is_online()) {
+		for (auto& p : g_online_users) {
+			if (p.second == target->get_id()) {
+			    SendMsgToClient(cloudchat_srv, p.first, new DeletedByContactMsg(user_id));
+				break;
+			}
+		}
+	}
+	return contact_deleted_msg->to_JSON();
 }

@@ -1,5 +1,5 @@
 #include "cloudchatmsg.h"
-#include "cloudchatuser.h"
+#include <string>
 
 ProtocalMsg::ProtocalMsg(std::string type) {
 	type_ = type;
@@ -345,7 +345,8 @@ std::string ContactAddedFailedMsg::to_JSON() {
 
 std::string ContactDeletedMsg::to_JSON() {
 	char buff[BUFF_LEN] = "";
-	sprintf(buff, "{\"type\":\"%s\",\"payload\":{}}", to_JSON_string(type_).c_str());
+	sprintf(buff, "{\"type\":\"%s\",\"payload\":{\"targetId\":%d}}", to_JSON_string(type_).c_str(),
+		target_id_);
 	std::string JSON;
 	for (int i = 0; i < strlen(buff); i++) JSON.push_back(buff[i]);
 	return JSON;
@@ -1342,4 +1343,17 @@ int DeleteContactMsg::get_user_id() {
 
 int DeleteContactMsg::get_target_id() {
 	return target_id_;
+}
+
+ContactDeletedMsg::ContactDeletedMsg(int target_id) : ServerMsg(CONTACT_DELETED) {
+	target_id_ = target_id;
+}
+
+DeletedByContactMsg::DeletedByContactMsg(int contact_id) : ServerMsg(DELETED_BY_CONTACT) {
+	contact_id_ = contact_id;
+}
+
+std::string DeletedByContactMsg::to_JSON() {
+	return "{\"type\":\"" + get_type() + "\",\"payload\":{\"contactId\":" +
+		std::to_string(contact_id_) + "}}";
 }
