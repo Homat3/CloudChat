@@ -302,8 +302,10 @@ std::string SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection
 	return search_for_user_result_msg->to_JSON();
 }
 
-void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					  AddFriendRequestClientMsg* add_friend_request_client_msg) {
+	bool websocket_open = check_websocket_open(cloudchat_srv, hdl);
+	
 	FriendRequest friend_request = add_friend_request_client_msg->get_friend_request();
 	
 	std::cout << "添加好友请求：" << std::endl;
@@ -315,31 +317,37 @@ void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 	// 检查是否已经是好友
 	if (CloudChatDatabase::GetInstance()->is_friend(friend_request.get_requester_id(),
 													friend_request.get_target_id())) {
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedFailedMsg("你和 TA 已经是好友了"));
-		return;
+		FriendRequestAddedFailedMsg* friend_request_added_failed_msg =
+			new FriendRequestAddedFailedMsg("你和 TA 已经是好友了");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_failed_msg);
+		return friend_request_added_failed_msg->to_JSON();
 	}
 
 	FriendRequest* res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
 		friend_request.get_requester_id(), friend_request.get_target_id()
 		);
 	if (res != nullptr) {		// 已经发送过请求
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedFailedMsg("已向 TA 发送过好友请求"));
-		return;
+		FriendRequestAddedFailedMsg* friend_request_added_failed_msg =
+			new FriendRequestAddedFailedMsg("已向 TA 发送过好友请求");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_failed_msg);
+		return friend_request_added_failed_msg->to_JSON();
 	}
 	res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
 		friend_request.get_target_id(),
 		friend_request.get_requester_id()
 		);
 	if (res != nullptr) {		// 已经收到过请求
-		SendMsgToClient(cloudchat_srv, hdl,
-						new FriendRequestAddedFailedMsg("已收到过 TA 发来的好友请求"));
-		return;
+		FriendRequestAddedFailedMsg* friend_request_added_failed_msg =
+			new FriendRequestAddedFailedMsg("已收到过 TA 发来的好友请求");
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_failed_msg);
+		return friend_request_added_failed_msg->to_JSON();
 	}
 	
 	if (CloudChatDatabase::GetInstance()->AddFriendRequest(friend_request)) {
 		res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
 			friend_request.get_requester_id(), friend_request.get_target_id());
-		SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedMsg(*res));
+		FriendRequestAddedMsg* friend_request_added_msg = new FriendRequestAddedMsg(*res);
+		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_msg);
 		CloudChatUser* target_user = CloudChatDatabase::GetInstance()->GetUserById(
 			friend_request.get_target_id());
 		if (target_user->is_online()) {
@@ -351,7 +359,12 @@ void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 				}
 			}
 		}
-	} else SendMsgToClient(cloudchat_srv, hdl, new FriendRequestAddedFailedMsg("数据库操作失败"));
+		return friend_request_added_msg->to_JSON();
+	}
+	FriendRequestAddedFailedMsg* friend_request_added_failed_msg =
+		new FriendRequestAddedFailedMsg("数据库操作失败");
+	if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_failed_msg);
+	return friend_request_added_failed_msg->to_JSON();
 }
 
 void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,

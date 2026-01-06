@@ -1,7 +1,6 @@
 #ifndef CLOUDCHAT_SERVICE
 #define CLOUDCHAT_SERVICE
 
-#include <websocketpp/common/connection_hdl.hpp>
 #define DEFAULT_AVATAR_URL "default.png"	// 默认用户头像 URL
 
 #include "cloudchatdat.h"
@@ -35,7 +34,7 @@ std::string SearchForUserById(server_t& cloudchat_srv, websocketpp::connection_h
 					   SearchForUserByIdMsg* search_for_user_by_id_msg);
 std::string SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 SearchForUserByNameMsg* search_for_user_by_name_msg);
-void AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					  AddFriendRequestClientMsg* add_friend_request_client_msg);
 void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 RefuseFriendRequestClientMsg* refuse_friend_request_client_msg);
