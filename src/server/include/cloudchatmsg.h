@@ -76,6 +76,7 @@
 #define FILE_UPLOADED                  "FILE_UPLOADED"					// 文件上传成功
 #define FILE_UPLOADED_FAILED           "FILE_UPLOADED_FAILED"			// 文件上传失败
 #define HDL_GOT                        "HDL_GOT"						// 已获取 hdl 信息
+#define DELETED_BY_CONTACT             "DELETED_BY_CONTACT"				// 被联系人删除好友
 
 class CloudChatMessage { // 聊天消息类
 private:
@@ -450,7 +451,10 @@ public:
 };
 
 class ContactDeletedMsg : public ServerMsg { // 联系人已删除消息
+private:
+	int target_id_;
 public:
+	ContactDeletedMsg(int target_id);
 	std::string to_JSON() override;
 };
 
@@ -699,6 +703,15 @@ private:
 	
 public:
 	HdlGotMsg(int user_id);
+	std::string to_JSON() override;
+};
+
+class DeletedByContactMsg : public ServerMsg {
+private:
+	int contact_id_;
+
+public:
+	DeletedByContactMsg(int contact_id);
 	std::string to_JSON() override;
 };
 

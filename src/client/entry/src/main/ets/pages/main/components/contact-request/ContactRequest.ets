@@ -24,7 +24,6 @@ import { WebsocketServiceMessage,
   AddFriendRequestPayload as RequireAddFriendRequestPayload,
   AcceptFriendRequestPayload as RequireAcceptFriendRequestPayload,
   RefuseFriendRequestPayload as RequireRefuseFriendRequestPayload,
-  MessageReceivedOtherPayload
 } from '../../../../core/protocol/websocket/service.websocket.protocol';
 import { loadStringResource } from '../../../../core/service/resource/load-resource';
 
