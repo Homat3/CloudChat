@@ -20,6 +20,14 @@ import { util } from "@kit.ArkTS";
 
 class SentMessageTempStore{
   private static storeMap: Map<string, SendMessagePayload> = new Map();
+  private static deletedUuid: string[] = [];
+  private static deleteStore(uuid: string){
+    SentMessageTempStore.storeMap.delete(uuid);
+    SentMessageTempStore.deletedUuid.push(uuid);
+    if (SentMessageTempStore.deletedUuid.length >= 100){
+      SentMessageTempStore.deletedUuid.splice(0, 49);
+    }
+  }
   public static pushStore(tempUuid: string, payload: SendMessagePayload){
     if (SentMessageTempStore.storeMap.has(tempUuid)){
       throw new Error("This UUID has been used");
@@ -32,13 +40,20 @@ class SentMessageTempStore{
       }
     }, 5000)
   }
-  public static takeStore(tempUuid: string): SendMessagePayload{
+  public static takeStore(tempUuid: string): SendMessagePayload | null {
     const payload = SentMessageTempStore.storeMap.get(tempUuid);
     if (payload){
+      SentMessageTempStore.deleteStore(tempUuid);
       return payload;
     }
     else {
-      throw new Error("Not found");
+      if (SentMessageTempStore.deletedUuid.reverse().includes(tempUuid)){
+        console.warn("The message has been taken");
+        return null;
+      }
+      else {
+        throw new Error("Not found");
+      }
     }
   }
 }
@@ -91,7 +106,7 @@ export function handleSendMessage(data: SendMessagePayload){
       if( receivedObject.type === WebsocketServiceMessageType.MESSAGE_RECEIVED_SELF) {
         const payload = receivedObject.payload as MessageReceivedSelfPayload;
         const localPayload = SentMessageTempStore.takeStore(payload.tempId);
-        EventBus.emit(Event.SEND_MESSAGE_SUCCESS, {
+        if (localPayload) EventBus.emit(Event.SEND_MESSAGE_SUCCESS, {
           id: payload.id,
           senderId: localPayload.senderId, receiverId: localPayload.receiverId,
           content: localPayload.content, timestamp: payload.timestamp,

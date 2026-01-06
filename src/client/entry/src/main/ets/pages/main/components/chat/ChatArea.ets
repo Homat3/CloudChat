@@ -7,7 +7,9 @@ import { EventBus } from "../../../../core/service/event/EventBus";
 import { getAvatar } from "../../../../core/util";
 import { MessageItem } from "./MessageItem";
 import { SendMessagePayload } from "../../../../core/protocol/websocket/client.websocket.protocol";
-import { util } from "@kit.ArkTS";
+import { MessageUpdateData } from "../../MainContainer";
+import { Page } from "../../../../core/tag/Page";
+import { DetailPanel } from "./DetailPanel";
 
 @Component
   /**
@@ -17,29 +19,75 @@ export struct ChatArea{
   // 状态变量
   @Prop currentUser: User;  //当前用户
   @Prop selectedContact: Contact;
-  @Link messages: Message[];
+  @Prop contacts: Contact[];
 
+  @State selectedMessages: Message[] | null = null;
   @State newMessage: string = '';
   @State showEmojiPicker: boolean = false;
   @State showAttachmentMenu: boolean = false;
+  @State showPanel: boolean = false;
+
+  private scroller: Scroller = new Scroller();
 
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
+  aboutToAppear(): void {
+    try {
+      EventBus.on(Event.UPDATE_MESSAGES, (data: MessageUpdateData) => {
+        this.selectedMessages = data.messages;
+        this.scroller.scrollToIndex(this.selectedMessages.length - 1);
+      });
+      EventBus.on(Event.OPEN_PANEL, () => {
+        this.showPanel = true;
+      });
+      EventBus.on(Event.CLOSE_PANEL, () => {
+        this.showPanel = false;
+      })
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   build(){
     Column() {
-      //头部
-      this.buildHeader()
-
-      Column(){
-        this.buildMessageList()
+      if (this.showPanel){
+        DetailPanel({
+          contact: this.selectedContact
+        });
       }
-      .layoutWeight(1)
-      .width('100%')
-      .backgroundColor($r('app.color.contact_list_contact_background'))
+      else {
+        //头部
+        this.buildHeader()
 
-      this.buildInputArea()
+        Column() {
+          List({ space: 10, scroller: this.scroller }) {
+            ForEach(this.selectedMessages, (message: Message) => {
+              ListItem() {
+                MessageItem({
+                  message: message,
+                  isCurrentUser: this.isCurrentUser(message)
+                })
+              }
+            }, (message: Message) => message.id.toString() + message.timestamp) // 添加时间戳保证key唯一
+          }
+          .onAppear(() => {
+            if (this.selectedMessages?.length) {
+              this.scroller.scrollToIndex(this.selectedMessages.length - 1);
+            }
+          })
+          .height('100%')
+          .width('100%')
+          .layoutWeight(1)
+          .scrollBar(BarState.Auto)
+        }
+        .layoutWeight(1)
+        .width('100%')
+        .backgroundColor($r('app.color.contact_list_contact_background'))
+
+        this.buildInputArea()
+      }
     }
     .width('100%')
     .height('100%')
@@ -60,14 +108,14 @@ export struct ChatArea{
             EventBus.emit(Event.CLOSE_CHAT_AREA);
           })
 
-        Image(getAvatar(this.selectedContact.avatar))
+        Image(getAvatar(this.selectedContact?.avatar))
           .width(40)
           .height(40)
           .margin({left:4,right:8})
           .borderRadius(24)
 
         //用户名
-        Text(this.selectedContact.username)
+        Text(this.selectedContact?.username)
           .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('app.color.primary_text'))
@@ -86,7 +134,7 @@ export struct ChatArea{
       .height(40)
       .padding(0)
       .onClick(()=>{
-        //跳转到详情页
+        EventBus.emit(Event.OPEN_PANEL);
       })
     }
     .width('100%')
@@ -98,23 +146,12 @@ export struct ChatArea{
     .border({ width: { bottom: 0.5 }, color: $r('app.color.list_divider') })
   }
 
-  @Builder
-  buildMessageList() {
-    //消息列表
-    List({ space: 10, initialIndex: this.messages.length - 1 }) {
-      ForEach(this.messages, (message: Message) => {
-        ListItem() {
-          MessageItem({
-            message: message,
-            isCurrentUser: this.currentUser.userId === this.selectedContact.contactId
-          })
-        }
-      }, (message: Message) => message.id.toString())
-    }
-    .height('100%')
-    .width('100%')
-    .layoutWeight(1)
-    .scrollBar(BarState.Auto)
+  private getLastIndex(messages: Message[] | null): number{
+    return messages? messages.length - 1 : 0;
+  }
+
+  private isCurrentUser(message: Message): boolean{
+    return this.currentUser?.userId === message.senderId
   }
 
   @Builder

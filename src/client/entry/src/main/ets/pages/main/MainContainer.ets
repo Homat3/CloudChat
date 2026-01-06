@@ -13,7 +13,11 @@ import { LoadContactsPayload, LoadMessagesPayload } from '../../core/protocol/ht
 import {
   MessageReceivedOtherPayload,
   WebsocketServiceMessage,
-  WebsocketServiceMessageType } from '../../core/protocol/websocket/service.websocket.protocol';
+  WebsocketServiceMessageType} from '../../core/protocol/websocket/service.websocket.protocol';
+
+export interface MessageUpdateData{
+  messages: Message[]
+}
 
 @Entry
 @Component
@@ -43,17 +47,29 @@ struct MainContainer {
 
     //注册监听
     try {
+      EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
+      EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
+
       EventBus.on(Event.CONTACT_LIST_LOADED, (): void => this.catchContacts());
       EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
 
-      EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
-      EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
+      EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
+        if (this.selectedContact){
+          this.selectedMessages = this.messagesMap?.get(this.selectedContact?.contactId) || null;
+          this.isChatAreaOpen = true;
+        }
+      });
+      EventBus.on(Event.CLOSE_CHAT_AREA, (): void => {
+        this.isChatAreaOpen = false;
+      })
+
+      EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
 
       EventBus.on(Event.SEND_MESSAGE_SUCCESS, (message: Message): void => {
         if (this.messagesMap){
           let changedMessageList = this.messagesMap.get(message.receiverId);
           if (changedMessageList) {
-            changedMessageList.push(message);
+            changedMessageList = [...changedMessageList, message];
           }
           else {
             changedMessageList = [message];
@@ -61,6 +77,7 @@ struct MainContainer {
           this.messagesMap.set(message.receiverId, changedMessageList);
           if (this.selectedContact?.contactId === message.receiverId){
             this.selectedMessages = changedMessageList;
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
           }
         }
       })
@@ -79,7 +96,7 @@ struct MainContainer {
         if (this.messagesMap){
           let changedMessageList = this.messagesMap.get(message.senderId);
           if (changedMessageList) {
-            changedMessageList.push(message);
+            changedMessageList = [...changedMessageList, message];
           }
           else {
             changedMessageList = [message];
@@ -87,41 +104,27 @@ struct MainContainer {
           this.messagesMap.set(message.senderId, changedMessageList);
           if (this.selectedContact?.contactId === message.senderId){
             this.selectedMessages = changedMessageList;
+            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
           }
         }
       })
 
-      EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
-        if (this.selectedContact){
-          const messageList = this.messagesMap?.get(this.selectedContact?.contactId);
-          if (messageList) {
-            this.selectedMessages = messageList;
+      CloudChat.websocketServer.addMessageObserver((msg: string) => {
+        //控制台响应
+        console.log("Received: " + msg);
+        let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
+        //处理响应
+        switch (receivedObject.type) {
+          case WebsocketServiceMessageType.MESSAGE_RECEIVED_OTHER: {
+            const payload = receivedObject.payload as MessageReceivedOtherPayload;
+            EventBus.emit(Event.RECEIVE_MESSAGE, payload);
+            break;
           }
         }
-        this.isChatAreaOpen = true;
-      });
-      EventBus.on(Event.CLOSE_CHAT_AREA, (): void => {
-        this.isChatAreaOpen = false;
       })
-
-      EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
     } catch (error) {
       console.error(error);
     }
-
-    CloudChat.websocketServer.addMessageObserver((msg: string) => {
-      //控制台响应
-      console.log("Received: " + msg);
-      let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
-      //处理响应
-      switch (receivedObject.type) {
-        case WebsocketServiceMessageType.MESSAGE_RECEIVED_OTHER: {
-          const payload = receivedObject.payload as MessageReceivedOtherPayload;
-          EventBus.emit(Event.RECEIVE_MESSAGE, payload);
-          break;
-        }
-      }
-    })
     //加载数据
     this.loadContacts();
   }
@@ -177,22 +180,22 @@ struct MainContainer {
 
   //导航栏
   build() {
-    if (this.isChatAreaOpen && this.currentUser && this.selectedContact && this.selectedMessages){
+    if (this.isChatAreaOpen){
       ChatArea({
-        currentUser: this.currentUser,
-        selectedContact: this.selectedContact,
-        messages: this.selectedMessages
+        currentUser: this.currentUser!!,
+        selectedContact: this.selectedContact!!,
+        contacts: this.contacts!!,
       })
+        .onAppear(() => {
+          EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages } as MessageUpdateData);
+        })
     }
     else {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
         TabContent() {
           Home({
             selectedContact: this.selectedContact,
-            selectedMessages: this.selectedMessages,
-            currentUser: this.currentUser,
             contacts: this.contacts,
-            messagesMap: this.messagesMap,
           })
         }.tabBar($r('app.string.text_MainContainer_homePage'));
 
