@@ -373,10 +373,6 @@
       "value": "个人"
     },
     {
-      "name": "text_MainContainer_aiPage",
-      "value": "AI"
-    },
-    {
       "name": "text_ContactRequest_RequestList_refuse",
       "value": "已拒绝"
     },
