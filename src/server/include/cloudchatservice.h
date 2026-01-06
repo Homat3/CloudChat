@@ -36,9 +36,9 @@ std::string SearchForUserByName(server_t& cloudchat_srv, websocketpp::connection
 						 SearchForUserByNameMsg* search_for_user_by_name_msg);
 std::string AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					  AddFriendRequestClientMsg* add_friend_request_client_msg);
-void RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string RefuseFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 RefuseFriendRequestClientMsg* refuse_friend_request_client_msg);
-void AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
+std::string AcceptFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 						 AcceptFriendRequestClientMsg* accept_friend_request_client_msg);
 std::string LoadFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hdl hdl,
 					   LoadFriendRequestMsg* load_friend_request_msg);
