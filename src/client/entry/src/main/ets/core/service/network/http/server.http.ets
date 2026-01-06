@@ -19,7 +19,7 @@ export class HttpService {
     this.SSL_Available = SSL_Available;
   }
 
-  private async request(uri: string, requestOptions: http.HttpRequestOptions, callback: AsyncCallback<http.HttpResponse>) {
+  async request(uri: string, requestOptions: http.HttpRequestOptions, callback: AsyncCallback<http.HttpResponse>) {
     try {
       const prefix = this.SSL_Available ? "https://" : "http://";
       const endfix = this.port ? ":" + this.port : "";

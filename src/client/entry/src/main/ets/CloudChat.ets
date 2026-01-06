@@ -9,6 +9,9 @@ import { WebsocketService } from './core/service/network/websocket/server.websoc
 export class CloudChat{
   public static websocketServer = new WebsocketService("cloudchat.infinomat.com", "14514");
   public static httpServer = new HttpService("cloudchat.infinomat.com", "14514", false);
+  public static aiHttpServer = new HttpService("api.coze.cn");
+  public static aiToken = "pat_ZulEzQXs1DOZd0XcLJsFKpsRN42nkxI3VP85CsMQKOHjB7SsMo4dmX37vpC50C2F";
+  public static botId = "7592221617674682387";
 
   private static _currentUser: User | null = null;
   private static _messageMap: Map<number, Message[]>;

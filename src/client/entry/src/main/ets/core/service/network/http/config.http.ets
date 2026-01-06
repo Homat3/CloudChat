@@ -28,7 +28,6 @@ export class HttpConfig implements HttpConfigInterface{
     this.connectTimeout = 5000; //管理读取超时
   }
 
-
   public header: HttpHeaderInterface;
   public expectDataType: http.HttpDataType = http.HttpDataType.OBJECT;
 
@@ -66,7 +65,7 @@ export class HttpConfig implements HttpConfigInterface{
   }
 };
 
-export class RequestOptionsBuilder{ //建造者模式
+export class RequestOptionsBuilder{
   private config: HttpConfigInterface = HttpConfig.getInstance();
   private requestOptions: http.HttpRequestOptions = { //配置HTTP方法
     method: http.RequestMethod.GET,
@@ -100,6 +99,11 @@ export class RequestOptionsBuilder{ //建造者模式
 
   public body(body: object): RequestOptionsBuilder {
     this.requestOptions.extraData = JSON.stringify(body);
+    return this;
+  }
+
+  public header(header: object){
+    this.requestOptions.header = header;
     return this;
   }
 
