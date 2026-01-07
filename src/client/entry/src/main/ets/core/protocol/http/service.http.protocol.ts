@@ -64,10 +64,7 @@ export type ServicePayload =
   FriendRequestRefusedFailedPayload |
   FriendRequestAcceptedFailedPayload |
 
-  MessagesLoadedPayload |
-
-  FileUploadedPayload |
-  FileUploadedFailedPayload;
+  MessagesLoadedPayload;
 
 export interface LoginSuccessPayload {
   userId: number;
@@ -195,13 +192,4 @@ export interface MessagesLoadedPayload {
     status: 'sending' | 'sent' | 'read';
     type: 'text' | 'image' | 'file';
   }>;
-}
-
-export interface FileUploadedPayload {
-  filePath: string;
-}
-
-export interface FileUploadedFailedPayload {
-  filePath: string;
-  error: string;
 }
