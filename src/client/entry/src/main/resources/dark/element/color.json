@@ -97,11 +97,11 @@
     },
     {
       "name": "button_secondary_bg",
-      "value": "transparent"
+      "value": "#FFA4A4A4"
     },
     {
       "name": "text_on_brand",
       "value": "#FFFFFF"
-    }
+    },
   ]
 }
