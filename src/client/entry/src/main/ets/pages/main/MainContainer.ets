@@ -261,7 +261,9 @@ struct MainContainer {
         }.tabBar($r('app.string.text_MainContainer_aiPage'))
 
         TabContent() {
-          OwnPage()
+          OwnPage({
+            currentUser: this.currentUser
+          })
         }.tabBar($r('app.string.text_MainContainer_ownPage'));
       }
       .width('100%')

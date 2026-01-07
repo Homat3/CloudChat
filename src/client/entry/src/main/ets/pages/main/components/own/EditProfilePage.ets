@@ -26,6 +26,16 @@ export struct EditProfilePage {
 
   aboutToAppear(): void {
     try {
+      EventBus.on(Event.PROFILE_UPDATED, (): void => {
+        try {
+          this.uiContext.getPromptAction().showToast({
+            message: "个人信息更新成功",
+            duration: 2000
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      });
       EventBus.on(Event.PROFILE_UPDATE_FAILED, (error: string): void => {
         try {
           this.uiContext.getPromptAction().showToast({

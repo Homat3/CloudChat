@@ -9,12 +9,11 @@ import { EditProfilePage } from "./EditProfilePage";
 ;
 @Component
 export struct OwnPage {
-  @State user: User | null = CloudChat.currentUser
-  @State isEditing: boolean = false //修改信息状态
-  @State notificationsEnabled: boolean = true
-  @State language: string = 'zh-CN'
+  @Prop currentUser: User;
+  @State isEditing: boolean = false; //修改信息状态
+  @State notificationsEnabled: boolean = true;
   // 颜色模式状态
-  @State colorMode: string = 'not_set'
+  @State colorMode: string = 'not_set';
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -41,7 +40,7 @@ export struct OwnPage {
       if (!this.isEditing) {
         Column() {
           // 用户头像
-          Image(getAvatar(this.user?.avatar ? this.user.avatar : ""))
+          Image(getAvatar(this.currentUser?.avatar ? this.currentUser.avatar : ""))
             .id('avatar')
             .width(80)
             .height(80)
@@ -57,7 +56,7 @@ export struct OwnPage {
             Text($r('app.string.text_OwnPage_userId'))
               .fontSize(16)
               .width(100)
-            Text(this.user?.userId.toString())
+            Text(this.currentUser?.userId.toString())
               .fontSize(16)
               .fontColor(Color.Gray)
               .margin({ left: 16 })
@@ -72,7 +71,7 @@ export struct OwnPage {
             Text($r('app.string.text_OwnPage_username'))
               .fontSize(16)
               .width(100)
-            Text(this.user?.email)
+            Text(this.currentUser?.username)
               .fontSize(16)
               .fontColor(Color.Gray)
               .margin({ left: 16 })
@@ -86,7 +85,7 @@ export struct OwnPage {
             Text($r("app.string.text_OwnPage_Email"))
               .fontSize(16)
               .width(100)
-            Text(this.user?.email)
+            Text(this.currentUser?.email)
               .fontSize(16)
               .fontColor(Color.Gray)
               .margin({ left: 16 })
@@ -163,7 +162,9 @@ export struct OwnPage {
       }
       else {
         //显示修改信息页面
-        EditProfilePage()
+        EditProfilePage({
+          currentUser: this.currentUser
+        })
       }
     }
     .width('100%')
