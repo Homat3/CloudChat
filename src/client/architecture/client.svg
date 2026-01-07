@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+  <style>
+    .box { fill:#f8f9fa; stroke:#2d3748; stroke-width:2; rx:8; }
+    .title { font: 700 20px sans-serif; fill:#111827 }
+    .label { font: 600 14px sans-serif; fill:#0f172a }
+    .small { font: 12px sans-serif; fill:#334155 }
+    .arrow { stroke:#0f172a; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <text x="20" y="34" class="title">CloudChat 客户端架构图</text>
+
+  <!-- AppScope -->
+  <rect x="20" y="60" width="220" height="80" class="box" />
+  <text x="30" y="95" class="label">AppScope</text>
+  <text x="30" y="115" class="small">app.json5 / 能力声明</text>
+
+  <!-- Entry Ability -->
+  <rect x="300" y="40" width="360" height="110" class="box" />
+  <text x="320" y="70" class="label">Entry Ability</text>
+  <text x="320" y="95" class="small">CloudChat.ets (入口、路由、App 生命周期)</text>
+
+  <!-- Resources -->
+  <rect x="700" y="60" width="260" height="80" class="box" />
+  <text x="710" y="95" class="label">Resources</text>
+  <text x="710" y="115" class="small">i18n / 主题 / media</text>
+
+  <!-- Arrow AppScope -> Entry -->
+  <path d="M240 100 L300 100" class="arrow" />
+
+  <!-- Entry children boxes -->
+  <rect x="200" y="200" width="260" height="110" class="box" />
+  <text x="220" y="230" class="label">UI Pages</text>
+  <text x="220" y="250" class="small">entry/src/main/ets/pages</text>
+
+  <rect x="480" y="200" width="260" height="110" class="box" />
+  <text x="500" y="230" class="label">Core Modules</text>
+  <text x="500" y="250" class="small">登录/好友/消息/文件上传 等</text>
+
+  <rect x="760" y="200" width="180" height="110" class="box" />
+  <text x="770" y="230" class="label">oh_modules</text>
+  <text x="770" y="250" class="small">原生能力与第三方模块桥接</text>
+
+  <!-- Arrows from Entry to children -->
+  <path d="M480 100 L330 200" class="arrow" />
+  <path d="M650 150 L480 200" class="arrow" />
+  <path d="M660 150 L760 200" class="arrow" />
+
+  <!-- Core internal -->
+  <rect x="520" y="330" width="200" height="120" class="box" />
+  <text x="540" y="360" class="label">业务细分</text>
+  <text x="540" y="385" class="small">Auth / 用户管理</text>
+  <text x="540" y="405" class="small">消息服务 (WS / HTTP)</text>
+  <text x="540" y="425" class="small">文件上传 / 存储</text>
+
+  <path d="M620 310 L620 330" class="arrow" />
+
+  <!-- Backend -->
+  <rect x="380" y="480" width="240" height="80" class="box" />
+  <text x="400" y="515" class="label">Server</text>
+  <text x="400" y="535" class="small">独立进程 (repo/server) 提供 API/消息转发</text>
+
+  <!-- Arrows Core <-> Server -->
+  <path d="M620 450 L620 480" class="arrow" />
+  <path d="M620 560 L620 580" stroke="#fff" stroke-width="8" />
+
+  <!-- Legend / Notes -->
+  <rect x="20" y="520" width="940" height="80" rx="6" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="40" y="545" class="small">说明: UI 页面通过 Core 模块调用业务逻辑；Core 负责网络、消息处理与持久化；oh_modules 提供底层能力。</text>
+
+</svg>

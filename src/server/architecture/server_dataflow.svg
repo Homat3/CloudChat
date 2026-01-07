@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="740" viewBox="0 0 1100 740">
+  <style>
+    .box { fill:#fffdfd; stroke:#0b1220; stroke-width:2; rx:8; }
+    .title { font: 700 20px sans-serif; fill:#0b1220 }
+    .label { font: 600 14px sans-serif; fill:#0b1220 }
+    .small { font: 12px sans-serif; fill:#334155 }
+    .arrow { stroke:#0b1220; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0b1220" />
+    </marker>
+  </defs>
+
+  <text x="20" y="34" class="title">CloudChat 服务端 数据流图</text>
+
+  <!-- Client -->
+  <rect x="20" y="60" width="220" height="80" class="box" />
+  <text x="40" y="95" class="label">Client (ArkUI)</text>
+  <text x="40" y="115" class="small">通过 HTTP / WebSocket 发送请求/接收通知</text>
+
+  <!-- Protocols -->
+  <rect x="270" y="40" width="200" height="120" class="box" />
+  <text x="290" y="72" class="label">HTTP Handler</text>
+  <text x="290" y="96" class="small">entry points: login/register/file-upload</text>
+  <text x="290" y="112" class="small">文件: cloudchatservice.cpp (HTTP 部分)</text>
+
+  <rect x="270" y="180" width="200" height="120" class="box" />
+  <text x="290" y="212" class="label">WebSocket Handler</text>
+  <text x="290" y="236" class="small">长连接: 消息收发、实时通知</text>
+  <text x="290" y="252" class="small">文件: cloudchatmsg.cpp / server.websocket.ets (client 协议)</text>
+
+  <path d="M240 100 L270 100" class="arrow" />
+  <path d="M240 220 L270 240" class="arrow" />
+
+  <!-- Main / Dispatcher -->
+  <rect x="500" y="90" width="300" height="140" class="box" />
+  <text x="520" y="120" class="label">Main / Dispatcher</text>
+  <text x="520" y="140" class="small">`main.cpp` 启动、监听、分发到 Service 层</text>
+  <text x="520" y="160" class="small">请求解析 -> 调用 `cloudchatservice` / `cloudchatsys`</text>
+
+  <path d="M470 140 L500 140" class="arrow" />
+  <path d="M470 240 L500 190" class="arrow" />
+
+  <!-- Service Layer box -->
+  <rect x="840" y="60" width="240" height="260" class="box" />
+  <text x="860" y="90" class="label">Service 层</text>
+  <text x="860" y="114" class="small">`cloudchatservice.cpp` / `cloudchatsys.cpp`</text>
+  <text x="860" y="134" class="small">业务逻辑: 会话管理 / 路由 / 权限 校验</text>
+  <text x="860" y="154" class="small">使用 `include/*.h` 定义接口与数据结构</text>
+
+  <!-- Message / Group -->
+  <rect x="500" y="270" width="300" height="120" class="box" />
+  <text x="520" y="300" class="label">消息 / 群组 处理</text>
+  <text x="520" y="324" class="small">`cloudchatmsg.cpp` / `cloudchatgroup.cpp`</text>
+  <text x="520" y="344" class="small">消息转发、群组广播、消息格式化</text>
+
+  <path d="M800 160 L840 160" class="arrow" />
+  <path d="M650 220 L650 270" class="arrow" />
+
+  <!-- Data Layer -->
+  <rect x="500" y="420" width="300" height="140" class="box" />
+  <text x="520" y="450" class="label">数据层 / 持久化</text>
+  <text x="520" y="474" class="small">`cloudchatdat.cpp` / `cloudchatrecord.cpp`</text>
+  <text x="520" y="494" class="small">消息历史、用户/好友数据存取</text>
+
+  <path d="M650 390 L650 420" class="arrow" />
+
+  <!-- DB / External storage -->
+  <rect x="840" y="420" width="240" height="120" class="box" />
+  <text x="860" y="450" class="label">DB / 外部存储</text>
+  <text x="860" y="474" class="small">MySQL / SQLite / 文件系统</text>
+
+  <path d="M780 480 L840 480" class="arrow" />
+
+  <!-- Notification path (WebSocket push) -->
+  <path d="M560 320 L360 260 L300 220" class="arrow" />
+  <text x="360" y="300" class="small">消息处理后 -> 通过 WebSocket 向客户端推送通知</text>
+
+  <!-- HTTP response path -->
+  <path d="M770 160 L560 160 L470 120 L320 120" class="arrow" />
+  <text x="320" y="140" class="small">HTTP 请求处理完成 -> 返回 HTTP 响应</text>
+
+  <!-- Notes / Headers / Makefile -->
+  <rect x="20" y="580" width="1060" height="140" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="40" y="610" class="label">说明</text>
+  <text x="40" y="635" class="small">- HTTP: 主要用于一次性请求/响应 (登录/注册/文件上传/查询)。文件示例: `cloudchatservice.cpp`。</text>
+  <text x="40" y="655" class="small">- WebSocket: 长连接用于实时消息收发与通知。消息到达后由 `cloudchatmsg.cpp` 分发并可通过连接推送到相关 Client。</text>
+  <text x="40" y="675" class="small">- 数据流通常为: Client -> (HTTP/WS) -> main -> Service -> Message/Group -> Data Layer -> DB；处理完成后根据场景返回 HTTP 或通过 WS 推送。</text>
+
+</svg>

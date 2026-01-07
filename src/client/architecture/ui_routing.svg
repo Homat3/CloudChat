@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560">
+  <style>
+    .box { fill:#fbfdff; stroke:#0f172a; stroke-width:2; rx:8; }
+    .title { font: 700 20px sans-serif; fill:#0f172a }
+    .label { font: 600 14px sans-serif; fill:#0b1220 }
+    .small { font: 12px sans-serif; fill:#334155 }
+    .arrow { stroke:#0b1220; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0b1220" />
+    </marker>
+  </defs>
+
+  <text x="20" y="34" class="title">CloudChat 客户端 — UI 路由结构图</text>
+
+  <!-- Entry / MainUI -->
+  <rect x="20" y="60" width="320" height="90" class="box" />
+  <text x="40" y="95" class="label">Entry / Main UI Ability</text>
+  <text x="40" y="115" class="small">CloudChat.ets / MainUIAbility.ets</text>
+
+  <!-- MainContainer -->
+  <rect x="380" y="40" width="360" height="120" class="box" />
+  <text x="400" y="72" class="label">`MainContainer`</text>
+  <text x="400" y="96" class="small">pages/main/MainContainer.ets — 包含 Tab 控件与页面容器</text>
+
+  <!-- Tab control -->
+  <rect x="760" y="40" width="300" height="120" class="box" />
+  <text x="780" y="72" class="label">Tab 控件</text>
+  <text x="780" y="96" class="small">直接切换子页面（路由）</text>
+
+  <path d="M340 105 L380 100" class="arrow" />
+  <path d="M740 100 L760 100" class="arrow" />
+
+  <!-- Pages -->
+  <rect x="60" y="200" width="230" height="180" class="box" />
+  <text x="80" y="230" class="label">Home 页</text>
+  <text x="80" y="254" class="small">pages/main/home/Home.ets</text>
+
+  <rect x="340" y="200" width="230" height="180" class="box" />
+  <text x="360" y="230" class="label">Chat 页</text>
+  <text x="360" y="254" class="small">pages/main/components/chat/ChatArea.ets</text>
+
+  <rect x="620" y="200" width="230" height="180" class="box" />
+  <text x="640" y="230" class="label">Own / Profile</text>
+  <text x="640" y="254" class="small">pages/main/own/OwnPage.ets</text>
+
+  <rect x="900" y="200" width="160" height="180" class="box" />
+  <text x="920" y="230" class="label">AI / 扩展页</text>
+  <text x="920" y="254" class="small">pages/main/components/ai-chat/AiPage.ets</text>
+
+  <!-- Arrow: Tab -> Pages (direct routing) -->
+  <path d="M820 100 L300 200" class="arrow" />
+  <path d="M820 100 L520 200" class="arrow" />
+  <path d="M820 100 L700 200" class="arrow" />
+  <path d="M820 100 L960 200" class="arrow" />
+
+  <!-- EventBus -->
+  <rect x="20" y="420" width="260" height="110" class="box" />
+  <text x="40" y="450" class="label">EventBus</text>
+  <text x="40" y="470" class="small">service/event/EventBus.ets — 发布/订阅事件</text>
+
+  <!-- Components controlled by EventBus (boolean props) -->
+  <rect x="320" y="420" width="300" height="110" class="box" />
+  <text x="340" y="450" class="label">弹窗 / 面板 / 细节视图</text>
+  <text x="340" y="470" class="small">DetailPanel.ets, ContactRequest.ets 等</text>
+  <text x="340" y="490" class="small">通过 boolean 属性（例如 `showDetail`）控制可见性</text>
+
+  <!-- Arrows: EventBus -> Components (toggle props) -->
+  <path d="M140 420 L320 420" class="arrow" />
+  <path d="M320 420 L520 420" stroke="#fff" stroke-width="8" />
+
+  <!-- Interaction lines: Pages subscribe to EventBus -->
+  <path d="M200 380 L200 340 L420 340 L420 380" class="arrow" />
+  <text x="220" y="330" class="small">订阅 / 触发事件以切换 boolean 状态</text>
+
+  <!-- Legend / Notes -->
+  <rect x="660" y="420" width="400" height="110" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="680" y="450" class="label">要点</text>
+  <text x="680" y="472" class="small">- Tab 控件直接决定当前渲染的页面（路由切换）。</text>
+  <text x="680" y="492" class="small">- EventBus 用于跨组件控制布尔属性（弹窗、侧栏、面板）。</text>
+  <text x="680" y="512" class="small">- 主要相关文件: CloudChat.ets, `MainContainer`, `EventBus`。</text>
+
+</svg>

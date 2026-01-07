@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640">
+  <style>
+    .box { fill:#ffffff; stroke:#1f2937; stroke-width:2; rx:8; }
+    .title { font: 700 20px sans-serif; fill:#0f172a }
+    .label { font: 600 14px sans-serif; fill:#0b1220 }
+    .small { font: 12px sans-serif; fill:#334155 }
+    .arrow { stroke:#0b1220; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0b1220" />
+    </marker>
+  </defs>
+
+  <text x="20" y="34" class="title">CloudChat 服务端架构图</text>
+
+  <!-- Client -->
+  <rect x="20" y="60" width="220" height="80" class="box" />
+  <text x="30" y="95" class="label">Client</text>
+  <text x="30" y="115" class="small">ArkUI 客户端 (CloudChat 客户端)</text>
+
+  <!-- Network -->
+  <path d="M240 100 L320 100" class="arrow" />
+  <text x="260" y="90" class="small">HTTP / WebSocket</text>
+
+  <!-- Server Entry -->
+  <rect x="360" y="40" width="280" height="110" class="box" />
+  <text x="380" y="70" class="label">Server: main.cpp</text>
+  <text x="380" y="95" class="small">启动、监听端口、连接管理</text>
+
+  <!-- Service Layer -->
+  <rect x="120" y="200" width="240" height="120" class="box" />
+  <text x="140" y="230" class="label">Service 层</text>
+  <text x="140" y="255" class="small">cloudchatservice.cpp / cloudchatsys.cpp</text>
+  <text x="140" y="275" class="small">业务逻辑：消息路由、会话管理、命令处理</text>
+
+  <!-- Message / Protocol -->
+  <rect x="420" y="200" width="240" height="120" class="box" />
+  <text x="440" y="230" class="label">消息 / 协议层</text>
+  <text x="440" y="255" class="small">cloudchatmsg.cpp / cloudchatgroup.cpp</text>
+  <text x="440" y="275" class="small">消息格式、群组管理、转发逻辑</text>
+
+  <!-- Data Layer -->
+  <rect x="720" y="200" width="240" height="120" class="box" />
+  <text x="740" y="230" class="label">数据层 (持久化)</text>
+  <text x="740" y="255" class="small">cloudchatdat.cpp / cloudchatrecord.cpp</text>
+  <text x="740" y="275" class="small">存储、检索、索引、历史消息</text>
+
+  <!-- Arrows between layers -->
+  <path d="M460 150 L200 200" class="arrow" />
+  <path d="M510 150 L520 200" class="arrow" />
+  <path d="M650 150 L780 200" class="arrow" />
+
+  <!-- User / Auth -->
+  <rect x="120" y="360" width="240" height="100" class="box" />
+  <text x="140" y="390" class="label">用户管理</text>
+  <text x="140" y="410" class="small">cloudchatuser.cpp / cloudchatgroup.h</text>
+
+  <!-- Storage / Filesystem -->
+  <rect x="420" y="360" width="240" height="100" class="box" />
+  <text x="440" y="390" class="label">文件/资源存储</text>
+  <text x="440" y="410" class="small">附件、文件上传接口、磁盘存储</text>
+
+  <!-- DB / 外部依赖 -->
+  <rect x="720" y="360" width="240" height="100" class="box" />
+  <text x="740" y="390" class="label">外部系统 / DB</text>
+  <text x="740" y="410" class="small">MySQL / SQLite / 外部服务</text>
+
+  <path d="M240 300 L240 360" class="arrow" />
+  <path d="M360 300 L360 360" class="arrow" />
+  <path d="M600 320 L480 360" class="arrow" />
+
+  <!-- Build / Headers -->
+  <rect x="20" y="500" width="450" height="110" class="box" />
+  <text x="40" y="530" class="label">构建 / 接口定义</text>
+  <text x="40" y="555" class="small">Makefile / include/*.h</text>
+  <text x="40" y="575" class="small">模块划分、接口契约、编译选项</text>
+
+  <!-- Notes -->
+  <rect x="490" y="500" width="470" height="110" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="510" y="530" class="label">说明</text>
+  <text x="510" y="555" class="small">- `main.cpp` 启动并分发请求到 Service 层。</text>
+  <text x="510" y="575" class="small">- Service 层依赖消息层和数据层完成业务逻辑。</text>
+  <text x="510" y="595" class="small">- `include/` 定义了各模块的接口与数据结构。</text>
+
+</svg>
