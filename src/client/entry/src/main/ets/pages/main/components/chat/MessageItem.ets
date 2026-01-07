@@ -6,7 +6,7 @@ export struct MessageItem {
   @Prop isCurrentUser: boolean;
 
   build() {
-    // 第七步：完整版本（添加时间戳和间距）
+
     Column() {
       // 消息气泡行
       Row() {
