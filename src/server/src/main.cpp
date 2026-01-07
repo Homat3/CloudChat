@@ -1,7 +1,6 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatservice.h"
-#include <websocketpp/http/constants.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
