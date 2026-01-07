@@ -56,7 +56,7 @@ export struct ContactRequest {
   }
 
   aboutToAppear(): void {
-    EventBus.on(Event.FRIEND_REQUEST_LOADED, (payload: FriendRequestLoadedPayload) => {
+    EventBus.on(Event.FRIEND_REQUEST_LOADED, ContactRequest.name, (payload: FriendRequestLoadedPayload) => {
       for (const friendRequest of payload.requests) {
         const newFriendRequest = new FriendRequest(
           friendRequest.id,
@@ -82,7 +82,7 @@ export struct ContactRequest {
         }
       }
     })
-    EventBus.on(Event.FRIEND_REQUEST_LOADED_FAILED, (payload: FriendRequestLoadedFailedPayload) => {
+    EventBus.on(Event.FRIEND_REQUEST_LOADED_FAILED, ContactRequest.name, (payload: FriendRequestLoadedFailedPayload) => {
       try {
         this.uiContext.getPromptAction().showToast({
           message: "好友请求列表加载失败" + payload.error,
@@ -93,11 +93,11 @@ export struct ContactRequest {
       }
     })
 
-    EventBus.on(Event.SEARCH_FOR_USERS_RESULT, (payload: SearchForUserResultPayload) => {
+    EventBus.on(Event.SEARCH_FOR_USERS_RESULT, ContactRequest.name, (payload: SearchForUserResultPayload) => {
       this.searchedContacts =
         payload.users.filter((contact: Contact) => !(contact.contactId === this.currentUser?.userId));
     })
-    EventBus.on(Event.SEARCH_FOR_USERS_FAILED, (err: string) => {
+    EventBus.on(Event.SEARCH_FOR_USERS_FAILED, ContactRequest.name, (err: string) => {
       try {
         this.uiContext.getPromptAction().showToast({
           message: err.toString(),
@@ -108,7 +108,7 @@ export struct ContactRequest {
       }
     })
 
-    EventBus.on(Event.REQUIRE_ADD_FRIEND_REQUEST, (payload: RequireAddFriendRequestPayload) => {
+    EventBus.on(Event.REQUIRE_ADD_FRIEND_REQUEST, ContactRequest.name, (payload: RequireAddFriendRequestPayload) => {
       this.receivedRequests.push(new FriendRequest(
         payload.id,
         payload.requesterId, payload.targetId,
@@ -117,7 +117,7 @@ export struct ContactRequest {
         payload.status
       ))
     });
-    EventBus.on(Event.REQUIRE_REFUSE_FRIEND_REQUEST, (payload: RequireRefuseFriendRequestPayload) => {
+    EventBus.on(Event.REQUIRE_REFUSE_FRIEND_REQUEST, ContactRequest.name, (payload: RequireRefuseFriendRequestPayload) => {
       this.sentRequests = this.sentRequests.map((request) => {
         if (request.id === payload.id) {
           request.status = 'refused';
@@ -125,7 +125,7 @@ export struct ContactRequest {
         return request;
       })
     });
-    EventBus.on(Event.REQUIRE_ACCEPT_FRIEND_REQUEST, (payload: RequireAcceptFriendRequestPayload) => {
+    EventBus.on(Event.REQUIRE_ACCEPT_FRIEND_REQUEST, ContactRequest.name, (payload: RequireAcceptFriendRequestPayload) => {
       this.sentRequests = this.sentRequests.map((request) => {
         if (request.id === payload.id) {
           request.status = 'accepted';
@@ -133,7 +133,7 @@ export struct ContactRequest {
         return request;
       })
     });
-    EventBus.on(Event.FRIEND_REQUEST_ADDED, (payload: FriendRequestAddedPayload) => {
+    EventBus.on(Event.FRIEND_REQUEST_ADDED, ContactRequest.name, (payload: FriendRequestAddedPayload) => {
       this.sentRequests.push(new FriendRequest(
         payload.id,
         payload.requesterId, payload.targetId,
@@ -142,7 +142,7 @@ export struct ContactRequest {
         payload.status
       ))
     })
-    EventBus.on(Event.FRIEND_REQUEST_ACCEPTED, (payload: FriendRequestAcceptedPayload) => {
+    EventBus.on(Event.FRIEND_REQUEST_ACCEPTED, ContactRequest.name, (payload: FriendRequestAcceptedPayload) => {
       this.receivedRequests = this.receivedRequests.map((request) => {
         if (request.id === payload.id) {
           request.status = 'accepted';
@@ -152,7 +152,7 @@ export struct ContactRequest {
       this.activeTab = 0;
       EventBus.emit(Event.CHANGE_INDEX, 0);
     })
-    EventBus.on(Event.FRIEND_REQUEST_REFUSED, (payload: FriendRequestRefusedPayload) => {
+    EventBus.on(Event.FRIEND_REQUEST_REFUSED, ContactRequest.name, (payload: FriendRequestRefusedPayload) => {
       this.receivedRequests = this.receivedRequests.map((request) => {
         if (request.id === payload.id) {
           request.status = 'refused';
@@ -162,7 +162,7 @@ export struct ContactRequest {
       this.activeTab = 0;
       EventBus.emit(Event.CHANGE_INDEX, 0);
     })
-    EventBus.on(Event.FRIEND_REQUEST_ERROR, (error: string) => {
+    EventBus.on(Event.FRIEND_REQUEST_ERROR, ContactRequest.name, (error: string) => {
       try {
         this.uiContext.getPromptAction().showToast({
           message: error.toString(),

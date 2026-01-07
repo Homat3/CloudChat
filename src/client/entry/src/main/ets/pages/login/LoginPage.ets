@@ -29,7 +29,7 @@ struct LoginPage {
   aboutToAppear(): void {
     try {
       // 监听登录失败事件
-      EventBus.on(Event.LOGIN_FAILED, (error: string) => {
+      EventBus.on(Event.LOGIN_FAILED, LoginPage.name, (error: string) => {
         this.isLoading = false;
         try {
           this.uiContext.getPromptAction().showToast({
@@ -42,7 +42,7 @@ struct LoginPage {
       });
 
       // 监听登录成功事件
-      EventBus.on(Event.LOGIN_SUCCESS, (payload: LoginSuccessPayload) => {
+      EventBus.on(Event.LOGIN_SUCCESS, LoginPage.name, (payload: LoginSuccessPayload) => {
         AppStorage.setOrCreate('isInUse', true);
         this.isLoading = false;
         CloudChat.currentUser =

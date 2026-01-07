@@ -31,7 +31,7 @@ struct Register {
   aboutToAppear(): void {
     try {
       //注册失败事件
-      EventBus.on(Event.REGISTER_FAILED, (payload: RegisterFailurePayload) => {
+      EventBus.on(Event.REGISTER_FAILED, Register.name, (payload: RegisterFailurePayload) => {
         this.isLoading = false;
         this.uiContext.getPromptAction().showToast({
           message: loadStringResource(this.uiAbilityContext, $r("app.string.error_register_RegisterFailed")) + ": " +
@@ -41,7 +41,7 @@ struct Register {
       });
 
       //注册成功事件
-      EventBus.on(Event.REGISTER_SUCCESS, (payload: RegisterSuccessPayload) => {
+      EventBus.on(Event.REGISTER_SUCCESS, Register.name, (payload: RegisterSuccessPayload) => {
         CloudChat.currentUser =
           new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
         this.uiContext.getRouter().replaceUrl({ url: Page.MAIN }).catch((err: Error) => {

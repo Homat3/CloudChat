@@ -53,34 +53,34 @@ struct MainContainer {
 
     //注册监听
     try {
-      EventBus.on(Event.CHANGE_INDEX, (index: number): void => {
+      EventBus.on(Event.CHANGE_INDEX, MainContainer.name, (index: number): void => {
         this.currentIndex = index;
       })
 
-      EventBus.on(Event.PROFILE_UPDATED, (data: ProfileUpdatedSuccessPayload): void => {
+      EventBus.on(Event.PROFILE_UPDATED, MainContainer.name, (data: ProfileUpdatedSuccessPayload): void => {
         CloudChat.currentUser = new User(data.userId, data.username, data.email, data.avatar, CloudChat.currentUser?.token);
         this.currentUser = CloudChat.currentUser;
       });
 
-      EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
-      EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
+      EventBus.on(Event.MESSAGES_LOADED, MainContainer.name, (): void => this.catchMessages());
+      EventBus.on(Event.MESSAGES_LOADED_FAILED, MainContainer.name, (msg: string): void => this.loadMessagesFailed(msg));
 
-      EventBus.on(Event.CONTACT_LIST_LOADED, (): void => this.catchContacts());
-      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED,
+      EventBus.on(Event.CONTACT_LIST_LOADED, MainContainer.name, (): void => this.catchContacts());
+      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, MainContainer.name,
         (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
-      EventBus.on(Event.CONTACT_ADDED, (payload: ContactAddedPayload): void => {
+      EventBus.on(Event.CONTACT_ADDED, MainContainer.name, (payload: ContactAddedPayload): void => {
         CloudChat.contacts = [...CloudChat.contacts, new Contact(
           payload.contactId, payload.username, payload.online, payload.avatar
         )];
         this.contacts = CloudChat.contacts;
       })
-      EventBus.on(Event.CONTACT_DELETED, (payload: ContactDeletedPayload): void => {
+      EventBus.on(Event.CONTACT_DELETED, MainContainer.name, (payload: ContactDeletedPayload): void => {
         CloudChat.contacts = this.contacts.filter((contact: Contact) => !(contact.contactId === payload.targetId));
         this.contacts = CloudChat.contacts;
         this.selectedContact = null;
         EventBus.emit(Event.CLOSE_CHAT_AREA);
       })
-      EventBus.on(Event.CONTACT_DELETED_FAILED, (e: string): void => {
+      EventBus.on(Event.CONTACT_DELETED_FAILED, MainContainer.name, (e: string): void => {
         try {
           this.uiContext.getPromptAction().showToast({
             message: "联系人删除失败：" + e,
@@ -91,19 +91,19 @@ struct MainContainer {
         }
       })
 
-      EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
+      EventBus.on(Event.OPEN_CHAT_AREA, MainContainer.name, (): void => {
         if (this.selectedContact) {
           this.selectedMessages = this.messagesMap?.get(this.selectedContact?.contactId) || null;
           this.isChatAreaOpen = true;
         }
       });
-      EventBus.on(Event.CLOSE_CHAT_AREA, (): void => {
+      EventBus.on(Event.CLOSE_CHAT_AREA, MainContainer.name, (): void => {
         this.isChatAreaOpen = false;
       })
 
-      EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
+      EventBus.on(Event.REFRESH_CONTACT_LIST, MainContainer.name, (): void => this.loadContacts());
 
-      EventBus.on(Event.SEND_MESSAGE_SUCCESS, (message: Message): void => {
+      EventBus.on(Event.SEND_MESSAGE_SUCCESS, MainContainer.name, (message: Message): void => {
         if (this.messagesMap) {
           let changedMessageList = this.messagesMap.get(message.receiverId);
           if (changedMessageList) {
@@ -119,7 +119,7 @@ struct MainContainer {
           }
         }
       })
-      EventBus.on(Event.SEND_MESSAGE_FAILED, (e: string): void => {
+      EventBus.on(Event.SEND_MESSAGE_FAILED, MainContainer.name, (e: string): void => {
         try {
           this.uiContext.getPromptAction().showToast({
             message: "消息发送失败：" + e,
@@ -129,7 +129,7 @@ struct MainContainer {
           console.error(error);
         }
       })
-      EventBus.on(Event.RECEIVE_MESSAGE, (payload: MessageReceivedOtherPayload): void => {
+      EventBus.on(Event.RECEIVE_MESSAGE, MainContainer.name, (payload: MessageReceivedOtherPayload): void => {
         const message = payload as Message;
         if (this.messagesMap) {
           let changedMessageList = this.messagesMap.get(message.senderId);

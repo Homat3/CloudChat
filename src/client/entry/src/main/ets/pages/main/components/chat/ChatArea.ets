@@ -29,17 +29,17 @@ export struct ChatArea {
 
   aboutToAppear(): void {
     try {
-      EventBus.on(Event.UPDATE_MESSAGES, (data: MessageUpdateData) => {
+      EventBus.on(Event.UPDATE_MESSAGES, ChatArea.name, (data: MessageUpdateData) => {
         this.selectedMessages = data.messages;
         if (data.clearInput) {
           this.newMessage = '';
         }
         this.scroller.scrollToIndex(this.selectedMessages.length - 1);
       });
-      EventBus.on(Event.OPEN_PANEL, () => {
+      EventBus.on(Event.OPEN_PANEL, ChatArea.name, () => {
         this.showPanel = true;
       });
-      EventBus.on(Event.CLOSE_PANEL, () => {
+      EventBus.on(Event.CLOSE_PANEL, ChatArea.name, () => {
         this.showPanel = false;
       })
     } catch (e) {

@@ -22,17 +22,17 @@ export struct OwnPage {
   aboutToAppear(): void {
     try {
       //注册失败事件
-      EventBus.on(Event.OPEN_EDIT_PROFILE, () => {
+      EventBus.on(Event.OPEN_EDIT_PROFILE, OwnPage.name, () => {
         this.isEditing = true;
       });
 
       //注册成功事件
-      EventBus.on(Event.CLOSE_EDIT_PROFILE, () => {
+      EventBus.on(Event.CLOSE_EDIT_PROFILE, OwnPage.name, () => {
         this.isEditing = false;
       });
 
       //登出
-      EventBus.on(Event.LOGOUT, () => {
+      EventBus.on(Event.LOGOUT, OwnPage.name, () => {
         PersistentStorage.deleteProp('username');
         PersistentStorage.deleteProp('user_token');
         this.uiContext.getRouter().replaceUrl({ url: Page.LOGIN_PAGE }).catch((e: Error) => {

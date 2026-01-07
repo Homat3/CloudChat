@@ -22,13 +22,13 @@ export struct AiPage {
 
   aboutToAppear(): void {
     try {
-      EventBus.on(Event.AGENT_POST_MESSAGE_SUCCESS, (data: AiMessage) => {
+      EventBus.on(Event.AGENT_POST_MESSAGE_SUCCESS, AiPage.name, (data: AiMessage) => {
         this.inputText = '';
         this.isProcessing = true;
         this.aiMessages = [...this.aiMessages, data];
         this.scroller.scrollToIndex(this.aiMessages.length - 1);
       });
-      EventBus.on(Event.AGENT_POST_MESSAGE_FAILED, (error: string) => {
+      EventBus.on(Event.AGENT_POST_MESSAGE_FAILED, AiPage.name, (error: string) => {
         this.isProcessing = false;
         try {
           this.uiContext.getPromptAction().showToast({
@@ -39,11 +39,11 @@ export struct AiPage {
           console.error(error);
         }
       });
-      EventBus.on(Event.AGENT_REPLY_SUCCESS, (data: AiMessage) => {
+      EventBus.on(Event.AGENT_REPLY_SUCCESS, AiPage.name, (data: AiMessage) => {
         this.isProcessing = false;
         this.aiMessages = [...this.aiMessages, data];
       });
-      EventBus.on(Event.AGENT_REPLY_FAILED, (error: string) => {
+      EventBus.on(Event.AGENT_REPLY_FAILED, AiPage.name, (error: string) => {
         this.isProcessing = false;
         try {
           this.uiContext.getPromptAction().showToast({

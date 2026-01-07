@@ -26,7 +26,7 @@ export struct EditProfilePage {
 
   aboutToAppear(): void {
     try {
-      EventBus.on(Event.PROFILE_UPDATED, (): void => {
+      EventBus.on(Event.PROFILE_UPDATED, EditProfilePage.name, (): void => {
         try {
           this.uiContext.getPromptAction().showToast({
             message: "个人信息更新成功",
@@ -36,7 +36,7 @@ export struct EditProfilePage {
           console.error(error);
         }
       });
-      EventBus.on(Event.PROFILE_UPDATE_FAILED, (error: string): void => {
+      EventBus.on(Event.PROFILE_UPDATE_FAILED, EditProfilePage.name, (error: string): void => {
         try {
           this.uiContext.getPromptAction().showToast({
             message: "个人信息更新失败：" + error,

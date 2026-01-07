@@ -19,7 +19,9 @@ import {
   LoadContactsPayload,
   LoadFriendRequestPayload,
   LoadMessagesPayload,
-  LoginByTokenPayload, LoginPayload,
+  LoginByTokenPayload,
+  LoginInfo,
+  LoginPayload,
   RefuseFriendRequestPayload,
   RegisterPayload,
   SearchForUserByIdPayload,
@@ -57,28 +59,28 @@ export default class MainUIAbility extends UIAbility {
 
     CloudChat.websocketServer.connect();  // 建立长连接
 
-    EventBus.on(Event.LOGIN, (data: LoginPayload): void => handleLogin(data));
-    EventBus.on(Event.LOGIN_BY_TOKEN, (data: LoginByTokenPayload): void => handleLoginByToken(data));
-    EventBus.on(Event.REGISTER, (data: RegisterPayload): void => handleRegister(data));
+    EventBus.on(Event.LOGIN, MainUIAbility.name, (data: LoginInfo): void => handleLogin(data));
+    EventBus.on(Event.LOGIN_BY_TOKEN, MainUIAbility.name, (data: LoginByTokenPayload): void => handleLoginByToken(data));
+    EventBus.on(Event.REGISTER, MainUIAbility.name, (data: RegisterPayload): void => handleRegister(data));
 
-    EventBus.on(Event.LOAD_CONTACT_LIST, (data: LoadContactsPayload): void => handleLoadContacts(data));
-    EventBus.on(Event.LOAD_MESSAGES_START, (count: number): void => CloudChat.startLoadMessage(count));
-    EventBus.on(Event.LOAD_MESSAGES, (data: LoadMessagesPayload): void => handleLoadMessages(data));
-    EventBus.on(Event.DELETE_CONTACT, (data: DeleteContactPayload): void => handleDeleteContact(data));
+    EventBus.on(Event.LOAD_CONTACT_LIST, MainUIAbility.name, (data: LoadContactsPayload): void => handleLoadContacts(data));
+    EventBus.on(Event.LOAD_MESSAGES_START, MainUIAbility.name, (count: number): void => CloudChat.startLoadMessage(count));
+    EventBus.on(Event.LOAD_MESSAGES, MainUIAbility.name, (data: LoadMessagesPayload): void => handleLoadMessages(data));
+    EventBus.on(Event.DELETE_CONTACT, MainUIAbility.name, (data: DeleteContactPayload): void => handleDeleteContact(data));
 
-    EventBus.on(Event.SEND_MESSAGE, (data: SendMessagePayload): void => handleSendMessage(data));
+    EventBus.on(Event.SEND_MESSAGE, MainUIAbility.name, (data: SendMessagePayload): void => handleSendMessage(data));
 
-    EventBus.on(Event.SEARCH_FOR_USERS_BY_NAME, (data: SearchForUserByUserNamePayload): void => handleSearchForUsersByName(data));
-    EventBus.on(Event.SEARCH_FOR_USERS_BY_ID, (data: SearchForUserByIdPayload): void => handleSearchForUsersById(data));
+    EventBus.on(Event.SEARCH_FOR_USERS_BY_NAME, MainUIAbility.name, (data: SearchForUserByUserNamePayload): void => handleSearchForUsersByName(data));
+    EventBus.on(Event.SEARCH_FOR_USERS_BY_ID, MainUIAbility.name, (data: SearchForUserByIdPayload): void => handleSearchForUsersById(data));
 
-    EventBus.on(Event.LOAD_FRIEND_REQUEST, (data: LoadFriendRequestPayload): void => handleLoadFriendRequest(data));
-    EventBus.on(Event.ACCEPT_REQUEST, (data: AcceptFriendRequestPayload): void => handleAcceptRequest(data));
-    EventBus.on(Event.REFUSE_REQUEST, (data: RefuseFriendRequestPayload): void => handleRefuseRequest(data));
-    EventBus.on(Event.ADD_FRIEND_REQUEST, (data: AddFriendRequestPayload): void => handlePostFriendRequest(data));
+    EventBus.on(Event.LOAD_FRIEND_REQUEST, MainUIAbility.name, (data: LoadFriendRequestPayload): void => handleLoadFriendRequest(data));
+    EventBus.on(Event.ACCEPT_REQUEST, MainUIAbility.name, (data: AcceptFriendRequestPayload): void => handleAcceptRequest(data));
+    EventBus.on(Event.REFUSE_REQUEST, MainUIAbility.name, (data: RefuseFriendRequestPayload): void => handleRefuseRequest(data));
+    EventBus.on(Event.ADD_FRIEND_REQUEST, MainUIAbility.name, (data: AddFriendRequestPayload): void => handlePostFriendRequest(data));
 
-    EventBus.on(Event.UPDATE_PROFILE, (data: UpdateProfilePayload): void => handleUpdateProfile(data));
+    EventBus.on(Event.UPDATE_PROFILE, MainUIAbility.name, (data: UpdateProfilePayload): void => handleUpdateProfile(data));
 
-    EventBus.on(Event.COLOR_MODE, (colorMode: string) => {
+    EventBus.on(Event.COLOR_MODE, MainUIAbility.name, (colorMode: string) => {
       try {
         switch (colorMode){
           case 'dark':
@@ -98,21 +100,21 @@ export default class MainUIAbility extends UIAbility {
       }
     })
 
-    EventBus.on(Event.AGENT_CONVERSATION_CREATE, (payload: send.CreateNewConversationPayload): void => createNewConversation({ username: payload.username }));
-    EventBus.on(Event.AGENT_CONVERSATION_CREATE_FAILED, (error: string) => {
+    EventBus.on(Event.AGENT_CONVERSATION_CREATE, MainUIAbility.name, (payload: send.CreateNewConversationPayload): void => createNewConversation({ username: payload.username }));
+    EventBus.on(Event.AGENT_CONVERSATION_CREATE_FAILED, MainUIAbility.name, (error: string) => {
       CloudChat.agentConversation = null;
     })
-    EventBus.on(Event.AGENT_CONVERSATION_CREATE_SUCCESS, (payload: receive.ConversationCreateSuccessPayload) => {
+    EventBus.on(Event.AGENT_CONVERSATION_CREATE_SUCCESS, MainUIAbility.name, (payload: receive.ConversationCreateSuccessPayload) => {
       CloudChat.agentConversation = { id: payload.conversationId, name: payload.conversationName };
     })
-    EventBus.on(Event.AGENT_CONVERSATION_DELETE, (payload: send.DeleteConversationPayload): void => deleteConversation({ conversationId: payload.conversationId }));
-    EventBus.on(Event.AGENT_CONVERSATION_DELETE_FAILED, (error: string) => {
+    EventBus.on(Event.AGENT_CONVERSATION_DELETE, MainUIAbility.name, (payload: send.DeleteConversationPayload): void => deleteConversation({ conversationId: payload.conversationId }));
+    EventBus.on(Event.AGENT_CONVERSATION_DELETE_FAILED, MainUIAbility.name, (error: string) => {
       CloudChat.agentConversation = null;
     })
-    EventBus.on(Event.AGENT_CONVERSATION_DELETE_SUCCESS, () => {
+    EventBus.on(Event.AGENT_CONVERSATION_DELETE_SUCCESS, MainUIAbility.name, () => {
       CloudChat.agentConversation = null;
     })
-    EventBus.on(Event.AGENT_POST_MESSAGE, (data: send.PostMessagePayload): void => postMessage(data));
+    EventBus.on(Event.AGENT_POST_MESSAGE, MainUIAbility.name, (data: send.PostMessagePayload): void => postMessage(data));
 
     try {
       //颜色跟随系统
