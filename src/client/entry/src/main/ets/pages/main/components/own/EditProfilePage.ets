@@ -73,7 +73,7 @@ export struct EditProfilePage {
         Blank()
 
         Text("保存")
-          .fontColor($r('app.color.save'))
+          .fontColor($r('app.color.brand_primary'))
           .fontWeight(FontWeight.Medium)
           .onClick(() => this.handleSave())
       }
@@ -98,19 +98,19 @@ export struct EditProfilePage {
                   .width(60)
                   .height(60)
                   .borderRadius(30)
-                  .border({ width: this.selectedAvatar === imgName ? 2 : 0, color: Color.Blue })
+                  .border({ width: this.selectedAvatar === imgName ? 2 : 0, color:$r('app.color.brand_primary') })
                   .onClick(() => this.selectedAvatar = imgName)
 
                 if (this.selectedAvatar === imgName) {
                   Circle({ width: 16, height: 16 })
-                    .fill(Color.Blue)
+                    .fill($r('app.color.brand_primary'))
                     .markAnchor({ x: -20, y: -20 })
                 }
               }
               .margin(10)
             })
           }
-          .padding(10).backgroundColor(Color.White)
+          .padding(10).backgroundColor($r('app.color.card_background'))
 
           //信息输入区
           List() {

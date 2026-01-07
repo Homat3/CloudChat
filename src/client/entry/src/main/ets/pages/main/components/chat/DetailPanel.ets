@@ -36,7 +36,7 @@ export struct DetailPanel {
         Row() {
           Text($r('app.string.text_DetailPanel_userId'))
             .fontSize(16)
-            .fontColor(Color.Gray)
+            .fontColor($r('app.color.secondary_text'))
             .width(80)
           Text(this.contact.contactId.toString())
             .fontSize(16)
@@ -52,7 +52,7 @@ export struct DetailPanel {
         Row() {
           Text($r('app.string.text_DetailPanel_username'))
             .fontSize(16)
-            .fontColor(Color.Gray)
+            .fontColor($r('app.color.secondary_text'))
             .width(80)
           Text(this.contact.username || $r('app.string.text_DetailPanel_unknownUser'))
             .fontSize(16)
@@ -65,7 +65,7 @@ export struct DetailPanel {
         .margin({ top: 10, bottom: 10 })
       }
       .width('100%')
-      .backgroundColor(Color.White)
+      .backgroundColor($r('app.color.DetailPanel_background'))
       .borderRadius(12)
       .margin({ top: 20, left: 16, right: 16 })
       .padding({ bottom: 20 })
@@ -111,7 +111,7 @@ export struct DetailPanel {
       Text($r('app.string.text_DetailPanel_PersonalInfo'))
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
-        .fontColor(Color.Gray)
+        .fontColor($r('app.color.secondary_text'))
         .layoutWeight(1)
         .textAlign(TextAlign.Center)
 

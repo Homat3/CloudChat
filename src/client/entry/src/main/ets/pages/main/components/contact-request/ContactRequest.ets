@@ -280,7 +280,7 @@ export struct ContactRequest {
         .placeholderFont({ size: 14 })
         .height(42)
         .width('100%')
-        .backgroundColor(Color.White)
+        .backgroundColor($r('app.color.input_background'))
         .borderRadius(21)
         .padding({ left: 16, right: 16 })
         .onChange((value: string) => {
@@ -399,7 +399,7 @@ export struct ContactRequest {
             // 操作按钮
             Button($r('app.string.text_ContactRequest_SearchUserCard'), { type: ButtonType.Normal })
               .fontSize(14)
-              .fontColor(Color.White)
+              .fontColor($r('app.color.card_background'))
               .height(36)
               .width(80)
               .backgroundColor($r('app.color.primary'))
@@ -428,7 +428,7 @@ export struct ContactRequest {
     .width('100%')
     .layoutWeight(1)
     .scrollBar(BarState.Auto)
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.card_background'))
     .borderRadius(12)
     .shadow({
       radius: 8,
@@ -521,7 +521,7 @@ export struct ContactRequest {
       .padding(12)
     }
     .width('100%')
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.card_background'))
     .borderRadius(12)
     .shadow({
       radius: 4,
@@ -583,7 +583,7 @@ export struct ContactRequest {
 
             Button($r('app.string.text_ContactRequest_ReceivedRequestCard_Refuse'), { type: ButtonType.Normal })
               .fontSize(14)
-              .fontColor(Color.White)
+              .fontColor($r('app.color.card_background'))
               .height(36)
               .width(70)
               .backgroundColor($r('app.color.primary'))
@@ -600,7 +600,7 @@ export struct ContactRequest {
       .padding(12)
     }
     .width('100%')
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.card_background'))
     .borderRadius(12)
     .shadow({
       radius: 4,

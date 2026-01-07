@@ -9,6 +9,10 @@
       "value": "#409EFF"
     },
     {
+      "name": "card_background",
+      "value": "#FFFFFF"
+    },
+    {
       "name": "login_textInput_all_border",
       "value": "#DCDFE6"
     },
@@ -215,6 +219,18 @@
     {
       "name": "save",
       "value": "#0000FF"
+    },
+    {
+      "name": "brand_primary",
+      "value": "#007DFF"
+    },
+    {
+      "name": "button_disable",
+      "value": "#999999"
+    },
+    {
+      "name": "text_timestamp",
+      "value": "#999999"
     }
   ]
 }

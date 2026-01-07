@@ -46,7 +46,7 @@ export struct MessageItem {
       Row() {
         Text(this.message.timestamp)
           .fontSize(12)
-          .fontColor(Color.Gray)
+          .fontColor($r('app.color.text_timestamp'))
           .textAlign(this.isCurrentUser ? TextAlign.End : TextAlign.Start)
           .margin({
             left: this.isCurrentUser ? 0 : 12,
