@@ -1,9 +1,4 @@
-iimport
-{
-  Page
-}
-from
-'../../core/tag/Page'
+
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
 import { EventBus } from '../../core/service/event/EventBus';
@@ -12,8 +7,7 @@ import { RegisterFailurePayload, RegisterSuccessPayload } from '../../core/proto
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
 import { RegisterPayload } from '../../core/protocol/http/client.http.protocol';
-;
-
+import { Page } from '../../core/tag/Page';
 @Entry
 @Component
 struct Register {

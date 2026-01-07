@@ -1,8 +1,14 @@
 import { common } from '@kit.AbilityKit';
-import { Message, TextMessage } from './core/models/message';
+import { Message } from './core/models/message';
 import { Contact, User } from './core/models/models';
 import { HttpService } from './core/service/network/http/server.http';
 import { WebsocketService } from './core/service/network/websocket/server.websocket';
+
+interface AgentConversation{
+  id: string,
+  name: string
+}
+
 /**
  * @description CloudChat 全局属性
  */
@@ -12,6 +18,7 @@ export class CloudChat{
   public static aiHttpServer = new HttpService("api.coze.cn");
   public static aiToken = "pat_ZulEzQXs1DOZd0XcLJsFKpsRN42nkxI3VP85CsMQKOHjB7SsMo4dmX37vpC50C2F";
   public static botId = "7592221617674682387";
+  public static agentConversation: AgentConversation | null = null;
 
   private static _currentUser: User | null = null;
   private static _messageMap: Map<number, Message[]>;

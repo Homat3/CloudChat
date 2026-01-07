@@ -18,6 +18,7 @@ import {
   WebsocketServiceMessageType
 } from '../../core/protocol/websocket/service.websocket.protocol';
 import { AiPage } from './components/ai-chat/AiPage';
+import { send } from '../../core/protocol/http/agent.http';
 
 export interface MessageUpdateData {
   messages: Message[],
@@ -30,7 +31,7 @@ struct MainContainer {
   @State currentIndex: number = 0;
   @State @Watch("onSwitchToChatArea") selectedContact: Contact | null = null;
   @State selectedMessages: Message[] | null = null;
-  @State currentUser: User | null = CloudChat.currentUser;
+  @State currentUser: User = CloudChat.currentUser!!;
   @State contacts: Contact[] = [];
   @State messagesMap: Map<number, Message[]> | null = null;
   @State isLoading: boolean = true;
@@ -168,6 +169,8 @@ struct MainContainer {
     }
     //加载数据
     this.loadContacts();
+    //创建智能体
+    EventBus.emit(Event.AGENT_CONVERSATION_CREATE, { username: this.currentUser?.username } as send.CreateNewConversationPayload)
   }
 
   catchContacts() {
@@ -246,7 +249,9 @@ struct MainContainer {
         }.tabBar($r('app.string.text_MainContainer_contactRequest'));
 
         TabContent() {
-          AiPage()
+          AiPage({
+            currentUser: this.currentUser
+          })
         }.tabBar($r('app.string.text_MainContainer_aiPage'))
 
         TabContent() {

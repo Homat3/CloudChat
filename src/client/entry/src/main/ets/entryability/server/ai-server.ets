@@ -254,6 +254,7 @@ function checkForReply(conversationId: string, chatId: string){
             case 'completed':{
               console.info("Get Agent Reply");
               getReply(conversationId, chatId);
+              break;
             }
             default : {
               EventBus.emit(Event.AGENT_REPLY_FAILED, resultData.data);
@@ -270,7 +271,7 @@ function checkForReply(conversationId: string, chatId: string){
 
 function getReply(conversationId: string, chatId: string){
   interface Response{
-    data: Agent.MessageData,
+    data: Agent.MessageData[],
     detail: Agent.ResponseDetail,
     code: number,
     msg: string
@@ -289,10 +290,10 @@ function getReply(conversationId: string, chatId: string){
       if (res.responseCode === 200) {
         if (resultData.code === 0) {
           EventBus.emit(Event.AGENT_REPLY_SUCCESS, {
-            id: resultData.data.id,
-            content: resultData.data.content,
+            id: resultData.data[0].id,
+            content: resultData.data[0].content,
             role: 'assistant',
-            timestamp: new Date(resultData.data.updated_at).toLocaleDateString()
+            timestamp: new Date(resultData.data[0].updated_at).toLocaleDateString()
           } as AiMessage);
         }
         else {

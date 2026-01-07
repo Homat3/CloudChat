@@ -36,6 +36,8 @@ import {
   handleRefuseRequest,
   handleSearchForUsersById, handleSearchForUsersByName } from './server/friend_request-server';
 import { SendMessagePayload } from '../core/protocol/websocket/client.websocket.protocol';
+import { receive, send } from '../core/protocol/http/agent.http';
+import { createNewConversation, deleteConversation, postMessage } from './server/ai-server';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -90,6 +92,22 @@ export default class MainUIAbility extends UIAbility {
         console.error(e);
       }
     })
+
+    EventBus.on(Event.AGENT_CONVERSATION_CREATE, (payload: send.CreateNewConversationPayload): void => createNewConversation({ username: payload.username }));
+    EventBus.on(Event.AGENT_CONVERSATION_CREATE_FAILED, (error: string) => {
+      CloudChat.agentConversation = null;
+    })
+    EventBus.on(Event.AGENT_CONVERSATION_CREATE_SUCCESS, (payload: receive.ConversationCreateSuccessPayload) => {
+      CloudChat.agentConversation = { id: payload.conversationId, name: payload.conversationName };
+    })
+    EventBus.on(Event.AGENT_CONVERSATION_DELETE, (payload: send.DeleteConversationPayload): void => deleteConversation({ conversationId: payload.conversationId }));
+    EventBus.on(Event.AGENT_CONVERSATION_DELETE_FAILED, (error: string) => {
+      CloudChat.agentConversation = null;
+    })
+    EventBus.on(Event.AGENT_CONVERSATION_DELETE_SUCCESS, () => {
+      CloudChat.agentConversation = null;
+    })
+    EventBus.on(Event.AGENT_POST_MESSAGE, (data: send.PostMessagePayload): void => postMessage(data));
 
     try {
       //颜色跟随系统
