@@ -215,6 +215,10 @@
     {
       "name": "save",
       "value": "#0000FF"
+    },
+    {
+      "name": "profileSetting_logoutButton_background",
+      "value": "#FFFF0000"
     }
   ]
 }

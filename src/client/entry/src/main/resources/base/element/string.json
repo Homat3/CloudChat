@@ -387,6 +387,10 @@
     {
       "name": "text_MainContainer_aiPage",
       "value": "AI"
+    },
+    {
+      "name": "text_OwnPage_logout",
+      "value": "退出登录"
     }
   ]
 }

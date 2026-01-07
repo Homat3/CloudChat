@@ -46,6 +46,10 @@
     {
       "name": "send_button",
       "value": "#64B5F6"
+    },
+    {
+      "name": "profileSetting_logoutButton_background",
+      "value": "#FFFF0000"
     }
   ]
 }
