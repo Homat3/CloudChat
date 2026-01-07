@@ -1,17 +1,45 @@
 import { CloudChat } from "../../../../CloudChat";
 import { User } from "../../../../core/models/models";
-import { getAvatar } from "../../../../core/util";
+import { EventBus } from "../../../../core/service/event/EventBus";
+import { Event } from "../../../../core/tag/Event";
+import { AVATAR, getAvatar } from "../../../../core/util";
+import { common } from "@kit.AbilityKit";
+import { UpdateProfilePayload } from "../../../../core/protocol/http/client.http.protocol";
 
 
 @Component
 export struct EditProfilePage {
-  @State user: User | null = CloudChat.currentUser
-  @State newUsername: string = this.user?.username || ''
-  @State newEmail: string = this.user?.email || ''
-  @State selectedAvatar: string = this.user?.avatar || 'default'
+  @Prop currentUser: User;
+
+  @State newUsername: string = this.currentUser.username
+  @State newEmail: string = this.currentUser.email
+  @State selectedAvatar: string = this.currentUser.avatar
+
+  // 上下文
+  private uiContext: UIContext = this.getUIContext();
+  private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   //预设头像资源名称
-  private avatars: string[] = ['Zombatar_1', 'Zombatar_2', 'Zombatar_3', 'Zombatar_4', 'Zombatar_5']
+  private avatars: string[] = [
+    AVATAR.DEFAULT, AVATAR.ZOMBATAR_1, AVATAR.ZOMBATAR_2, AVATAR.ZOMBATAR_3, AVATAR.ZOMBATAR_4, AVATAR.ZOMBATAR_5
+  ]
+
+  aboutToAppear(): void {
+    try {
+      EventBus.on(Event.PROFILE_UPDATE_FAILED, (error: string): void => {
+        try {
+          this.uiContext.getPromptAction().showToast({
+            message: "个人信息更新失败：" + error,
+            duration: 2000
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   build() {
     Column() {
@@ -24,7 +52,7 @@ export struct EditProfilePage {
           .padding(0)
           .margin({ left: 8 })
           .onClick(() => {
-            //
+            EventBus.emit(Event.CLOSE_EDIT_PROFILE);
           })
 
         Text("修改个人信息")
@@ -83,6 +111,8 @@ export struct EditProfilePage {
               this.buildInputItem("邮箱地址", this.newEmail, (val) => this.newEmail = val)
             }
           }
+          .width('100%')
+          .height('100%')
           .margin({ top: 20 })
           .backgroundColor($r('app.color.input_background'))
           .divider({ strokeWidth: 0.5, color: $r('app.color.list_divider'), startMargin: 20 })
@@ -111,8 +141,9 @@ export struct EditProfilePage {
   }
 
   private handleSave() {
-    if (this.user) {
-      //
-    }
+    EventBus.emit(Event.UPDATE_PROFILE, {
+        userId: this.currentUser.userId, username: this.newUsername,
+        email: this.newEmail, avatar: this.selectedAvatar, password: ''
+      } as UpdateProfilePayload)
   }
 }

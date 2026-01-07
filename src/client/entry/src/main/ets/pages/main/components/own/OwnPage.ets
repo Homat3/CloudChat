@@ -19,6 +19,23 @@ export struct OwnPage {
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
+  aboutToAppear(): void {
+    try {
+      //注册失败事件
+      EventBus.on(Event.OPEN_EDIT_PROFILE, () => {
+        this.isEditing = true;
+      });
+
+      //注册成功事件
+      EventBus.on(Event.CLOSE_EDIT_PROFILE, () => {
+        this.isEditing = false;
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   build() {
     Stack() {
       if (!this.isEditing) {
@@ -31,7 +48,9 @@ export struct OwnPage {
             .borderRadius(40)
             .margin({ top: 40 })
             .alignSelf(ItemAlign.Center)
-            .onClick(() => this.isEditing = true) //点击头像进入信息修改页面
+            .onClick(() => {
+              EventBus.emit(Event.OPEN_EDIT_PROFILE);
+            }) //点击头像进入信息修改页面
 
           //用户ID
           Row() {
@@ -145,7 +164,6 @@ export struct OwnPage {
       else {
         //显示修改信息页面
         EditProfilePage()
-
       }
     }
     .width('100%')

@@ -23,7 +23,8 @@ import {
   RefuseFriendRequestPayload,
   RegisterPayload,
   SearchForUserByIdPayload,
-  SearchForUserByUserNamePayload } from '../core/protocol/http/client.http.protocol';
+  SearchForUserByUserNamePayload,
+  UpdateProfilePayload} from '../core/protocol/http/client.http.protocol';
 import { handleLogin, handleLoginByToken } from './server/login-server';
 import { handleDeleteContact, handleLoadContacts } from './server/contact-server';
 import { handleLoadMessages, handleSendMessage } from './server/message-server';
@@ -38,6 +39,8 @@ import {
 import { SendMessagePayload } from '../core/protocol/websocket/client.websocket.protocol';
 import { receive, send } from '../core/protocol/http/agent.http';
 import { createNewConversation, deleteConversation, postMessage } from './server/ai-server';
+import { handleUpdateProfile } from './server/profile-server';
+import { ProfileUpdatedSuccessPayload } from '../core/protocol/http/service.http.protocol';
 
 const DOMAIN = 0x0000;  //日志域标识
 
@@ -72,6 +75,8 @@ export default class MainUIAbility extends UIAbility {
     EventBus.on(Event.ACCEPT_REQUEST, (data: AcceptFriendRequestPayload): void => handleAcceptRequest(data));
     EventBus.on(Event.REFUSE_REQUEST, (data: RefuseFriendRequestPayload): void => handleRefuseRequest(data));
     EventBus.on(Event.ADD_FRIEND_REQUEST, (data: AddFriendRequestPayload): void => handlePostFriendRequest(data));
+
+    EventBus.on(Event.UPDATE_PROFILE, (data: UpdateProfilePayload): void => handleUpdateProfile(data));
 
     EventBus.on(Event.COLOR_MODE, (colorMode: string) => {
       try {

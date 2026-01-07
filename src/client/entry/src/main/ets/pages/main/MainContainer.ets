@@ -7,7 +7,8 @@ import { ChatArea } from './components/chat/ChatArea';
 import { Message } from '../../core/models/message';
 import { Contact, User } from '../../core/models/models';
 import { CloudChat } from '../../CloudChat';
-import { ContactDeletedPayload, ContactsLoadedFailedPayload } from '../../core/protocol/http/service.http.protocol';
+import { ContactDeletedPayload, ContactsLoadedFailedPayload,
+  ProfileUpdatedSuccessPayload } from '../../core/protocol/http/service.http.protocol';
 import { common } from '@kit.AbilityKit';
 import { LoadContactsPayload, LoadMessagesPayload } from '../../core/protocol/http/client.http.protocol';
 import {
@@ -55,6 +56,11 @@ struct MainContainer {
       EventBus.on(Event.CHANGE_INDEX, (index: number): void => {
         this.currentIndex = index;
       })
+
+      EventBus.on(Event.PROFILE_UPDATED, (data: ProfileUpdatedSuccessPayload): void => {
+        CloudChat.currentUser = new User(data.userId, data.username, data.email, data.avatar, CloudChat.currentUser?.token);
+        this.currentUser = CloudChat.currentUser;
+      });
 
       EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
       EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
