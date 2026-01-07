@@ -1,4 +1,4 @@
-import { Message } from '../../../../core/models/message';
+import { Message } from "../../../../core/models/message";
 
 @Component
 export struct MessageItem {
@@ -6,10 +6,12 @@ export struct MessageItem {
   @Prop isCurrentUser: boolean;
 
   build() {
+    // 第七步：完整版本（添加时间戳和间距）
     Column() {
       // 消息气泡行
       Row() {
         Text(this.message.content)
+          .fontSize(16)
           .padding(12)
           .backgroundColor(
             this.isCurrentUser
@@ -28,16 +30,13 @@ export struct MessageItem {
               : $r('app.color.other_message_text')
           )
           .textAlign(this.isCurrentUser ? TextAlign.End : TextAlign.Start)
-          // 显式声明换行
           .constraintSize({
-            minWidth: 0,
+            minWidth: 40,
             maxWidth: '75%'
           })
-          .textOverflow({ overflow: TextOverflow.Clip })
-          .maxLines(0)
           .margin({
-            left: this.isCurrentUser ? 0 : 12, // 对方消息左间距
-            right: this.isCurrentUser ? 12 : 0   // 自己消息右间距
+            left: this.isCurrentUser ? 0 : 12,
+            right: this.isCurrentUser ? 12 : 0
           })
       }
       .width('100%')
