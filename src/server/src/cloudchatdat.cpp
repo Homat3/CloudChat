@@ -1,6 +1,4 @@
 #include "cloudchatdat.h"
-#include "cloudchatmsg.h"
-#include "cloudchatuser.h"
 
 std::string g_database_username = "cloudchat"; // 数据库用户名
 std::string g_database_password = "1919810";   // 数据库密码
@@ -661,6 +659,25 @@ bool CloudChatDatabase::DeleteFriendship(int user_id1, int user_id2) {
 		pstmt->setInt(2, user_id2);
 		pstmt->setInt(3, user_id2);
 		pstmt->setInt(4, user_id1);
+
+		return pstmt->executeUpdate() > 0;
+
+		delete pstmt;
+	} catch (sql::SQLException &e) {
+		std::cerr << "add-failed:" << e.what() << std::endl;
+		std::cerr << "wrong-code:" << e.getErrorCode() << std::endl;
+		return false;
+	}
+}
+
+bool CloudChatDatabase::RemoveFriendRequest(FriendRequest friend_request) {
+	try {
+		sql::PreparedStatement *pstmt = connection_->prepareStatement(
+		    "delete from friend_requests where requester_id = ? and target_id = ?"
+		);
+		
+		pstmt->setInt(1, friend_request.get_requester_id());
+		pstmt->setInt(2, friend_request.get_target_id());
 
 		return pstmt->executeUpdate() > 0;
 

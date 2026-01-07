@@ -6,7 +6,6 @@
 #define CLOUDCHATDAT_H
 
 #include "cloudchatmsg.h"
-#include "cloudchatuser.h"
 
 extern std::string g_database_username;
 extern std::string g_database_password;
@@ -47,6 +46,7 @@ public:
 	bool                       UpdateFriendRequest(FriendRequest* friend_request); // 更新好友请求列表
 	// 根据请求者和被请求者用户 ID 获取好友请求
 	FriendRequest*             GetFriendRequestByTwoIds(int requester_id, int target_id);
+	bool RemoveFriendRequest(FriendRequest friend_request); // 删除好友请求
 	// friends
 	bool AddFriend(int user_id1, int user_id2);			  // 添加好友关系
 	std::vector<CloudChatUser> get_contacts(int user_id); // 根据用户 ID 获取联系人列表

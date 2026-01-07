@@ -2,6 +2,7 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatuser.h"
+#include <termios.h>
 
 std::map<websocketpp::connection_hdl, int,
 	std::owner_less<websocketpp::connection_hdl>> g_online_users;
@@ -330,22 +331,23 @@ std::string AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hd
 	FriendRequest* res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
 		friend_request.get_requester_id(), friend_request.get_target_id()
 		);
-	if (res != nullptr) {		// 已经发送过请求
+	if (res != nullptr && res->get_status() == FRIEND_REQUEST_STATUS_PENDING) {		// 已经发送过请求
 		FriendRequestAddedFailedMsg* friend_request_added_failed_msg =
 			new FriendRequestAddedFailedMsg("已向 TA 发送过好友请求");
 		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_failed_msg);
 		return friend_request_added_failed_msg->to_JSON();
-	}
+	} else if (res != nullptr) CloudChatDatabase::GetInstance()->RemoveFriendRequest(*res);
+	
 	res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
 		friend_request.get_target_id(),
 		friend_request.get_requester_id()
 		);
-	if (res != nullptr) {		// 已经收到过请求
+	if (res != nullptr && res->get_status() == FRIEND_REQUEST_STATUS_PENDING) {		// 已经收到过请求
 		FriendRequestAddedFailedMsg* friend_request_added_failed_msg =
 			new FriendRequestAddedFailedMsg("已收到过 TA 发来的好友请求");
 		if (websocket_open) SendMsgToClient(cloudchat_srv, hdl, friend_request_added_failed_msg);
 		return friend_request_added_failed_msg->to_JSON();
-	}
+	} else if (res != nullptr) CloudChatDatabase::GetInstance()->RemoveFriendRequest(*res);
 	
 	if (CloudChatDatabase::GetInstance()->AddFriendRequest(friend_request)) {
 		res = CloudChatDatabase::GetInstance()->GetFriendRequestByTwoIds(
@@ -357,8 +359,7 @@ std::string AddFriendRequest(server_t& cloudchat_srv, websocketpp::connection_hd
 		if (target_user->is_online()) {
 			for (auto& p : g_online_users) {
 				if (p.second == target_user->get_id()) {
-					SendMsgToClient(cloudchat_srv, p.first,
-									new AddFriendRequestServerMsg(friend_request));
+					SendMsgToClient(cloudchat_srv, p.first, new AddFriendRequestServerMsg(*res));
 					break;
 				}
 			}
