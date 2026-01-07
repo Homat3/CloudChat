@@ -102,6 +102,10 @@
     {
       "name": "text_on_brand",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "card_background",
+      "value": "#FF545454"
     }
   ]
 }

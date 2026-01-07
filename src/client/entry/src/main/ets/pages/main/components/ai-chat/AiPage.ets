@@ -177,7 +177,7 @@ export struct AiPage {
       })
         .layoutWeight(1)
         .height(40)
-        .backgroundColor($r('app.color.app.color.input_background'))
+        .backgroundColor($r('app.color.input_background'))
         .borderRadius(8)
         .onChange((value: string) => {
           this.inputText = value;
