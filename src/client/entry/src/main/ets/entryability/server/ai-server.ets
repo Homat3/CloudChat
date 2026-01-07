@@ -5,6 +5,8 @@ import { http } from "@kit.NetworkKit";
 import { Event } from "../../core/tag/Event";
 import { EventBus } from "../../core/service/event/EventBus";
 import { util } from "@kit.ArkTS";
+import { AiMessage } from "../../core/models/message";
+import utils from "@arkts.utils";
 
 class SentMessageTempStore{
   private static storeMap: Map<string, send.PostMessagePayload> = new Map();
@@ -64,6 +66,7 @@ namespace Agent {
   export interface ChatData{
     id: string,
     conversation_id: string,
+    created_at: number,
     bot_id: string,
     status: 'created' | 'in_progress' | 'completed' | 'failed' | 'requires_action' | 'canceled',
     meta_data: MetaData
@@ -71,6 +74,7 @@ namespace Agent {
   export interface MessageData{
     id: string,
     conversation_id: string,
+    updated_at: number,
     role: 'user' | 'assistant',
     type: 'question' | 'answer',
     content: string,
@@ -200,9 +204,14 @@ export function postMessage(data: send.PostMessagePayload){
       console.log('Response:', resultData);
       if (res.responseCode === 200) {
         if (resultData.code === 0) {
+          EventBus.emit(Event.AGENT_POST_MESSAGE_SUCCESS, {
+            id: resultData.data.meta_data.uuid,
+            content: SentMessageTempStore.takeStore(resultData.data.meta_data.uuid)?.message,
+            role: 'user',
+            timestamp: new Date(resultData.data.created_at).toLocaleDateString()
+          } as AiMessage);
           setTimeout(() => {
             console.info("Start Check For Agent Reply");
-            EventBus.emit(Event.AGENT_POST_MESSAGE_SUCCESS, SentMessageTempStore.takeStore(resultData.data.meta_data.uuid)?.message);
             checkForReply(resultData.data.conversation_id, resultData.data.id);
           }, 1200);
         }
@@ -279,7 +288,12 @@ function getReply(conversationId: string, chatId: string){
       console.log('Response:', resultData);
       if (res.responseCode === 200) {
         if (resultData.code === 0) {
-          EventBus.emit(Event.AGENT_REPLY_SUCCESS, resultData.data as receive.ReplyMessagePayload);
+          EventBus.emit(Event.AGENT_REPLY_SUCCESS, {
+            id: resultData.data.id,
+            content: resultData.data.content,
+            role: 'assistant',
+            timestamp: new Date(resultData.data.updated_at).toLocaleDateString()
+          } as AiMessage);
         }
         else {
           EventBus.emit(Event.AGENT_REPLY_FAILED, resultData.msg);
