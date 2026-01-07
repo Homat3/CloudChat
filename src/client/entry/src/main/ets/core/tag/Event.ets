@@ -11,6 +11,8 @@
  * }
  */
 export enum Event {
+  CHANGE_INDEX = "CHANGE_INDEX",
+
   LOGIN = "LOGIN",
   LOGIN_BY_TOKEN = "LOGIN_BY_TOKEN",
   LOGIN_SUCCESS = "LOGIN_SUCCESS",

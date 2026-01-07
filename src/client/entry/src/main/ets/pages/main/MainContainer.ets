@@ -51,6 +51,10 @@ struct MainContainer {
 
     //注册监听
     try {
+      EventBus.on(Event.CHANGE_INDEX, (index: number): void => {
+        this.currentIndex = index;
+      })
+
       EventBus.on(Event.MESSAGES_LOADED, (): void => this.catchMessages());
       EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
 

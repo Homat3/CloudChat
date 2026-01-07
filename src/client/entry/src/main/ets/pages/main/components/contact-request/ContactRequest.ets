@@ -118,16 +118,16 @@ export struct ContactRequest {
       ))
     });
     EventBus.on(Event.REQUIRE_REFUSE_FRIEND_REQUEST, (payload: RequireRefuseFriendRequestPayload) => {
-      const targetRequest = this.sentRequests.find((request): boolean => request.id === payload.id);
-      if (targetRequest) {
-        targetRequest.status = 'refused';
-      }
+      this.sentRequests = this.sentRequests.map((request) => {
+        if (request.id === payload.id) request.status = 'refused';
+        return request;
+      })
     });
     EventBus.on(Event.REQUIRE_ACCEPT_FRIEND_REQUEST, (payload: RequireAcceptFriendRequestPayload) => {
-      const targetRequest = this.sentRequests.find((request): boolean => request.id === payload.id);
-      if (targetRequest) {
-        targetRequest.status = 'accepted';
-      }
+      this.sentRequests = this.sentRequests.map((request) => {
+        if (request.id === payload.id) request.status = 'accepted';
+        return request;
+      })
     });
     EventBus.on(Event.FRIEND_REQUEST_ADDED, (payload: FriendRequestAddedPayload) => {
       this.sentRequests.push(new FriendRequest(
@@ -139,16 +139,20 @@ export struct ContactRequest {
       ))
     })
     EventBus.on(Event.FRIEND_REQUEST_ACCEPTED, (payload: FriendRequestAcceptedPayload) => {
-      const targetRequest = this.sentRequests.find((request): boolean => request.id === payload.id);
-      if (targetRequest) {
-        targetRequest.status = 'accepted';
-      }
+      this.receivedRequests = this.receivedRequests.map((request) => {
+        if (request.id === payload.id) request.status = 'accepted';
+        return request;
+      })
+      this.activeTab = 0;
+      EventBus.emit(Event.CHANGE_INDEX, 0);
     })
     EventBus.on(Event.FRIEND_REQUEST_REFUSED, (payload: FriendRequestRefusedPayload) => {
-      const targetRequest = this.sentRequests.find((request): boolean => request.id === payload.id);
-      if (targetRequest) {
-        targetRequest.status = 'refused';
-      }
+      this.receivedRequests = this.receivedRequests.map((request) => {
+        if (request.id === payload.id) request.status = 'refused';
+        return request;
+      })
+      this.activeTab = 0;
+      EventBus.emit(Event.CHANGE_INDEX, 0);
     })
     EventBus.on(Event.FRIEND_REQUEST_ERROR, (error: string) => {
       try {
@@ -231,7 +235,7 @@ export struct ContactRequest {
               if (this.receivedRequests.length > 0) {
                 ForEach(this.receivedRequests, (request: FriendRequest) => {
                   this.ReceivedRequestCard(request)
-                }, (request: FriendRequest) => request.id.toString())
+                }, (request: FriendRequest, index: number) => index + request.id.toString())
               } else {
                 this.EmptyState(
                   loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noReceived_title')),
