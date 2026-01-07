@@ -40,7 +40,7 @@ export function handleLogin(data: LoginPayload) {
   //发送http请求
   httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse) => {
     if (err) {
-      EventBus.emit(Event.LOGIN_FAILED, { error: err.message } as LoginFailurePayload);
+      EventBus.emit(Event.LOGIN_FAILED, err.message);
       return;
     }
     //解析数据
@@ -55,13 +55,13 @@ export function handleLogin(data: LoginPayload) {
             websocketNormalVerify({ userId: successData.userId }, successData);
             break;
           case HttpServiceMessageType.LOGIN_FAILURE:
-            EventBus.emit(Event.LOGIN_FAILED, resultData.payload as LoginFailurePayload);
+            EventBus.emit(Event.LOGIN_FAILED, (resultData.payload as LoginFailurePayload).error);
             break;
           default:
             throw new Error("Unknown error");
         }
       } else {
-        EventBus.emit(Event.LOGIN_FAILED, { error: "Http error code: " + res.responseCode } as LoginFailurePayload);
+        EventBus.emit(Event.LOGIN_FAILED, "Http error code: " + res.responseCode);
       }
     } catch (e) {
       EventBus.emit(Event.LOGIN_FAILED, e);
@@ -81,7 +81,7 @@ function websocketNormalVerify(data: HdlInfoPayload, verifyData: LoginSuccessPay
         if ((receivedObject.payload as HdlGotPayload).userId === verifyData.userId) {
           EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
         } else {
-          EventBus.emit(Event.LOGIN_FAILED, { error: "Multiple Id" } as LoginFailurePayload);
+          EventBus.emit(Event.LOGIN_FAILED, "Multiple Id");
         }
       }
     });
@@ -108,13 +108,13 @@ export function handleLoginByToken(data: hLoginByTokenPayload): void {
   //发送http请求
   httpService.post('/login', loginRequest, (err: BusinessError, res: http.HttpResponse) => {
     if (err) {
-      EventBus.emit(Event.LOGIN_FAILED, { error: err.message } as LoginFailurePayload);
+      EventBus.emit(Event.LOGIN_FAILED, err.message);
       return;
     }
     //解析数据
     try {
       const resultData = res.result as HttpServiceMessage;
-      console.log('Password_login Response:', resultData);
+      console.log('Token_login Response:', resultData);
 
       if (res.responseCode === 200) {
         switch (resultData.type) {
@@ -123,7 +123,7 @@ export function handleLoginByToken(data: hLoginByTokenPayload): void {
             websocketTokenVerify({ userId: successData.userId }, successData);
             break;
           case HttpServiceMessageType.LOGIN_FAILURE:
-            EventBus.emit(Event.LOGIN_FAILED, resultData.payload as hLoginFailurePayload);
+            EventBus.emit(Event.LOGIN_FAILED, (resultData.payload as hLoginFailurePayload).error);
             break;
           default:
             throw new Error("Unknown error");
@@ -147,7 +147,7 @@ function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPay
         if ((receivedObject.payload as HdlGotPayload).userId === verifyData.userId) {
           EventBus.emit(Event.LOGIN_SUCCESS, verifyData);
         } else {
-          EventBus.emit(Event.LOGIN_FAILED, { error: "Multiple Id" } as LoginFailurePayload);
+          EventBus.emit(Event.LOGIN_FAILED, "Multiple Id");
         }
       }
     });
@@ -158,6 +158,6 @@ function websocketTokenVerify(data: HdlInfoPayload, verifyData: hLoginSuccessPay
     }
     ws.send(loginInfo);
   } catch (e) {
-    EventBus.emit(Event.LOGIN_FAILED, { error: e } as LoginFailurePayload);
+    EventBus.emit(Event.LOGIN_FAILED, e);
   }
 }

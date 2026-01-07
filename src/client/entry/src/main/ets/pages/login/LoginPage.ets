@@ -2,23 +2,25 @@ import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
 import { Event } from '../../core/tag/Event';
 import { Page } from '../../core/tag/Page';
-import { UserManager } from '../../core/manager/user-manager/user-manager';
 import { LoginFailurePayload, LoginSuccessPayload } from '../../core/protocol/websocket/service.websocket.protocol';
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
 import { EventBus } from '../../core/service/event/EventBus';
-import { LoginPayload } from '../../core/protocol/http/client.http.protocol';
+import { LoginByTokenPayload, LoginPayload } from '../../core/protocol/http/client.http.protocol';
 
+PersistentStorage.persistProp('username', '');
+PersistentStorage.persistProp('user_token', '');
 
 @Entry
 @Component
 struct LoginPage {
   // 状态
-  @State username: string = '';
+  @StorageLink('username') username: string = '';
+  @StorageLink('user_token') user_token: string = '';
   @State password: string = '';
   @State errorMessage: string = "";
   @State isLoading: boolean = false;
-  @State rememberMe: boolean = false;
+  @State rememberMe: boolean = true;
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -26,20 +28,12 @@ struct LoginPage {
   //尝试读取保存的用户名
   aboutToAppear(): void {
     try {
-      //记住的用户名
-      const rememberedUsername = UserManager.getRememberedUsername();
-      if (rememberedUsername) {
-        this.username = rememberedUsername;
-        this.rememberMe = true;
-      }
-
       // 监听登录失败事件
-      EventBus.on(Event.LOGIN_FAILED, (payload: LoginFailurePayload) => {
+      EventBus.on(Event.LOGIN_FAILED, (error: string) => {
         this.isLoading = false;
         try {
           this.uiContext.getPromptAction().showToast({
-            message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' +
-            payload.error,
+            message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' + error,
             duration: 2000
           });
         } catch (e) {
@@ -51,6 +45,7 @@ struct LoginPage {
       EventBus.on(Event.LOGIN_SUCCESS, (payload: LoginSuccessPayload) => {
         CloudChat.currentUser =
           new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
+        if (this.rememberMe) this.user_token = payload.token;
         this.uiContext.getRouter().replaceUrl({ url: Page.MAIN }).catch((err: Error) => {
           console.error(err.message);
         });
@@ -241,15 +236,10 @@ struct LoginPage {
 
   //检查本地令牌并尝试自动登录
   private checkLocalTokenAndAutoLogin(): void {
-    const localTokenInfo = UserManager.getLocalTokenInfo();
-
-    if (localTokenInfo) {
+    if (this.username && this.user_token) {
       console.log('Local Token is found,login...');
       this.isLoading = true;
-
-      this.username = localTokenInfo.username;
-
-      EventBus.emit(Event.LOGIN_BY_TOKEN, localTokenInfo);
+      EventBus.emit(Event.LOGIN_BY_TOKEN, { username: this.username, token: this.user_token } as LoginByTokenPayload);
     }
   }
 
