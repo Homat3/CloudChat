@@ -5,14 +5,6 @@
       "value": "#FF676767"
     },
     {
-      "name": "secondary_text",
-      "value": "#A0A0A0"
-    },
-    {
-      "name": "card_background",
-      "value": "#1C1C1E"
-    },
-    {
       "name": "profileSetting_relativeContainer_background",
       "value": "#121212"
     }, {
@@ -54,6 +46,10 @@
     {
       "name": "send_button",
       "value": "#64B5F6"
+    },
+    {
+      "name": "profileSetting_logoutButton_background",
+      "value": "#FFFF0000"
     },
     {
       "name": "panel_background",

@@ -3,6 +3,7 @@ import { CloudChat } from '../../../../CloudChat';
 import { User } from '../../../../core/models/models';
 import { EventBus } from '../../../../core/service/event/EventBus';
 import { Event } from '../../../../core/tag/Event';
+import { Page } from "../../../../core/tag/Page";
 import { getAvatar } from '../../../../core/util';
 import { EditProfilePage } from "./EditProfilePage";
 
@@ -29,6 +30,15 @@ export struct OwnPage {
       EventBus.on(Event.CLOSE_EDIT_PROFILE, () => {
         this.isEditing = false;
       });
+
+      //登出
+      EventBus.on(Event.LOGOUT, () => {
+        PersistentStorage.deleteProp('username');
+        PersistentStorage.deleteProp('user_token');
+        this.uiContext.getRouter().replaceUrl({ url: Page.LOGIN_PAGE }).catch((e: Error) => {
+          console.error(e.message)
+        });
+      })
 
     } catch (error) {
       console.error(error);
@@ -154,6 +164,15 @@ export struct OwnPage {
           .width('100%')
           .padding({ left: 20, right: 20 })
           .margin({ top: 60 })
+
+          Button($r('app.string.text_OwnPage_logout'))
+            .width('90%')
+            .backgroundColor($r('app.color.profileSetting_logoutButton_background'))
+            .margin({ top: 40 })
+            .onClick(() => {
+              EventBus.emit(Event.LOGOUT);
+            })
+
         }
         .height('100%')
         .width('100%')

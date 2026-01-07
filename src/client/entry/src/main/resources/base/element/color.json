@@ -9,10 +9,6 @@
       "value": "#409EFF"
     },
     {
-      "name": "card_background",
-      "value": "#FFFFFF"
-    },
-    {
       "name": "login_textInput_all_border",
       "value": "#DCDFE6"
     },
@@ -219,6 +215,10 @@
     {
       "name": "save",
       "value": "#0000FF"
+    },
+    {
+      "name": "profileSetting_logoutButton_background",
+      "value": "#FFFF0000"
     },
     {
       "name": "brand_primary",
