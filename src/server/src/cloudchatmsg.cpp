@@ -1,5 +1,4 @@
 #include "cloudchatmsg.h"
-#include <string>
 
 ProtocalMsg::ProtocalMsg(std::string type) {
 	type_ = type;
