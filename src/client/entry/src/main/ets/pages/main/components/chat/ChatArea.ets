@@ -154,7 +154,7 @@ export struct ChatArea {
         })
           .layoutWeight(1)
           .height(32)
-          .backgroundColor(Color.White)
+          .backgroundColor($r('app.color.input_background'))
           .borderRadius(6)
           .padding({ left: 12, right: 12 })
           .fontSize(15)
@@ -163,7 +163,7 @@ export struct ChatArea {
       }
       .layoutWeight(0.6)
       .padding({ left: 10, right: 10 })
-      .backgroundColor(Color.White)
+      .backgroundColor($r('app.color.input_background'))
       .borderRadius(10)
       .height(40)
 
@@ -171,7 +171,7 @@ export struct ChatArea {
       Button($r("app.string.text_contactList_chatArea_Send"))
         .width(70)
         .height(32)
-        .backgroundColor(this.newMessage.trim().length > 0 ? $r('app.color.send_button') : Color.Gray)
+        .backgroundColor(this.newMessage.trim().length > 0 ? $r('app.color.send_button') : $r('app.color.button_disable'))
         .fontColor(Color.White)
         .fontSize(14)
         .margin({ left: 8 })

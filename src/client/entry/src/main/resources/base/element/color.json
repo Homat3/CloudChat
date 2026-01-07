@@ -219,6 +219,18 @@
     {
       "name": "profileSetting_logoutButton_background",
       "value": "#FFFF0000"
+    },
+    {
+      "name": "brand_primary",
+      "value": "#007DFF"
+    },
+    {
+      "name": "button_disable",
+      "value": "#999999"
+    },
+    {
+      "name": "text_timestamp",
+      "value": "#999999"
     }
   ]
 }

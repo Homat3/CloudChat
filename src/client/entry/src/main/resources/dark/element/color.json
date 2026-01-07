@@ -49,7 +49,59 @@
     },
     {
       "name": "profileSetting_logoutButton_background",
-      "value": "#FF450000"
+      "value": "#FFFF0000"
+    },
+    {
+      "name": "panel_background",
+      "value": "#1E1E1E"
+    },
+    {
+      "name": "input_background",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "online_status",
+      "value": "#66BB6A"
+    },
+    {
+      "name": "tertiary_text",
+      "value": "#707070"
+    },
+    {
+      "name": "DetailPanel_border",
+      "value": "#2D2D2D"
+    },
+    {
+      "name": "DetailPanel_wholeBackground",
+      "value": "#121212"
+    },
+    {
+      "name": "DetailPanel_background",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "brand_primary",
+      "value": "#64B5F6"
+    },
+    {
+      "name": "primary",
+      "value": "#64B5F6"
+    },
+    {
+      "name": "button_disable",
+      "value": "#666666"
+    },
+    {
+      "name": "text_timestamp",
+      "value": "#707070"
+    },
+    {
+      "name": "button_secondary_bg",
+      "value": "transparent"
+    },
+    {
+      "name": "text_on_brand",
+      "value": "#FFFFFF"
     }
   ]
 }

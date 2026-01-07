@@ -120,7 +120,7 @@ export struct AiPage {
             .fontColor($r('app.color.primary_text'))
           Text("在线")
             .fontSize(10)
-            .fontColor(Color.Green)
+            .fontColor($r('app.color.online_status'))
         }.alignItems(HorizontalAlign.Start)
       }
       .alignItems(VerticalAlign.Center)
@@ -156,7 +156,7 @@ export struct AiPage {
         // 时间戳
         Text(msg.timestamp)
           .fontSize(10)
-          .fontColor(Color.Gray)
+          .fontColor($r('app.color.tertiary_text'))
           .margin({ top: 4 })
       }
       .alignItems(this.isUser(msg) ? HorizontalAlign.End : HorizontalAlign.Start)
@@ -177,7 +177,7 @@ export struct AiPage {
       })
         .layoutWeight(1)
         .height(40)
-        .backgroundColor(Color.White)
+        .backgroundColor($r('app.color.app.color.input_background'))
         .borderRadius(8)
         .onChange((value: string) => {
           this.inputText = value;
