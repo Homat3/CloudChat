@@ -1,3 +1,8 @@
+export interface LoginInfo {
+  payload: LoginPayload,
+  needHdl: boolean
+}
+
 export interface HttpClientMessage {
   type: HttpClientMessageType;
   payload: ClientPayload;

@@ -6,7 +6,7 @@ import { LoginFailurePayload, LoginSuccessPayload } from '../../core/protocol/we
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
 import { EventBus } from '../../core/service/event/EventBus';
-import { LoginByTokenPayload, LoginPayload } from '../../core/protocol/http/client.http.protocol';
+import { LoginByTokenPayload, LoginInfo, LoginPayload } from '../../core/protocol/http/client.http.protocol';
 
 PersistentStorage.persistProp('username', '');
 PersistentStorage.persistProp('user_token', '');
@@ -43,6 +43,8 @@ struct LoginPage {
 
       // 监听登录成功事件
       EventBus.on(Event.LOGIN_SUCCESS, (payload: LoginSuccessPayload) => {
+        AppStorage.setOrCreate('isInUse', true);
+        this.isLoading = false;
         CloudChat.currentUser =
           new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
         if (this.rememberMe) this.user_token = payload.token;
@@ -51,11 +53,15 @@ struct LoginPage {
         });
       });
 
-      this.checkLocalTokenAndAutoLogin();
+      this.checkLocalTokenAndAutoLogin(this.getIsInUse());
 
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private getIsInUse(): boolean{
+    return AppStorage.get('isInUse') ?? false;
   }
 
   build() {
@@ -235,8 +241,8 @@ struct LoginPage {
   }
 
   //检查本地令牌并尝试自动登录
-  private checkLocalTokenAndAutoLogin(): void {
-    if (this.username && this.user_token) {
+  private checkLocalTokenAndAutoLogin(isInUse: boolean): void {
+    if (!isInUse && this.username && this.user_token) {
       console.log('Local Token is found,login...');
       this.isLoading = true;
       EventBus.emit(Event.LOGIN_BY_TOKEN, { username: this.username, token: this.user_token } as LoginByTokenPayload);
@@ -250,9 +256,14 @@ struct LoginPage {
     }
 
     this.isLoading = true;
+    setTimeout(() => {
+      if (this.isLoading){
+        EventBus.emit(Event.LOGIN_FAILED, "登录超时")
+      }
+    }, 5000)
     this.errorMessage = "";
 
-    EventBus.emit(Event.LOGIN, { username: this.username, password: this.password } as LoginPayload);
+    EventBus.emit(Event.LOGIN, { payload: { username: this.username, password: this.password } as LoginPayload, needHdl: !this.getIsInUse() } as LoginInfo);
   }
 
   //本地验证表单信息

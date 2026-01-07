@@ -36,7 +36,7 @@ export struct OwnPage {
         PersistentStorage.deleteProp('username');
         PersistentStorage.deleteProp('user_token');
         this.uiContext.getRouter().replaceUrl({ url: Page.LOGIN_PAGE }).catch((e: Error) => {
-          console.error(e.message)
+          console.error(e.message);
         });
       })
 
@@ -166,7 +166,7 @@ export struct OwnPage {
           .margin({ top: 60 })
 
           Button($r('app.string.text_OwnPage_logout'))
-            .width('90%')
+            .width('100%')
             .backgroundColor($r('app.color.profileSetting_logoutButton_background'))
             .margin({ top: 40 })
             .onClick(() => {

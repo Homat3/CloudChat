@@ -2,7 +2,8 @@ import {
   LoginByTokenPayload as hLoginByTokenPayload,
   HttpClientMessage,
   HttpClientMessageType,
-  LoginPayload
+  LoginPayload,
+  LoginInfo
 } from '../../core/protocol/http/client.http.protocol';
 import { HttpService } from '../../core/service/network/http/server.http';
 import {
@@ -29,11 +30,11 @@ import { Event } from '../../core/tag/Event';
 import { EventBus } from '../../core/service/event/EventBus';
 import { CloudChat } from '../../CloudChat';
 
-export function handleLogin(data: LoginPayload) {
+export function handleLogin(data: LoginInfo) {
   const httpService = CloudChat.httpServer;
   const loginRequest: HttpClientMessage = {
     type: HttpClientMessageType.LOGIN,
-    payload: data
+    payload: data.payload
   };
 
   console.log('Send Request:', loginRequest);
@@ -52,7 +53,8 @@ export function handleLogin(data: LoginPayload) {
         switch (resultData.type) {
           case HttpServiceMessageType.LOGIN_SUCCESS:
             const successData = resultData.payload as LoginSuccessPayload;
-            websocketNormalVerify({ userId: successData.userId }, successData);
+            if (data.needHdl) websocketNormalVerify({ userId: successData.userId }, successData);
+            else EventBus.emit(Event.LOGIN_SUCCESS, successData);
             break;
           case HttpServiceMessageType.LOGIN_FAILURE:
             EventBus.emit(Event.LOGIN_FAILED, (resultData.payload as LoginFailurePayload).error);
