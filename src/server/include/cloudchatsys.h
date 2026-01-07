@@ -26,13 +26,14 @@
 #include <filesystem>
 #include <csignal>
 #include <thread>
+#include <csignal>
+#include <cstdio>
 
-#define SERVER_PORT 14514 // 服务器通信端口号
-// 114.116.245.123
-// server
-// 1234567SSH
+int g_server_port = 14514;
+int g_buff_len    = 2048;
 
-#define BUFF_LEN    2048		// 字符串缓冲区大小
+#define SERVER_PORT g_server_port // 服务器通信端口号
+#define BUFF_LEN    g_buff_len	  // 字符串缓冲区大小
 
 typedef websocketpp::server<websocketpp::config::asio> server_t; // 服务器对象类型
 

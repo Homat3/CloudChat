@@ -1,8 +1,6 @@
 #include "cloudchatdat.h"
 #include "cloudchatmsg.h"
 #include "cloudchatservice.h"
-#include <csignal>
-#include <websocketpp/logger/levels.hpp>
 
 #define SERVER_INITIALIZED 0 // 服务器已初始化
 #define SERVER_INITIALIZATION_FAILED -1 // 服务器初始化失败
@@ -15,6 +13,7 @@ int InitServer(); // 初始化服务器
 int InitNetwork(); // 初始化网络
 int InitDatabase(); // 初始化数据库
 
+void LoadConfig();				// 加载配置文件
 void OnOpen(websocketpp::connection_hdl hdl);
 void OnClose(websocketpp::connection_hdl hdl);
 void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg);
@@ -48,6 +47,8 @@ int InitDatabase() {
 }
 
 int InitServer() {
+	LoadConfig();				// 加载配置文件
+	
 	printf("正在初始化数据库...\n");
 	if (InitDatabase() != DATABASE_INITIALIZED) {
 		printf("数据库初始化失败。\n");
@@ -188,4 +189,33 @@ void OnMessage(websocketpp::connection_hdl hdl, server_t::message_ptr msg) {
 void signal_handler(int signal) {
 	std::cout << "收到信号：" << signal << std::endl;
 	std::exit(signal);
+}
+
+void LoadConfig() {
+	std::string text;
+	FILE* fin = fopen("config.json", "r");
+	if (fin == NULL) return;
+	char c;
+	while (fscanf(fin, "%c", &c) != EOF) text.push_back(c);
+	int end = text.length() - 1;
+	
+	int server_port_pos = find_field_pos(text, "\"server_port\"");
+	int server_port = parse_int_from_json(text, server_port_pos, end);
+	if (server_port > 0) g_server_port = server_port;
+	
+	int buff_len_pos = find_field_pos(text, "\"buff_len\"");
+	int buff_len = parse_int_from_json(text, buff_len_pos, end);
+	if (buff_len > 0) g_buff_len = buff_len;
+
+	int database_username_pos = find_field_pos(text, "\"database_username\"");
+	std::string database_username = parse_str_from_json(text, database_username_pos, end);
+	if (database_username != "") g_database_username = database_username;
+
+	int database_password_pos = find_field_pos(text, "\"database_password\"");
+	std::string database_password = parse_str_from_json(text, database_password_pos, end);
+	if (database_password != "") g_database_password = database_password;
+
+	int database_host_pos = find_field_pos(text, "\"database_host\"");
+	std::string database_host = parse_str_from_json(text, database_host_pos, end);
+	if (database_host != "") g_database_host = database_host;
 }
