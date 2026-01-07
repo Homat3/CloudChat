@@ -3,6 +3,49 @@
     {
       "name": "start_window_background",
       "value": "#FF676767"
+    },
+    {
+      "name": "profileSetting_relativeContainer_background",
+      "value": "#121212"
+    }, {
+      "name": "contact_list_chat_background",
+      "value": "#121212"
+    },
+    {
+      "name": "contact_list_contact_background",
+      "value": "#1E1E1E"
+    },
+    {
+      "name": "header_background",
+      "value": "#1C1C1E"
+    },
+    {
+      "name": "primary_text",
+      "value": "#E0E0E0"
+    },
+    {
+      "name": "list_divider",
+      "value": "#2D2D2D"
+    },
+    {
+      "name": "my_message_bg",
+      "value": "#0D47A1"
+    },
+    {
+      "name": "my_message_text",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "other_message_bg",
+      "value": "#2C2C2C"
+    },
+    {
+      "name": "other_message_text",
+      "value": "#E0E0E0"
+    },
+    {
+      "name": "send_button",
+      "value": "#64B5F6"
     }
   ]
 }
