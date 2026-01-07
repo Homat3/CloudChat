@@ -1,13 +1,18 @@
-
-import { Page } from '../../core/tag/Page';
+iimport
+{
+  Page
+}
+from
+'../../core/tag/Page'
 import { common } from '@kit.AbilityKit';
 import { loadStringResource } from '../../core/service/resource/load-resource';
 import { EventBus } from '../../core/service/event/EventBus';
-import { Event} from '../../core/tag/Event';
+import { Event } from '../../core/tag/Event';
 import { RegisterFailurePayload, RegisterSuccessPayload } from '../../core/protocol/http/service.http.protocol';
 import { CloudChat } from '../../CloudChat';
 import { User } from '../../core/models/models';
 import { RegisterPayload } from '../../core/protocol/http/client.http.protocol';
+;
 
 @Entry
 @Component
@@ -20,37 +25,37 @@ struct Register {
   @State passWord_check: string = ''
   @State errorMessage: string = ''
   @State isLoading: boolean = false
-
   // 添加各个字段的独立错误状态，用于实时验证
   @State userNameError: string = ''
   @State emailError: string = ''
   @State passwordError: string = ''
   @State confirmPasswordError: string = ''
-
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
-    try{
+    try {
       //注册失败事件
-      EventBus.on(Event.REGISTER_FAILED,(payload: RegisterFailurePayload)=>{
+      EventBus.on(Event.REGISTER_FAILED, (payload: RegisterFailurePayload) => {
         this.isLoading = false;
         this.uiContext.getPromptAction().showToast({
-          message: loadStringResource(this.uiAbilityContext, $r("app.string.error_register_RegisterFailed")) + ": " + payload.error,
+          message: loadStringResource(this.uiAbilityContext, $r("app.string.error_register_RegisterFailed")) + ": " +
+          payload.error,
           duration: 2000
         });
       });
 
       //注册成功事件
-      EventBus.on(Event.REGISTER_SUCCESS,(payload: RegisterSuccessPayload)=>{
-        CloudChat.currentUser = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
-        this.uiContext.getRouter().replaceUrl({url:Page.MAIN}).catch((err:Error)=>{
+      EventBus.on(Event.REGISTER_SUCCESS, (payload: RegisterSuccessPayload) => {
+        CloudChat.currentUser =
+          new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
+        this.uiContext.getRouter().replaceUrl({ url: Page.MAIN }).catch((err: Error) => {
           console.error(err.message);
         })
       });
 
-    }catch(error){
+    } catch (error) {
       console.error(error);
     }
   }
@@ -139,7 +144,7 @@ struct Register {
           })
           .onChange((value: string) => {
             this.passWord = value;
-           this.errorMessage = '';
+            this.errorMessage = '';
           })
 
         // 密码错误提示（实时）
@@ -177,7 +182,8 @@ struct Register {
           .height(48)
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
-          .backgroundColor(this.canRegister() ? $r("app.color.login_button_login_background_enabled") : $r("app.color.login_button_login_background_disabled"))
+          .backgroundColor(this.canRegister() ? $r("app.color.login_button_login_background_enabled") :
+            $r("app.color.login_button_login_background_disabled"))
           .opacity(this.canRegister() ? 1 : 0.6)
           .enabled(this.canRegister() && !this.isLoading)
           .onClick(() => {
@@ -210,7 +216,12 @@ struct Register {
               .lineHeight(20)
           }
           .width('100%')
-          .padding({ left: 8, right: 8, top: 8, bottom: 8 })
+          .padding({
+            left: 8,
+            right: 8,
+            top: 8,
+            bottom: 8
+          })
           .backgroundColor($r("app.color.register_row_error_background"))
           .borderRadius(8)
         }
@@ -231,13 +242,14 @@ struct Register {
     .alignItems(HorizontalAlign.Center)
   }
 
-  private handleRegister(){
-    if(!this.canRegister()){
+  private handleRegister() {
+    if (!this.canRegister()) {
       return;
     }
     this.isLoading = true;
     this.errorMessage = '';
-    EventBus.emit(Event.REGISTER,{username:this.userName,password:this.passWord,email:this.email} as RegisterPayload)
+    EventBus.emit(Event.REGISTER,
+      { username: this.userName, password: this.passWord, email: this.email } as RegisterPayload)
   }
 
   // 检查是否可以注册
@@ -250,28 +262,29 @@ struct Register {
       !this.isLoading;
 
     const usernameValid = !(this.userName.trim().length === 0);
-    const emailValid =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
     const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/.test(this.passWord);
-    const passwordCheckedValid = (this.passWord_check == this.passWord) &&  !(this.userName.trim().length === 0);
+    const passwordCheckedValid = (this.passWord_check == this.passWord) && !(this.userName.trim().length === 0);
 
-    if(!usernameValid){
-      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameRequireNotNull"));
+    if (!usernameValid) {
+      this.errorMessage =
+        loadStringResource(this.uiAbilityContext, $r("app.string.error_register_UsernameRequireNotNull"));
       return false;
     }
-    if(!emailValid){
+    if (!emailValid) {
       this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_EmailInputError"));
       return false;
     }
-    if(!passwordValid){
+    if (!passwordValid) {
       this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordInputError"));
       return false;
     }
-    if(!passwordCheckedValid){
-      this.errorMessage = loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordConfirmError"));
+    if (!passwordCheckedValid) {
+      this.errorMessage =
+        loadStringResource(this.uiAbilityContext, $r("app.string.error_register_PasswordConfirmError"));
       return false;
     }
     console.log(`canRegister检查: ${canRegister}`);
     return canRegister;
   }
-
 }

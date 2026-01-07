@@ -13,25 +13,67 @@ export class WebsocketService {
   private port: string | null;
   private _newMessage: string = "";
   private messageObservers: Array<(newMessage: string) => void> = [];
-
   private retryCount = 0;
   private maxRetryCount = 5;
 
-  private set newMessage(value: string){
-    if (!(this._newMessage === value)){
+  private get newMessage() {
+    return this._newMessage;
+  }
+
+  private set newMessage(value: string) {
+    if (!(this._newMessage === value)) {
       this._newMessage = value;
       this.OnNewMessage(value);
     }
   }
-  private get newMessage(){
-    return this._newMessage;
+
+  public connect() {
+    let errorOccurs = this.retryCount > this.maxRetryCount;
+    this.retryCount++;
+    // 定义WebSocket连接的URL前缀
+    const prefix = 'ws://';
+    // 根据端口是否存在，决定是否添加端口号
+    const endfix = this.port ? ":" + this.port : "";
+    // 调用WebSocket连接方法，进行实际连接
+    this.websocketBase.connect(prefix + this.serverUrl + endfix, (err: BusinessError) => {
+      if (!err) {
+        // 连接成功，输出日志并订阅消息
+        console.info("Connected successfully");
+        this.subscribe();
+      } else {
+        // 连接失败，抛出连接失败错误
+        console.error(`连接失败，3秒后重试 Code:${err.code}`);
+        setTimeout((): void => this.connect(), 3000);
+        if (errorOccurs) {
+          throw new ConnectFailedError(err.message, err.code);
+        }
+      }
+    });
   }
 
-  private OnNewMessage(newValue: string){
+  public disconnect() {
+    this.websocketBase.close({
+      code: 100,
+      reason: "App exit"
+    }).catch((error: Error) => {
+      console.error(error.message)
+    })
+  }
+
+  public constructor(serverUrl: string, port: string | null) {
+    this.port = port;
+    this.serverUrl = serverUrl;
+  }
+
+  public addMessageObserver(observer: (newMessage: string) => void): void {
+    this.messageObservers.push(observer);
+  }
+
+  private OnNewMessage(newValue: string) {
     this.messageObservers.forEach(it => it(newValue));
   }
 
-  private subscribe(){// 连接成功事件
+  private subscribe() { // 连接成功事件
     this.websocketBase.on('open', (err: BusinessError, value: Object) => {
       if (err != undefined) {
         const msg = JSON.stringify(err);
@@ -41,7 +83,7 @@ export class WebsocketService {
     });
 
     // 接收消息事件
-    this.websocketBase.on('message',(err: BusinessError, value: string | ArrayBuffer) => {
+    this.websocketBase.on('message', (err: BusinessError, value: string | ArrayBuffer) => {
       if (err != undefined) {
         const msg = JSON.stringify(err);
         console.error(msg);
@@ -67,46 +109,6 @@ export class WebsocketService {
       console.error(msg);
       throw new WebsocketServiceError(msg);
     });
-  }
-
-  public constructor(serverUrl: string, port: string | null) {
-    this.port = port;
-    this.serverUrl = serverUrl;
-  }
-
-  public addMessageObserver(observer: (newMessage: string) => void): void {
-    this.messageObservers.push(observer);
-  }
-
-  public connect() {
-    let errorOccurs = this.retryCount > this.maxRetryCount;
-    this.retryCount++;
-    // 定义WebSocket连接的URL前缀
-    const prefix = 'ws://';
-    // 根据端口是否存在，决定是否添加端口号
-    const endfix = this.port ? ":" + this.port : "";
-    // 调用WebSocket连接方法，进行实际连接
-    this.websocketBase.connect(prefix + this.serverUrl + endfix, (err: BusinessError) => {
-      if (!err) {
-        // 连接成功，输出日志并订阅消息
-        console.info("Connected successfully");
-        this.subscribe();
-      } else {
-        // 连接失败，抛出连接失败错误
-        console.error(`连接失败，3秒后重试 Code:${err.code}`);
-        setTimeout((): void => this.connect(), 3000);
-        if (errorOccurs) throw new ConnectFailedError(err.message, err.code);
-      }
-    });
-  }
-
-  public disconnect(){
-    this.websocketBase.close({
-      code: 100,
-      reason: "App exit"
-    }).catch((error: Error) => {
-      console.error(error.message)
-    })
   }
 
   public send(message: object) {

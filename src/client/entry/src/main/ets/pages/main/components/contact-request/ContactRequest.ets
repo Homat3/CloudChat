@@ -9,21 +9,24 @@ import {
   LoadFriendRequestPayload,
   RefuseFriendRequestPayload,
   SearchForUserByIdPayload,
-  SearchForUserByUserNamePayload } from '../../../../core/protocol/http/client.http.protocol';
+  SearchForUserByUserNamePayload
+} from '../../../../core/protocol/http/client.http.protocol';
 import {
   FriendRequestAcceptedPayload,
   FriendRequestAddedPayload,
   FriendRequestLoadedFailedPayload,
   FriendRequestLoadedPayload,
   FriendRequestRefusedPayload,
-  SearchForUserResultPayload } from '../../../../core/protocol/http/service.http.protocol';
+  SearchForUserResultPayload
+} from '../../../../core/protocol/http/service.http.protocol';
 import { getAvatar } from '../../../../core/util';
 import { FriendRequest } from '../../../../core/models/friend_request';
-import { WebsocketServiceMessage,
-  WebsocketServiceMessageType,
-  AddFriendRequestPayload as RequireAddFriendRequestPayload,
+import {
   AcceptFriendRequestPayload as RequireAcceptFriendRequestPayload,
+  AddFriendRequestPayload as RequireAddFriendRequestPayload,
   RefuseFriendRequestPayload as RequireRefuseFriendRequestPayload,
+  WebsocketServiceMessage,
+  WebsocketServiceMessageType,
 } from '../../../../core/protocol/websocket/service.websocket.protocol';
 import { loadStringResource } from '../../../../core/service/resource/load-resource';
 
@@ -39,25 +42,22 @@ export struct ContactRequest {
   @State receivedRequests: FriendRequest[] = [];
   @State isSearchByName: boolean = false;
   @State activeTab: number = 0; // 当前激活的标签页
-
   @Prop currentUser: User | null;
-
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  onSearchForUsers(){
-    if (this.isSearchByName){
+  onSearchForUsers() {
+    if (this.isSearchByName) {
       EventBus.emit(Event.SEARCH_FOR_USERS_BY_NAME, { username: this.searchKeyword } as SearchForUserByUserNamePayload);
-    }
-    else {
+    } else {
       EventBus.emit(Event.SEARCH_FOR_USERS_BY_ID, { userId: parseInt(this.searchKeyword) } as SearchForUserByIdPayload);
     }
   }
 
   aboutToAppear(): void {
     EventBus.on(Event.FRIEND_REQUEST_LOADED, (payload: FriendRequestLoadedPayload) => {
-      for (const friendRequest of payload.requests){
+      for (const friendRequest of payload.requests) {
         const newFriendRequest = new FriendRequest(
           friendRequest.id,
           friendRequest.requesterId, friendRequest.targetId,
@@ -65,16 +65,15 @@ export struct ContactRequest {
           friendRequest.requesterAvatar, friendRequest.targetAvatar,
           friendRequest.status
         );
-        if (friendRequest.requesterId === this.currentUser?.userId){
+        if (friendRequest.requesterId === this.currentUser?.userId) {
           this.sentRequests.push(newFriendRequest);
-        }
-        else if (friendRequest.targetId === this.currentUser?.userId){
+        } else if (friendRequest.targetId === this.currentUser?.userId) {
           this.receivedRequests.push(newFriendRequest);
-        }
-        else {
+        } else {
           try {
             this.uiContext.getPromptAction().showToast({
-              message: "一个加载失败的好友请求：{" + newFriendRequest.requesterId + " -> " + newFriendRequest.targetId + '}',
+              message: "一个加载失败的好友请求：{" + newFriendRequest.requesterId + " -> " + newFriendRequest.targetId +
+                '}',
               duration: 2000
             });
           } catch (error) {
@@ -95,7 +94,8 @@ export struct ContactRequest {
     })
 
     EventBus.on(Event.SEARCH_FOR_USERS_RESULT, (payload: SearchForUserResultPayload) => {
-      this.searchedContacts = payload.users.filter((contact: Contact) => !(contact.contactId === this.currentUser?.userId));
+      this.searchedContacts =
+        payload.users.filter((contact: Contact) => !(contact.contactId === this.currentUser?.userId));
     })
     EventBus.on(Event.SEARCH_FOR_USERS_FAILED, (err: string) => {
       try {
@@ -119,13 +119,17 @@ export struct ContactRequest {
     });
     EventBus.on(Event.REQUIRE_REFUSE_FRIEND_REQUEST, (payload: RequireRefuseFriendRequestPayload) => {
       this.sentRequests = this.sentRequests.map((request) => {
-        if (request.id === payload.id) request.status = 'refused';
+        if (request.id === payload.id) {
+          request.status = 'refused';
+        }
         return request;
       })
     });
     EventBus.on(Event.REQUIRE_ACCEPT_FRIEND_REQUEST, (payload: RequireAcceptFriendRequestPayload) => {
       this.sentRequests = this.sentRequests.map((request) => {
-        if (request.id === payload.id) request.status = 'accepted';
+        if (request.id === payload.id) {
+          request.status = 'accepted';
+        }
         return request;
       })
     });
@@ -140,7 +144,9 @@ export struct ContactRequest {
     })
     EventBus.on(Event.FRIEND_REQUEST_ACCEPTED, (payload: FriendRequestAcceptedPayload) => {
       this.receivedRequests = this.receivedRequests.map((request) => {
-        if (request.id === payload.id) request.status = 'accepted';
+        if (request.id === payload.id) {
+          request.status = 'accepted';
+        }
         return request;
       })
       this.activeTab = 0;
@@ -148,7 +154,9 @@ export struct ContactRequest {
     })
     EventBus.on(Event.FRIEND_REQUEST_REFUSED, (payload: FriendRequestRefusedPayload) => {
       this.receivedRequests = this.receivedRequests.map((request) => {
-        if (request.id === payload.id) request.status = 'refused';
+        if (request.id === payload.id) {
+          request.status = 'refused';
+        }
         return request;
       })
       this.activeTab = 0;
@@ -170,7 +178,7 @@ export struct ContactRequest {
       console.log("Received: " + msg);
       let receivedObject = JSON.parse(msg) as WebsocketServiceMessage;
       //处理响应
-      switch (receivedObject.type){
+      switch (receivedObject.type) {
         case WebsocketServiceMessageType.ADD_FRIEND_REQUEST: {
           const payload = receivedObject.payload as RequireAddFriendRequestPayload;
           EventBus.emit(Event.REQUIRE_ADD_FRIEND_REQUEST, payload);
@@ -192,13 +200,6 @@ export struct ContactRequest {
     this.loadFriendRequest();
   }
 
-  private loadFriendRequest(){
-    this.isLoading = true;
-    if (this.currentUser){
-      EventBus.emit(Event.LOAD_FRIEND_REQUEST, { userId: this.currentUser?.userId } as LoadFriendRequestPayload);
-    }
-  }
-
   build() {
     Column() {
       // 搜索区域
@@ -207,13 +208,15 @@ export struct ContactRequest {
         Column() {
           if (this.searchedContacts.length > 0) {
             this.SectionTitle(
-              loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_sectionTitle'))
+              loadStringResource(this.uiAbilityContext, $r('app.string.text_ContactRequest_sectionTitle'))
             )
             this.SearchUserCard(this.searchedContacts)
           } else if (this.searchKeyword.length > 0 && this.searchedContacts.length <= 0) {
             this.EmptyState(
-              loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSearched_title')),
-              loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSearched_description'))
+              loadStringResource(this.uiAbilityContext,
+                $r('app.string.text_ContactRequest_emptyState_noSearched_title')),
+              loadStringResource(this.uiAbilityContext,
+                $r('app.string.text_ContactRequest_emptyState_noSearched_description'))
             )
           } else {
             // 标签页切换
@@ -227,8 +230,10 @@ export struct ContactRequest {
                 }, (request: FriendRequest) => request.id.toString())
               } else {
                 this.EmptyState(
-                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSend_title')),
-                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noSend_description'))
+                  loadStringResource(this.uiAbilityContext,
+                    $r('app.string.text_ContactRequest_emptyState_noSend_title')),
+                  loadStringResource(this.uiAbilityContext,
+                    $r('app.string.text_ContactRequest_emptyState_noSend_description'))
                 )
               }
             } else {
@@ -238,8 +243,10 @@ export struct ContactRequest {
                 }, (request: FriendRequest, index: number) => index + request.id.toString())
               } else {
                 this.EmptyState(
-                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noReceived_title')),
-                  loadStringResource(this.uiAbilityContext,$r('app.string.text_ContactRequest_emptyState_noReceived_description'))
+                  loadStringResource(this.uiAbilityContext,
+                    $r('app.string.text_ContactRequest_emptyState_noReceived_title')),
+                  loadStringResource(this.uiAbilityContext,
+                    $r('app.string.text_ContactRequest_emptyState_noReceived_description'))
                 )
               }
             }
@@ -252,12 +259,18 @@ export struct ContactRequest {
       .scrollBar(BarState.Off)
       .width('100%')
     }
-    .padding({ top: 12, left: 16, right: 16, bottom: 16 })
+    .padding({
+      top: 12,
+      left: 16,
+      right: 16,
+      bottom: 16
+    })
     .backgroundColor($r('app.color.input_background'))
     .height('100%')
   }
 
-  @Builder SearchSection() {
+  @Builder
+  SearchSection() {
     Row() {
       Search({
         value: this.searchKeyword,
@@ -281,7 +294,8 @@ export struct ContactRequest {
     .padding({ bottom: 20 })
   }
 
-  @Builder TabSection() {
+  @Builder
+  TabSection() {
     Row({ space: 0 }) {
       // 已发送标签
       Column() {
@@ -335,7 +349,8 @@ export struct ContactRequest {
     .margin({ bottom: 16 })
   }
 
-  @Builder SectionTitle(title: string) {
+  @Builder
+  SectionTitle(title: string) {
     Text(title)
       .fontSize(14)
       .fontColor($r('app.color.secondary_text'))
@@ -343,7 +358,8 @@ export struct ContactRequest {
       .margin({ top: 8, bottom: 12, left: 4 })
   }
 
-  @Builder SearchUserCard(user: Contact[]) {
+  @Builder
+  SearchUserCard(user: Contact[]) {
     List({ space: 10, initialIndex: 0 }) {
       ForEach(user, (user: Contact) => {
         ListItem() {
@@ -389,7 +405,7 @@ export struct ContactRequest {
               .backgroundColor($r('app.color.primary'))
               .borderRadius(18)
               .onClick(() => {
-                if (this.currentUser){
+                if (this.currentUser) {
                   EventBus.emit(Event.ADD_FRIEND_REQUEST, {
                     id: 0,
                     requesterId: this.currentUser.userId,
@@ -414,14 +430,20 @@ export struct ContactRequest {
     .scrollBar(BarState.Auto)
     .backgroundColor(Color.White)
     .borderRadius(12)
-    .shadow({ radius: 8, color: $r('app.color.ContactRequest_shadow'), offsetX: 0, offsetY: 2 })
+    .shadow({
+      radius: 8,
+      color: $r('app.color.ContactRequest_shadow'),
+      offsetX: 0,
+      offsetY: 2
+    })
     .margin({ bottom: 12 })
   }
 
-  @Builder RequestList(status: 'pending' | 'accepted' | 'refused'){
+  @Builder
+  RequestList(status: 'pending' | 'accepted' | 'refused') {
     // 状态标签
     Row() {
-      if (status === 'refused'){
+      if (status === 'refused') {
         Image('✖️')
           .width(14)
           .height(14)
@@ -429,7 +451,7 @@ export struct ContactRequest {
         Text($r('app.string.text_ContactRequest_RequestList_refuse'))
           .fontSize(12)
           .fontColor($r('app.color.warning'))
-      } else if (status === 'accepted'){
+      } else if (status === 'accepted') {
         Image('✔️')
           .width(14)
           .height(14)
@@ -447,12 +469,18 @@ export struct ContactRequest {
           .fontColor($r('app.color.warning'))
       }
     }
-    .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+    .padding({
+      left: 10,
+      right: 10,
+      top: 6,
+      bottom: 6
+    })
     .backgroundColor($r('app.color.warning_bg'))
     .borderRadius(15)
   }
 
-  @Builder SentRequestCard(request: FriendRequest) {
+  @Builder
+  SentRequestCard(request: FriendRequest) {
     Column() {
       Row() {
         // 头像
@@ -495,11 +523,17 @@ export struct ContactRequest {
     .width('100%')
     .backgroundColor(Color.White)
     .borderRadius(12)
-    .shadow({ radius: 4, color: $r('app.color.ContactRequest_shadow'), offsetX: 0, offsetY: 1 })
+    .shadow({
+      radius: 4,
+      color: $r('app.color.ContactRequest_shadow'),
+      offsetX: 0,
+      offsetY: 1
+    })
     .margin({ bottom: 10 })
   }
 
-  @Builder ReceivedRequestCard(request: FriendRequest) {
+  @Builder
+  ReceivedRequestCard(request: FriendRequest) {
     Column() {
       Row() {
         // 头像
@@ -528,7 +562,7 @@ export struct ContactRequest {
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.Center)
 
-        if (request.status === 'pending'){
+        if (request.status === 'pending') {
           // 操作按钮
           Row({ space: 8 }) {
             Button($r('app.string.text_ContactRequest_ReceivedRequestCard_Accept'), { type: ButtonType.Normal })
@@ -558,8 +592,7 @@ export struct ContactRequest {
                 EventBus.emit(Event.REFUSE_REQUEST, { id: request.id } as RefuseFriendRequestPayload)
               })
           }
-        }
-        else {
+        } else {
           this.RequestList(request.status)
         }
       }
@@ -569,11 +602,17 @@ export struct ContactRequest {
     .width('100%')
     .backgroundColor(Color.White)
     .borderRadius(12)
-    .shadow({ radius: 4, color: $r('app.color.ContactRequest_shadow'), offsetX: 0, offsetY: 1 })
+    .shadow({
+      radius: 4,
+      color: $r('app.color.ContactRequest_shadow'),
+      offsetX: 0,
+      offsetY: 1
+    })
     .margin({ bottom: 10 })
   }
 
-  @Builder EmptyState(title: string, description: string) {
+  @Builder
+  EmptyState(title: string, description: string) {
     Column() {
       Image($r('app.media.empty'))
         .width(120)
@@ -597,5 +636,12 @@ export struct ContactRequest {
     .height(300)
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
+  }
+
+  private loadFriendRequest() {
+    this.isLoading = true;
+    if (this.currentUser) {
+      EventBus.emit(Event.LOAD_FRIEND_REQUEST, { userId: this.currentUser?.userId } as LoadFriendRequestPayload);
+    }
   }
 }

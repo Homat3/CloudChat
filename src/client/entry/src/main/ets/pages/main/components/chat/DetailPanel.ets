@@ -1,12 +1,12 @@
-import { common } from "@kit.AbilityKit";
-import { Contact, User } from "../../../../core/models/models";
-import { DeleteContactPayload } from "../../../../core/protocol/http/client.http.protocol";
-import { EventBus } from "../../../../core/service/event/EventBus";
-import { Event } from "../../../../core/tag/Event";
-import { getAvatar } from "../../../../core/util";
+import { common } from '@kit.AbilityKit';
+import { Contact, User } from '../../../../core/models/models';
+import { DeleteContactPayload } from '../../../../core/protocol/http/client.http.protocol';
+import { EventBus } from '../../../../core/service/event/EventBus';
+import { Event } from '../../../../core/tag/Event';
+import { getAvatar } from '../../../../core/util';
 
 @Component
-export struct DetailPanel{
+export struct DetailPanel {
   // 从外部接收的用户参数
   @Prop contact: Contact;
   @Prop currentUser: User;
@@ -84,7 +84,8 @@ export struct DetailPanel{
         .margin({ bottom: 40 })
         .onClick(() => {
           // 删除好友逻辑
-          EventBus.emit(Event.DELETE_CONTACT, { userId: this.currentUser.userId, targetId: this.contact.contactId } as DeleteContactPayload)
+          EventBus.emit(Event.DELETE_CONTACT,
+            { userId: this.currentUser.userId, targetId: this.contact.contactId } as DeleteContactPayload)
         })
     }
     .height('100%')
@@ -100,7 +101,7 @@ export struct DetailPanel{
       Image($r('app.media.backicon'))
         .height(24)
         .width(24)
-        .margin({left:8})
+        .margin({ left: 8 })
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           EventBus.emit(Event.CLOSE_PANEL);

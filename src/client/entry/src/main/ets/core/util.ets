@@ -1,5 +1,5 @@
-export function getAvatar(string: string | undefined | null): Resource{
-  switch (string){
+export function getAvatar(string: string | undefined | null): Resource {
+  switch (string) {
     case "default.png":
       return $r("app.media.default");
     case "avatar/Zombatar_1.jpg":
@@ -12,7 +12,7 @@ export function getAvatar(string: string | undefined | null): Resource{
       return $r("app.media.Zombatar_4");
     case "avatar/Zombatar_5.jpg":
       return $r("app.media.Zombatar_5");
-    default :
+    default:
       return $r("app.media.default");
   }
 }

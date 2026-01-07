@@ -28,7 +28,7 @@ struct LoginPage {
     try {
       //记住的用户名
       const rememberedUsername = UserManager.getRememberedUsername();
-      if(rememberedUsername){
+      if (rememberedUsername) {
         this.username = rememberedUsername;
         this.rememberMe = true;
       }
@@ -38,18 +38,19 @@ struct LoginPage {
         this.isLoading = false;
         try {
           this.uiContext.getPromptAction().showToast({
-            message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' + payload.error,
+            message: loadStringResource(this.uiAbilityContext, $r("app.string.error_login_LoginFailed")) + ': ' +
+            payload.error,
             duration: 2000
           });
-        }
-        catch (e) {
+        } catch (e) {
           console.error(e);
         }
       });
 
       // 监听登录成功事件
       EventBus.on(Event.LOGIN_SUCCESS, (payload: LoginSuccessPayload) => {
-        CloudChat.currentUser = new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
+        CloudChat.currentUser =
+          new User(payload.userId, payload.username, payload.email, payload.avatar, payload.token);
         this.uiContext.getRouter().replaceUrl({ url: Page.MAIN }).catch((err: Error) => {
           console.error(err.message);
         });
@@ -68,8 +69,14 @@ struct LoginPage {
         //Logo
         Text($r('app.string.text_all_logo')).fontSize(64).margin({ bottom: 8 })
         Column() {
-          Text($r("app.string.text_all_Title")).fontSize(28).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
-          Text($r("app.string.text_all_Subtitle")).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r("app.color.login_title_font"))
+          Text($r("app.string.text_all_Title"))
+            .fontSize(28)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.login_title_font"))
+          Text($r("app.string.text_all_Subtitle"))
+            .fontSize(14)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.login_title_font"))
         }
       }
       .margin({ top: 40, bottom: 30 })
@@ -132,7 +139,10 @@ struct LoginPage {
               this.rememberMe = checked;
             }).size({ width: 18, height: 18 })
 
-            Text($r("app.string.text_login_RememberMe")).margin({ left: 4 }).fontSize(14).fontColor($r("app.color.login_text_rememberMe_font"))
+            Text($r("app.string.text_login_RememberMe"))
+              .margin({ left: 4 })
+              .fontSize(14)
+              .fontColor($r("app.color.login_text_rememberMe_font"))
           }
           .margin({ left: 20 })
           .onClick(() => {
@@ -142,7 +152,10 @@ struct LoginPage {
           Blank()
 
           //忘记密码
-          Text($r("app.string.text_login_ForgotPassword")).margin({ right: 4 }).fontSize(14).fontColor($r("app.color.login_text_forgetPassword_font"))
+          Text($r("app.string.text_login_ForgotPassword"))
+            .margin({ right: 4 })
+            .fontSize(14)
+            .fontColor($r("app.color.login_text_forgetPassword_font"))
             .onClick(() => {
               try {
                 this.uiContext.getPromptAction().showToast({
@@ -162,7 +175,8 @@ struct LoginPage {
           .width('80%')
           .height(50)
           .backgroundColor(this.canLogin() && !this.isLoading ?
-            $r("app.color.login_button_login_background_enabled") : $r("app.color.login_button_login_background_disabled")
+            $r("app.color.login_button_login_background_enabled") :
+            $r("app.color.login_button_login_background_disabled")
           )
           .alignRules({
             top: { anchor: 'passwordInput', align: VerticalAlign.Bottom },
@@ -226,10 +240,10 @@ struct LoginPage {
   }
 
   //检查本地令牌并尝试自动登录
-  private checkLocalTokenAndAutoLogin():void{
+  private checkLocalTokenAndAutoLogin(): void {
     const localTokenInfo = UserManager.getLocalTokenInfo();
 
-    if(localTokenInfo){
+    if (localTokenInfo) {
       console.log('Local Token is found,login...');
       this.isLoading = true;
 
@@ -248,7 +262,7 @@ struct LoginPage {
     this.isLoading = true;
     this.errorMessage = "";
 
-    EventBus.emit(Event.LOGIN, {username: this.username, password: this.password} as LoginPayload);
+    EventBus.emit(Event.LOGIN, { username: this.username, password: this.password } as LoginPayload);
   }
 
   //本地验证表单信息

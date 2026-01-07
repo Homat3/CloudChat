@@ -66,7 +66,7 @@ export type ServicePayload =
 
   MessagesLoadedPayload |
 
-  FileUploadedPayload|
+  FileUploadedPayload |
   FileUploadedFailedPayload;
 
 export interface LoginSuccessPayload {
@@ -119,11 +119,11 @@ export interface ContactsLoadedFailedPayload {
   error: string;
 }
 
-export interface ContactDeletedPayload{
+export interface ContactDeletedPayload {
   targetId: number
 }
 
-export interface ContactDeletedFailedPayload{
+export interface ContactDeletedFailedPayload {
   error: string
 }
 

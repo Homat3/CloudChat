@@ -1,4 +1,4 @@
-import { Message } from "../../../../core/models/message";
+import { Message } from '../../../../core/models/message';
 
 @Component
 export struct MessageItem {
@@ -33,10 +33,10 @@ export struct MessageItem {
             minWidth: 0,
             maxWidth: '75%'
           })
-          .textOverflow({overflow:TextOverflow.Clip})
+          .textOverflow({ overflow: TextOverflow.Clip })
           .maxLines(0)
           .margin({
-            left: this.isCurrentUser ? 0 : 12,  // 对方消息左间距
+            left: this.isCurrentUser ? 0 : 12, // 对方消息左间距
             right: this.isCurrentUser ? 12 : 0   // 自己消息右间距
           })
       }

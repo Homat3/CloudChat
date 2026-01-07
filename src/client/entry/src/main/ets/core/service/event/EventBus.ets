@@ -1,6 +1,6 @@
-import { Event } from "../../tag/Event";
+import { Event } from '../../tag/Event';
 
-export class EventBus{
+export class EventBus {
   private static eventBus: Map<Event, Array<Function>> = new Map();
 
   public static on(event: Event, listener: Function) {
@@ -8,7 +8,7 @@ export class EventBus{
       EventBus.eventBus.set(event, new Array<Function>());
     }
     const funcList = EventBus.eventBus.get(event)
-    if (funcList){
+    if (funcList) {
       funcList.push(listener);
     }
   }

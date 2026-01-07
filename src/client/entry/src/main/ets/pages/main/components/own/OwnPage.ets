@@ -1,20 +1,17 @@
-
-import { common } from "@kit.AbilityKit";
-import { CloudChat } from "../../../../CloudChat";
-import { User } from "../../../../core/models/models";
-import { EventBus } from "../../../../core/service/event/EventBus";
-import { Event } from "../../../../core/tag/Event";
-import { getAvatar } from "../../../../core/util";
-
+import { common } from "@kit.AbilityKit"
+import { CloudChat } from '../../../../CloudChat';
+import { User } from '../../../../core/models/models';
+import { EventBus } from '../../../../core/service/event/EventBus';
+import { Event } from '../../../../core/tag/Event';
+import { getAvatar } from '../../../../core/util';
+;
 @Component
 export struct OwnPage {
   @State user: User | null = CloudChat.currentUser
   @State notificationsEnabled: boolean = true
   @State language: string = 'zh-CN'
-
   // 颜色模式状态
   @State colorMode: string = 'not_set'
-
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -31,18 +28,18 @@ export struct OwnPage {
         .alignSelf(ItemAlign.Center)
 
       //用户ID
-      Row(){
+      Row() {
         Text($r('app.string.text_OwnPage_userId'))
           .fontSize(16)
           .width(100)
         Text(this.user?.userId.toString())
           .fontSize(16)
           .fontColor(Color.Gray)
-          .margin({left:16})
+          .margin({ left: 16 })
       }
       .width('100%')
-      .padding({ left: 20 , right:20})
-      .margin({top:60})
+      .padding({ left: 20, right: 20 })
+      .margin({ top: 60 })
 
 
       //用户名

@@ -1,18 +1,16 @@
-import { ContactItem } from "./ContactItem";
-import { common } from "@kit.AbilityKit";
-import { Contact } from "../../../../../core/models/models";
-import { Message } from "../../../../../core/models/message";
+import { ContactItem } from './ContactItem';
+import { common } from '@kit.AbilityKit';
+import { Contact } from '../../../../../core/models/models';
 
 @Component
-/**
- * 联系人栏
- */
+  /**
+   * 联系人栏
+   */
 export struct ContactList {
   // 状态变量
   @Prop contacts: Array<Contact> = [];
   @Link selectedContact: Contact | null;
   @Link searchKeyword: string
-
   @State refreshing: boolean = false
   // 上下文
   private uiContext: UIContext = this.getUIContext();
@@ -21,18 +19,7 @@ export struct ContactList {
   aboutToAppear() {
   }
 
-  //过滤联系人
-  private filterContacts(key: string, contacts: Contact[]): Contact[] {
-    if(key.trim() === '') {
-      return [...contacts];
-    } else {
-      return contacts.filter(contact =>
-        contact.username.toLowerCase().includes(key.toLowerCase())
-      );
-    }
-  }
-
-  build(){
+  build() {
     Column() {
       //搜索框
       Search({ placeholder: $r("app.string.text_contactList_contactSidebar_SearchForUsers") })
@@ -57,7 +44,18 @@ export struct ContactList {
       .height('100%')
       .width('100%')
       .layoutWeight(1)
-      .divider({ strokeWidth: 1, color: $r('app.color.list_divider')})
+      .divider({ strokeWidth: 1, color: $r('app.color.list_divider') })
+    }
+  }
+
+  //过滤联系人
+  private filterContacts(key: string, contacts: Contact[]): Contact[] {
+    if (key.trim() === '') {
+      return [...contacts];
+    } else {
+      return contacts.filter(contact =>
+      contact.username.toLowerCase().includes(key.toLowerCase())
+      );
     }
   }
 }

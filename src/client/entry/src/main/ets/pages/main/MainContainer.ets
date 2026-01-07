@@ -15,10 +15,11 @@ import {
   DeleteByContactPayload,
   MessageReceivedOtherPayload,
   WebsocketServiceMessage,
-  WebsocketServiceMessageType} from '../../core/protocol/websocket/service.websocket.protocol';
+  WebsocketServiceMessageType
+} from '../../core/protocol/websocket/service.websocket.protocol';
 import { AiPage } from './components/ai-chat/AiPage';
 
-export interface MessageUpdateData{
+export interface MessageUpdateData {
   messages: Message[],
   clearInput: boolean
 }
@@ -26,23 +27,22 @@ export interface MessageUpdateData{
 @Entry
 @Component
 struct MainContainer {
-  @State currentIndex : number = 0;
-
+  @State currentIndex: number = 0;
   @State @Watch("onSwitchToChatArea") selectedContact: Contact | null = null;
   @State selectedMessages: Message[] | null = null;
   @State currentUser: User | null = CloudChat.currentUser;
   @State contacts: Contact[] = [];
   @State messagesMap: Map<number, Message[]> | null = null;
-
   @State isLoading: boolean = true;
   @State isChatAreaOpen: boolean = false;
-
   // 上下文
   private uiContext: UIContext = this.getUIContext();
   private uiAbilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
-  onSwitchToChatArea(){
-    if (this.selectedContact) EventBus.emit(Event.OPEN_CHAT_AREA);
+  onSwitchToChatArea() {
+    if (this.selectedContact) {
+      EventBus.emit(Event.OPEN_CHAT_AREA);
+    }
   }
 
   // 添加页面生命周期
@@ -59,7 +59,8 @@ struct MainContainer {
       EventBus.on(Event.MESSAGES_LOADED_FAILED, (msg: string): void => this.loadMessagesFailed(msg));
 
       EventBus.on(Event.CONTACT_LIST_LOADED, (): void => this.catchContacts());
-      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED, (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
+      EventBus.on(Event.CONTACT_LIST_LOAD_FAILED,
+        (payload: ContactsLoadedFailedPayload): void => this.loadContactsFailed(payload));
       EventBus.on(Event.CONTACT_ADDED, (payload: ContactAddedPayload): void => {
         CloudChat.contacts = [...CloudChat.contacts, new Contact(
           payload.contactId, payload.username, payload.online, payload.avatar
@@ -84,7 +85,7 @@ struct MainContainer {
       })
 
       EventBus.on(Event.OPEN_CHAT_AREA, (): void => {
-        if (this.selectedContact){
+        if (this.selectedContact) {
           this.selectedMessages = this.messagesMap?.get(this.selectedContact?.contactId) || null;
           this.isChatAreaOpen = true;
         }
@@ -96,18 +97,18 @@ struct MainContainer {
       EventBus.on(Event.REFRESH_CONTACT_LIST, (): void => this.loadContacts());
 
       EventBus.on(Event.SEND_MESSAGE_SUCCESS, (message: Message): void => {
-        if (this.messagesMap){
+        if (this.messagesMap) {
           let changedMessageList = this.messagesMap.get(message.receiverId);
           if (changedMessageList) {
             changedMessageList = [...changedMessageList, message];
-          }
-          else {
+          } else {
             changedMessageList = [message];
           }
           this.messagesMap.set(message.receiverId, changedMessageList);
-          if (this.selectedContact?.contactId === message.receiverId){
+          if (this.selectedContact?.contactId === message.receiverId) {
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, clearInput: true } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES,
+              { messages: this.selectedMessages, clearInput: true } as MessageUpdateData);
           }
         }
       })
@@ -123,18 +124,18 @@ struct MainContainer {
       })
       EventBus.on(Event.RECEIVE_MESSAGE, (payload: MessageReceivedOtherPayload): void => {
         const message = payload as Message;
-        if (this.messagesMap){
+        if (this.messagesMap) {
           let changedMessageList = this.messagesMap.get(message.senderId);
           if (changedMessageList) {
             changedMessageList = [...changedMessageList, message];
-          }
-          else {
+          } else {
             changedMessageList = [message];
           }
           this.messagesMap.set(message.senderId, changedMessageList);
-          if (this.selectedContact?.contactId === message.senderId){
+          if (this.selectedContact?.contactId === message.senderId) {
             this.selectedMessages = changedMessageList;
-            EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, clearInput: false } as MessageUpdateData);
+            EventBus.emit(Event.UPDATE_MESSAGES,
+              { messages: this.selectedMessages, clearInput: false } as MessageUpdateData);
           }
         }
       })
@@ -169,7 +170,7 @@ struct MainContainer {
     this.loadContacts();
   }
 
-  catchContacts(){
+  catchContacts() {
     this.contacts = CloudChat.contacts;
     try {
       this.uiContext.getPromptAction().showToast({
@@ -183,9 +184,10 @@ struct MainContainer {
     this.isLoading = false;
   }
 
-  loadContactsFailed(payload: ContactsLoadedFailedPayload){
+  loadContactsFailed(payload: ContactsLoadedFailedPayload) {
     try {
-      this.uiContext.getPromptAction().showToast({ message: $r("app.string.error_mainContainer_LoadFailed") + ": " + payload.error });
+      this.uiContext.getPromptAction()
+        .showToast({ message: $r("app.string.error_mainContainer_LoadFailed") + ": " + payload.error });
     } catch (error) {
       console.error(error);
     }
@@ -198,36 +200,37 @@ struct MainContainer {
 
   loadMessages() {
     EventBus.emit(Event.LOAD_MESSAGES_START, this.contacts.length);
-    for (const contact of this.contacts){
-      EventBus.emit(Event.LOAD_MESSAGES, { userId: this.currentUser?.userId, targetId: contact.contactId } as LoadMessagesPayload);
+    for (const contact of this.contacts) {
+      EventBus.emit(Event.LOAD_MESSAGES,
+        { userId: this.currentUser?.userId, targetId: contact.contactId } as LoadMessagesPayload);
     }
   }
 
-  catchMessages(){
+  catchMessages() {
     this.messagesMap = CloudChat.messageMap;
   }
 
-  loadMessagesFailed(msg: string){
+  loadMessagesFailed(msg: string) {
     try {
-      this.uiContext.getPromptAction().showToast({ message: $r("app.string.error_mainContainer_LoadFailed") + ": " + msg });
+      this.uiContext.getPromptAction()
+        .showToast({ message: $r("app.string.error_mainContainer_LoadFailed") + ": " + msg });
     } catch (error) {
       console.error(error);
     }
   }
 
-
   //导航栏
   build() {
-    if (this.isChatAreaOpen){
+    if (this.isChatAreaOpen) {
       ChatArea({
         currentUser: this.currentUser!!,
         selectedContact: this.selectedContact!!
       })
         .onAppear(() => {
-          EventBus.emit(Event.UPDATE_MESSAGES, { messages: this.selectedMessages, clearInput: false } as MessageUpdateData);
+          EventBus.emit(Event.UPDATE_MESSAGES,
+            { messages: this.selectedMessages, clearInput: false } as MessageUpdateData);
         })
-    }
-    else {
+    } else {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
         TabContent() {
           Home({

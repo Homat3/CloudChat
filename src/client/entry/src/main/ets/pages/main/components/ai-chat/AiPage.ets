@@ -1,5 +1,5 @@
-import { Message } from "../../../../core/models/message";
-import { User } from "../../../../core/models/models";
+import { Message } from '../../../../core/models/message';
+import { User } from '../../../../core/models/models';
 
 
 @Component
@@ -8,7 +8,6 @@ export struct AiPage {
   @Prop currentUser: User;
   @State aiMessages: Message[] = [];
   @State inputText: string = '';
-
   private scroller: Scroller = new Scroller();
 
   build() {
@@ -17,7 +16,7 @@ export struct AiPage {
       this.buildHeader()
 
       //显示消息
-      List({ space: 15, scroller: this.scroller}) {
+      List({ space: 15, scroller: this.scroller }) {
         ForEach(this.aiMessages, (msg: Message) => {
           ListItem() {
             this.buildMessageItem(msg)
@@ -142,7 +141,9 @@ export struct AiPage {
 
   // 发送逻辑空实现
   private handleSend() {
-    if (this.inputText.trim().length === 0) return;
+    if (this.inputText.trim().length === 0) {
+      return;
+    }
 
     // 清空输入框
     this.inputText = '';

@@ -3,6 +3,7 @@ export class Contact {
   username: string;
   online: boolean;
   avatar: string;
+
   constructor(contactId: number, userName: string, online: boolean, avatar: string) {
     this.contactId = contactId;
     this.username = userName;

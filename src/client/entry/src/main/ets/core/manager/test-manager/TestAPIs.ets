@@ -1,11 +1,11 @@
-import { UIAbility } from "@kit.AbilityKit";
-import { WebsocketService } from "../../service/network/websocket/server.websocket";
+import { UIAbility } from '@kit.AbilityKit';
+import { WebsocketService } from '../../service/network/websocket/server.websocket';
 
 /**
  * @description 在 Ability 的 OnCreate 事件中调用以开启测试函数
  * @param uiAbility
  * @example
- * onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+* onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
  *   ...
  *   enableTest(this);
  *   ...
@@ -18,7 +18,7 @@ export function enableTest(uiAbility: UIAbility) {
 }
 
 // websocket test
-function testWebsocket(){
+function testWebsocket() {
   interface PasswordPayload {
     username: string;
     password: string;

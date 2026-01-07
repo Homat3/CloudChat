@@ -9,7 +9,7 @@ export interface FriendRequestInfo {
   status: 'pending' | 'accepted' | 'refused';
 }
 
-export class FriendRequest implements FriendRequestInfo{
+export class FriendRequest implements FriendRequestInfo {
   id: number;
   requesterId: number;
   targetId: number;

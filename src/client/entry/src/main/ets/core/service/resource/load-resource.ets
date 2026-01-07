@@ -8,7 +8,7 @@ import { ColorResourceLoadError, FloatResourceLoadError, StringResourceLoadError
  * @param resource 类型: {@see Resource} 代表: 文本资源
  * @returns 类型: string 代表: 加载到的文本数据
  */
-export function loadStringResource(context: common.UIAbilityContext, resource: Resource): string{
+export function loadStringResource(context: common.UIAbilityContext, resource: Resource): string {
   try {
     return context.resourceManager.getStringSync(resource.id);
   } catch (error) {
@@ -23,7 +23,7 @@ export function loadStringResource(context: common.UIAbilityContext, resource: R
  * @param resource 类型: {@see Resource} 代表: 颜色资源
  * @returns 类型: string 代表: 加载到的颜色数据
  */
-export function loadColorResource(context: common.UIAbilityContext, resource: Resource): string{
+export function loadColorResource(context: common.UIAbilityContext, resource: Resource): string {
   try {
     return context.resourceManager.getStringSync(resource.id);
   } catch (error) {
@@ -38,7 +38,7 @@ export function loadColorResource(context: common.UIAbilityContext, resource: Re
  * @param resource 类型: {@see Resource} 代表: 浮点资源
  * @returns 类型: string 代表: 加载到的浮点数据
  */
-export function loadFloatResource(context: common.UIAbilityContext, resource: Resource): string{
+export function loadFloatResource(context: common.UIAbilityContext, resource: Resource): string {
   try {
     return context.resourceManager.getStringSync(resource.id);
   } catch (error) {

@@ -55,7 +55,7 @@ export interface RegisterSuccessPayload {
   token: string;
 }
 
-export interface HdlGotPayload{
+export interface HdlGotPayload {
   userId: number
 }
 
@@ -99,7 +99,7 @@ export interface RefuseFriendRequestPayload {
   id: number;
 }
 
-export interface DeleteByContactPayload{
+export interface DeleteByContactPayload {
   contactId: number;
 }
 

@@ -70,7 +70,7 @@ export interface LoadContactsPayload {
   userId: number;
 }
 
-export interface DeleteContactPayload{
+export interface DeleteContactPayload {
   userId: number,
   targetId: number
 }

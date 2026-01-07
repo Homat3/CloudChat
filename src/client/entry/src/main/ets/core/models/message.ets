@@ -1,4 +1,3 @@
-
 export interface Message {
   id: number;
   senderId: number;
@@ -51,7 +50,7 @@ export class ImageMessage implements Message {
     content: string,
     timestamp: string,
     status: 'sending' | 'sent' | 'read' = 'sent'
-  ){
+  ) {
     this.id = id;
     this.senderId = senderId;
     this.receiverId = receiverId;
@@ -77,7 +76,7 @@ export class FileMessage implements Message {
     content: string,
     timestamp: string,
     status: 'sending' | 'sent' | 'read' = 'sent'
-  ){
+  ) {
     this.id = id;
     this.senderId = senderId;
     this.receiverId = receiverId;
@@ -85,5 +84,4 @@ export class FileMessage implements Message {
     this.timestamp = timestamp;
     this.status = status;
   }
-
 }

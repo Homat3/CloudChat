@@ -1,4 +1,4 @@
-import { http } from '@kit.NetworkKit'
+import { http } from '@kit.NetworkKit';
 import { AsyncCallback } from '@kit.BasicServicesKit';
 import { DeleteServiceError, GetServiceError, PostServiceError, PutServiceError } from './error.http';
 import { RequestOptionsBuilder } from './config.http';
@@ -29,38 +29,38 @@ export class HttpService {
     }
   }
 
-  async post(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+  async post(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>) {
     const requestOptions = new RequestOptionsBuilder().method('POST').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
-    } catch (error){
+    } catch (error) {
       throw new PostServiceError(error);
     }
   }
 
-  async get(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+  async get(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>) {
     const requestOptions = new RequestOptionsBuilder().method('GET').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
-    } catch (error){
+    } catch (error) {
       throw new GetServiceError(error);
     }
   }
 
-  async put(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+  async put(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>) {
     const requestOptions = new RequestOptionsBuilder().method('PUT').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
-    } catch (error){
+    } catch (error) {
       throw new PutServiceError(error);
     }
   }
 
-  async delete(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>){
+  async delete(uri: string, body: object, callback: AsyncCallback<http.HttpResponse>) {
     const requestOptions = new RequestOptionsBuilder().method('DELETE').body(body).build();
     try {
       this.request(uri, requestOptions, callback);
-    } catch (error){
+    } catch (error) {
       throw new DeleteServiceError(error);
     }
   }
