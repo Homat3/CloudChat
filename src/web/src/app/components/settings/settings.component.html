@@ -1,0 +1,70 @@
+<div class="settings-container">
+    <div class="settings-header">
+        <a routerLink="/" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+        <h1>设置</h1>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <h2>个人信息</h2>
+            @if (currentUser){
+              <div class="setting-item">
+                <div class="setting-info">
+                  @if (currentUser.avatar){
+                    <div class="w-48 h-48 rounded-full bg-gradient-to-br items-center justify-center text-white text-3xl font-bold">
+                      <img src="{{currentUser.avatar}}" alt="{{ currentUser.username.charAt(0) || '?' }}" style="border-radius: 50%; width: 20%; height: 20%">
+                    </div>
+                  } @else {
+                    <label>{{ currentUser.username.charAt(0) || '?' }}</label>
+                  }
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">用户名</span>
+                  <span class="setting-desc">{{ currentUser.username }}</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">用户ID</span>
+                  <span class="setting-desc">{{ currentUser.userId }}</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <span class="setting-label">邮箱</span>
+                  <span class="setting-desc">{{ currentUser.email }}</span>
+                </div>
+              </div>
+              <!-- 添加修改个人信息按钮 -->
+              <div class="setting-item">
+                <button class="logout-btn" (click)="onEditProfile()">修改个人信息</button>
+              </div>
+            }
+        </div>
+
+        <div class="settings-section">
+            <h2>账号</h2>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">退出登录</span>
+                    <span class="setting-desc">清除本地缓存并退出当前账号</span>
+                </div>
+                <button class="logout-btn" (click)="onLogout()">退出登录</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>关于</h2>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">版本</span>
+                    <span class="setting-desc">v1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>CloudChat</h1>
+      <p>注册</p>
+    </div>
+
+    <form (ngSubmit)="onRegister()" class="login-form">
+      <div class="form-group">
+        <label for="username">用户名</label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="请输入用户名"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="请输入密码"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password_repeat">重复密码</label>
+        <input
+          type="password"
+          id="password_repeat"
+          [(ngModel)]="password_repeat"
+          name="password_repeat"
+          placeholder="请输入密码"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="email">邮箱</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="请输入邮箱"
+          required
+        >
+      </div>
+
+      @if (errorMessage){
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button type="submit" [disabled]="isLoading" class="login-btn">
+        @if (!isLoading) {
+          <span>注册</span>
+        }
+        @if (isLoading) {
+          <span>等待服务器响应...</span>
+        }
+      </button>
+    </form>
+  </div>
+</div>

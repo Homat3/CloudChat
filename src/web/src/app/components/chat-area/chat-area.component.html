@@ -1,0 +1,61 @@
+<!-- chat-area.component.html -->
+<div class="chat-container">
+  <!-- 顶部信息栏 -->
+  <div class="chat-header">
+    <div class="contact-info">
+      <div class="avatar">
+        @if (selectedContact?.avatar){
+          <img src="{{selectedContact?.avatar}}" alt="{{ selectedContact?.username?.charAt(0) || '?' }}" style="border-radius: 50%; width: 100%; height: 100%">
+        } @else {
+          <label>{{ selectedContact?.username?.charAt(0) || '?' }}</label>
+        }
+      </div>
+      <div class="contact-details">
+        <div class="contact-name">{{ selectedContact?.username || '请选择一个联系人' }}</div>
+        @if (selectedContact){
+          <div class="contact-status-{{selectedContact.online ? 'online' : 'offline'}}"> {{selectedContact.online ? '在线' : '离线'}} </div>
+        } @else {
+          <div class="contact-status-offline"> 无联系人选择 </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间消息区 -->
+  <div class="chat-messages" #chatMessagesContainer *ngIf="selectedContact; else noContactSelected">
+    @for (message of messages; track message.id) {
+    <div class="message-bubble" [class.own-message]="isNewMessage(message)"
+      [class.other-message]="isNewReceivedMessage(message)" [class.new-message]="isNewMessage(message)"
+      [class.new-received-message]="isNewReceivedMessage(message)">
+      <div class="message-content">
+        {{ message.content }}
+      </div>
+      <div class="message-time">{{ message.timestamp }}</div>
+    </div>
+    }
+  </div>
+
+  <ng-template #noContactSelected>
+    <div class="no-contact-selected">
+      <div class="welcome-message">
+        <h2>欢迎使用 CloudChat</h2>
+        <p>请选择一个联系人开始聊天</p>
+        <div class="welcome-icon">💬</div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- 底部输入区 -->
+  @if (selectedContact){
+  <div class="input-area">
+    <div class="input-container">
+      <div class="input-actions">
+        <button class="icon-button" (click)="appendEmoji()" [disabled]="!selectedContact">😊</button>
+      </div>
+      <textarea class="message-input" placeholder="{{selectedContact ? '输入消息...' : '请先选择一个联系人'}}"
+        [(ngModel)]="newMessage" (keydown.enter)="sendMessage()" [disabled]="!selectedContact"></textarea>
+    </div>
+    <button class="send-button" (click)="sendMessage()" [disabled]="!selectedContact || !newMessage.trim()">发送</button>
+  </div>
+  }
+</div>

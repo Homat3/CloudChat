@@ -1,0 +1,189 @@
+<div class="add-contact-overlay" (click)="closeOverlay($event)">
+  <div class="add-contact-modal">
+    <h2>添加联系人</h2>
+
+    <!-- 搜索与添加联系人部分 -->
+    <div class="section">
+      <h3>搜索用户</h3>
+      <div class="search-options">
+        <div class="search-option" [class.active]="searchType === 'id'">
+          <input
+            type="radio"
+            id="searchById"
+            name="searchType"
+            value="id"
+            [(ngModel)]="searchType"
+            (change)="onSearchTypeChange()">
+          <label for="searchById">通过ID搜索</label>
+        </div>
+        <div class="search-option" [class.active]="searchType === 'username'">
+          <input
+            type="radio"
+            id="searchByUsername"
+            name="searchType"
+            value="username"
+            [(ngModel)]="searchType"
+            (change)="onSearchTypeChange()">
+          <label for="searchByUsername">通过用户名搜索</label>
+        </div>
+      </div>
+
+      <div class="search-input-container">
+        @if (searchType === 'id'){
+          <input
+            type="number"
+            [(ngModel)]="searchId"
+            placeholder="🔎输入用户ID"
+            class="search-input">
+        } @else if (searchType === 'username'){
+          <input
+            type="text"
+            [(ngModel)]="searchUsername"
+            placeholder="🔎输入用户名"
+            class="search-input">
+        } @else {
+          <label> Error </label>
+        }
+
+        <button (click)="searchContact()" class="search-button">搜索</button>
+      </div>
+
+      @if (searchResult && searchResult.length > 0){
+        <div class="search-result">
+          <div class="result-header">
+            <h4>搜索结果</h4>
+            <select [(ngModel)]="selectedContact" class="contact-select">
+              <option [ngValue]="null">请选择要添加的联系人</option>
+              @for (contact of searchResult; track contact.contactId){
+                <option [ngValue]="contact">
+                  <div class="setting-item">
+                    <div class="setting-info">
+                      @if (contact.avatar){
+                        <div class="w-48 h-48 rounded-full bg-gradient-to-br items-center justify-center text-white text-3xl font-bold">
+                          <img src="{{contact.avatar}}" alt="{{ contact.username.charAt(0) || '?' }}" style="border-radius: 50%; width: 20%; height: 20%">
+                        </div>
+                      } @else {
+                        <label>{{ contact.username.charAt(0) || '?' }}</label>
+                      }
+                    </div>
+                  </div>
+                  {{ contact.username }} <br> (ID: {{ contact.contactId }})
+                </option>
+              }
+            </select>
+            <button
+              (click)="addContact()"
+              [disabled]="!selectedContact"
+              class="add-button">
+              添加联系人
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (searchResult && searchResult.length === 0){
+        <div class="no-results">
+          未找到匹配的用户
+        </div>
+      }
+
+      @if (searchError){
+        <div class="error-message">
+          {{ searchError }}
+        </div>
+      }
+      @if (friendRequestError){
+        <div class="error-message">
+          {{ friendRequestError }}
+        </div>
+      }
+    </div>
+
+    <!-- 好友申请列表部分 -->
+    <div class="section">
+      <h3>好友申请</h3>
+      <div class="friend-requests-container">
+        @if (friendRequests && friendRequests.size > 0) {
+          @for (request of friendRequests; track request[0]) {
+            <div class="friend-request-item">
+              <div class="request-info">
+                <div class="avatar-container">
+                  @if (isCurrentUserRequester(request[1])) {
+                    @if (request[1].targetAvatar) {
+                      <img [src]="request[1].targetAvatar" class="avatar" alt="{{ request[1].targetUsername }}">
+                    } @else {
+                      <div class="avatar">{{ request[1].targetUsername.charAt(0) }}</div>
+                    }
+                  } @else {
+                    @if (request[1].requesterAvatar) {
+                      <img [src]="request[1].requesterAvatar" class="avatar" alt="{{ request[1].requesterUsername }}">
+                    } @else {
+                      <div class="avatar">{{ request[1].requesterUsername.charAt(0) }}</div>
+                    }
+                  }
+                </div>
+                <div class="request-details">
+                  @if (isCurrentUserRequester(request[1])) {
+                    <div class="request-text">
+                      您向 <strong>{{ request[1].targetUsername }}</strong> 发送了好友申请
+                    </div>
+                  } @else {
+                    <div class="request-text">
+                      <strong>{{ request[1].requesterUsername }}</strong> 请求添加您为好友
+                    </div>
+                  }
+                  <div class="request-status">
+                    @switch (request[1].status) {
+                      @case ('pending') {
+                        @if (isCurrentUserRequester(request[1])) {
+                          <span class="status pending">待验证</span>
+                        } @else {
+                          <span class="status pending">待处理</span>
+                        }
+                      }
+                      @case ('accepted') {
+                        <span class="status accepted">已同意</span>
+                      }
+                      @case ('refused') {
+                        <span class="status refused">已拒绝</span>
+                      }
+                    }
+                  </div>
+                </div>
+              </div>
+
+              @if (!isCurrentUserRequester(request[1]) && request[1].status === 'pending') {
+                <div class="request-actions">
+                  <button class="btn btn-success" (click)="acceptRequest(request[1])">同意</button>
+                  <button class="btn btn-danger" (click)="refuseRequest(request[1])">拒绝</button>
+                </div>
+              } @else if (isCurrentUserRequester(request[1])) {
+                <div class="request-actions readonly">
+                  @switch (request[1].status) {
+                    @case ('pending') {
+                      <span class="status pending">待验证</span>
+                    }
+                    @case ('accepted') {
+                      <span class="status accepted">已同意</span>
+                    }
+                    @case ('refused') {
+                      <span class="status refused">已拒绝</span>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <div class="no-requests">
+            暂无好友申请
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button (click)="close()" class="cancel-button">关闭</button>
+    </div>
+  </div>
+</div>
