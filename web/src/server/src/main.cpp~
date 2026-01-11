@@ -1,8 +1,0 @@
-#include "cloudchatsys.h"
-#include "cloudchatuser.h"
-#include "cloudchatdat.h"
-
-int main() {
-	CloudChatDatabase::GetInstance(); // 实例化数据库
-	return 0;
-}
